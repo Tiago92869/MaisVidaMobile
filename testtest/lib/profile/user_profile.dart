@@ -74,12 +74,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // Starfish Image between the background and content
           Positioned(
-            left: 100,
-            top: 400,
-            width: 540,
-            height: 540,
+            left: 80,
+            top: 340,
+            width: 600,
+            height: 600,
             child: Opacity(
-              opacity: 0.7, // Adjust opacity for starfish image
+              opacity: 0.9, // Adjust opacity for starfish image
               child: FadeInUp(
                 duration: Duration(seconds: 1),
                 child: Container(
