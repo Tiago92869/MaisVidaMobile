@@ -1,14 +1,15 @@
-// create_account_page.dart
+// reset_password_page.dart
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'login_page.dart'; // Import the Login Page
 
-class CreateAccountPage extends StatelessWidget {
+class ResetPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
+          // Background Image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -18,56 +19,54 @@ class CreateAccountPage extends StatelessWidget {
             ),
           ),
 
-          // Starfish positioned above background but below content
-          Positioned(
-            top: 35,
-            right: 10,
-            child: Opacity(
-              opacity: 0.4,
-              child: Image.asset(
-                'assets/images/starfish.png',
-                width: 240,
-                height: 240,
-              ),
-            ),
-          ),
-
-          // Content (text fields and buttons)
-          SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                SizedBox(height: 100),
-                Center(
-                  child: Text(
-                    "Create Account",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
+          // Content
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(30.0),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 50),
+                  Center(
+                    child: Text(
+                      "Reset Password",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(30.0),
-                  child: Column(
-                    children: <Widget>[
-                      _buildInputField("Email"),
-                      _buildInputField("First Name"),
-                      _buildInputField("Family Name"),
-                      _buildInputField("City"),
-                      _buildInputField("Birthday Date"),
-                      _buildInputField("Password", obscureText: true),
-                      _buildInputField("Confirm Password", obscureText: true),
-                      SizedBox(height: 30),
-                      _buildButton(context, "Create Account", () {}),
-                      SizedBox(height: 20),
-                      _buildButton(context, "Go Back", () {
-                        Navigator.pop(context);
-                      }),
-                    ],
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      "Write your respective email address and a new password will be sent to you via email",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 30),
+
+                  // Input field
+                  _buildInputField("Email"),
+
+                  // Pushes everything above upwards, making buttons stay at the bottom
+                  Spacer(),
+
+                  // Buttons at the bottom
+                  _buildButton(context, "Create New Password", () {
+                    // Navigate to Login Page
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  }),
+                  SizedBox(height: 20),
+                  _buildButton(context, "Go Back", () {
+                    Navigator.pop(context);
+                  }),
+                ],
+              ),
             ),
           ),
         ],
@@ -75,12 +74,11 @@ class CreateAccountPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInputField(String hint, {bool obscureText = false}) {
+  Widget _buildInputField(String hint) {
     return FadeInUp(
       duration: Duration(milliseconds: 1800),
       child: Container(
         padding: EdgeInsets.all(8.0),
-        margin: EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -94,7 +92,6 @@ class CreateAccountPage extends StatelessWidget {
           ],
         ),
         child: TextField(
-          obscureText: obscureText,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hint,
@@ -112,6 +109,7 @@ class CreateAccountPage extends StatelessWidget {
         onTap: onTap,
         child: Container(
           height: 50,
+          width: double.infinity, // Makes button full width
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             gradient: LinearGradient(

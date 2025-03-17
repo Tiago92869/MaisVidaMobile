@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'create_account_page.dart';
+import 'reset_password_page.dart';
+import 'package:testtest/menu/menu.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -24,30 +26,38 @@ class LoginPage extends StatelessWidget {
               child: Stack(
                 children: <Widget>[
                   Positioned(
-                    left: 30,
-                    width: 80,
+                    left: 0,
+                    top: 50,
+                    width: 160,
                     height: 200,
-                    child: FadeInUp(
-                      duration: Duration(seconds: 1),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/images/starfish1.png'),
+                    child: Opacity(
+                      opacity: 0.4,
+                      child: FadeInUp(
+                        duration: Duration(seconds: 1),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/starfish1.png'),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                    left: 140,
-                    width: 80,
-                    height: 150,
-                    child: FadeInUp(
-                      duration: Duration(milliseconds: 1200),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/images/starfish2.png'),
+                    left: 270,
+                    top: 100,
+                    width: 200,
+                    height: 200,
+                    child: Opacity(
+                      opacity: 0.4,
+                      child: FadeInUp(
+                        duration: Duration(milliseconds: 1200),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/starfish2.png'),
+                            ),
                           ),
                         ),
                       ),
@@ -75,7 +85,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(30.0),
+              padding: EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
               child: Column(
                 children: <Widget>[
                   FadeInUp(
@@ -128,28 +138,36 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: 30),
                   FadeInUp(
-                    duration: Duration(milliseconds: 1900),
-                    child: GestureDetector(
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Login",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+  duration: Duration(milliseconds: 1900),
+  child: GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MenuScreen(),
+        ),
+      );
+    },
+    child: Container(
+      height: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: LinearGradient(
+          colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          "Login",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    ),
+  ),
+),
                   SizedBox(height: 20),
                   FadeInUp(
                     duration: Duration(milliseconds: 1950),
@@ -188,9 +206,22 @@ class LoginPage extends StatelessWidget {
                   SizedBox(height: 70),
                   FadeInUp(
                     duration: Duration(milliseconds: 2000),
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(color: Color(0xFF557BE9)),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ResetPasswordPage(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Color(0xFF557BE9),
+                          decoration: TextDecoration.underline, // Underline to show it's clickable
+                        ),
+                      ),
                     ),
                   ),
                 ],
