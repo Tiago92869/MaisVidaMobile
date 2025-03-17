@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:testtest/menu/navigation/custom_tab_bar.dart';
 import 'package:testtest/menu/navigation/home_tab_view.dart';
 import 'package:testtest/menu/navigation/side_menu.dart';
+import 'package:testtest/resources/resources_page.dart';
 import 'package:testtest/menu/theme.dart';
 import 'package:testtest/menu/assets.dart' as app_assets;
 import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.dart
@@ -14,6 +15,9 @@ import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.
 Widget commonTabScene(String tabName) {
   if (tabName == "Profile") {
     return UserProfilePage(); // Return the user profile page directly
+  }
+  if (tabName == "Resources") {
+    return ResourcesPage(); // Return the user profile page directly
   }
   return Container(
     color: RiveAppTheme.background,

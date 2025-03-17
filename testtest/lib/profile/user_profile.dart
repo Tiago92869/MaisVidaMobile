@@ -64,7 +64,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.lightBlue[300]!, Colors.lightBlue[100]!],
+                  colors: [const Color.fromARGB(255, 255, 255, 255)!, const Color.fromARGB(255, 255, 255, 255)!],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -80,14 +80,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
             height: 600,
             child: Opacity(
               opacity: 0.9, // Adjust opacity for starfish image
-              child: FadeInUp(
-                duration: Duration(seconds: 1),
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/startfhis1blue.png'),
-                      fit: BoxFit.cover,
-                    ),
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/startfhis1blue.png'),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -105,88 +102,71 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                   // Profile Image
                   Center(
-                    child: FadeInUp(
-                      duration: Duration(milliseconds: 1200),
-                      child: CircleAvatar(
-                        radius: 60,
-                        backgroundImage: AssetImage('assets/images/starfish.png'),
-                        backgroundColor: Colors.grey[300],
-                      ),
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundImage: AssetImage('assets/images/starfish.png'),
+                      backgroundColor: Colors.grey[300],
                     ),
                   ),
 
                   SizedBox(height: 40),
 
-                  // User Info Fields with FadeInUp Animation
-                  FadeInUp(
-                    duration: Duration(milliseconds: 1400),
-                    child: _buildUserInfo("Full Name", nameController),
-                  ),
+                  // User Info Fields (No FadeInUp animation anymore)
+                  _buildUserInfo("Full Name", nameController),
                   SizedBox(height: 20),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 1600),
-                    child: _buildUserInfo("Email", emailController),
-                  ),
+                  _buildUserInfo("Email", emailController),
                   SizedBox(height: 20),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 1800),
-                    child: _buildUserInfo("City", cityController),
-                  ),
+                  _buildUserInfo("City", cityController),
                   SizedBox(height: 20),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 2000),
-                    child: _buildUserInfo("Birthday", birthdayController),
-                  ),
+                  _buildUserInfo("Birthday", birthdayController),
 
                   SizedBox(height: 30),
 
                   // About Me Section
-                  FadeInUp(
-                    duration: Duration(milliseconds: 1400),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "About Me",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "About Me",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
-                        SizedBox(height: 10), // Space after the "About Me" text
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey[400]!),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 10.0,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-                            "Vestibulum in neque et nisl vestibulum cursus.",
-                            style: TextStyle(color: Colors.grey[700], fontSize: 16),
-                          ),
+                      ),
+                      SizedBox(height: 10), // Space after the "About Me" text
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey[400]!),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10.0,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 30), // Adding some space after the "About Me" container for better separation
-                      ],
-                    ),
+                        child: Text(
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+                          "Vestibulum in neque et nisl vestibulum cursus.",
+                          style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                        ),
+                      ),
+                      SizedBox(height: 30), // Adding some space after the "About Me" container for better separation
+                    ],
                   ),
                 ],
               ),
             ),
           ),
+
           // Cancel Icon with white circle moved to the left side
           Positioned(
-            top: 55,
+            top: 58,
             right: 90, // Move to the left side
             child: Row(
               children: [
@@ -224,7 +204,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // Edit/Save Icon with white circle behind it, keep it on the right side
           Positioned(
-            top: 55,
+            top: 58,
             right: 30,
             child: Row(
               children: [
