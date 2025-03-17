@@ -12,6 +12,9 @@ import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.
 
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
+  if (tabName == "Profile") {
+    return UserProfilePage(); // Return the user profile page directly
+  }
   return Container(
     color: RiveAppTheme.background,
     alignment: Alignment.center,
@@ -25,6 +28,7 @@ Widget commonTabScene(String tabName) {
     ),
   );
 }
+
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({Key? key}) : super(key: key);
@@ -50,7 +54,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     commonTabScene("Diary"),
     commonTabScene("Resources"),
     commonTabScene("Goals"),
-    commonTabScene("Favorites"),
+    commonTabScene("Profile"),
   ];
 
   final springDesc = const SpringDescription(
@@ -165,44 +169,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 );
               },
               child: _tabBody,
-            ),
-          ),
-          AnimatedBuilder(
-            animation: _sidebarAnim,
-            builder: (context, child) {
-              return Positioned(
-                top: MediaQuery.of(context).padding.top + 20,
-                right: (_sidebarAnim.value * -100) + 16,
-                child: child!,
-              );
-            },
-            child: GestureDetector(
-              onTap: () {
-                // Navigate to the UserProfilePage when the icon is tapped
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UserProfilePage()),
-                );
-              },
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: RiveAppTheme.shadow.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.person_outline),
-                ),
-              ),
             ),
           ),
           RepaintBoundary(
