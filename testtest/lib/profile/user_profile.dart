@@ -184,84 +184,79 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
             ),
           ),
-
-          // Edit/Save and Cancel icons
           // Cancel Icon with white circle moved to the left side
-// Cancel Icon with white circle moved to the left side
-Positioned(
-  top: 55,
-  right: 90, // Move to the left side
-  child: Row(
-    children: [
-      // Cancel Icon with white circle moved to the left side
-      if (editMode)
-        GestureDetector(
-          onTap: cancelEdit,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Container(
-              width: 40, // Smaller size for the circle
-              height: 40, // Smaller size for the circle
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    offset: Offset(0, 5),
+          Positioned(
+            top: 55,
+            right: 90, // Move to the left side
+            child: Row(
+              children: [
+                // Cancel Icon with white circle moved to the left side
+                if (editMode)
+                  GestureDetector(
+                    onTap: cancelEdit,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Container(
+                        width: 40, // Smaller size for the circle
+                        height: 40, // Smaller size for the circle
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 5,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.red,
+                          size: 28, // Smaller icon size to fit the smaller circle
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              child: Icon(
-                Icons.cancel,
-                color: Colors.red,
-                size: 28, // Smaller icon size to fit the smaller circle
-              ),
+              ],
             ),
           ),
-        ),
-    ],
-  ),
-),
 
-// Edit/Save Icon with white circle behind it, keep it on the right side
-Positioned(
-  top: 55,
-  right: 30,
-  child: Row(
-    children: [
-      GestureDetector(
-        onTap: editMode ? saveChanges : toggleEditMode,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: Container(
-            width: 40, // Smaller size for the circle
-            height: 40, // Smaller size for the circle
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 5,
-                  offset: Offset(0, 5),
+          // Edit/Save Icon with white circle behind it, keep it on the right side
+          Positioned(
+            top: 55,
+            right: 30,
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: editMode ? saveChanges : toggleEditMode,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40, // Smaller size for the circle
+                      height: 40, // Smaller size for the circle
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        editMode ? Icons.save : Icons.edit,
+                        color: Color.fromRGBO(85, 123, 233, 1),
+                        size: 28, // Smaller icon size to fit the smaller circle
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: Icon(
-              editMode ? Icons.save : Icons.edit,
-              color: Color.fromRGBO(85, 123, 233, 1),
-              size: 28, // Smaller icon size to fit the smaller circle
-            ),
           ),
-        ),
-      ),
-    ],
-  ),
-),
-
-
         ],
       ),
     );

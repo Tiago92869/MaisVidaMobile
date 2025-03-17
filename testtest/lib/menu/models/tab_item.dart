@@ -14,6 +14,6 @@ class TabItem {
     TabItem(stateMachine: "State Machine 1", artboard: "RULES"),
     TabItem(stateMachine: "SEARCH_Interactivity", artboard: "SEARCH"),
     TabItem(stateMachine: "State Machine 1", artboard: "SCORE"),
-    TabItem(stateMachine: "STAR_Interactivity", artboard: "LIKE/STAR"),
+    TabItem(stateMachine: "USER_Interactivity", artboard: "USER"),
   ];
 }
