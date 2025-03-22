@@ -61,6 +61,7 @@ flutter:
   
   assets:
     - assets/samples/animations/
+    - assets/images/resources/
     - assets/samples/ui/rive_app/
     - assets/samples/ui/rive_app/rive/
     - assets/samples/ui/rive_app/images/

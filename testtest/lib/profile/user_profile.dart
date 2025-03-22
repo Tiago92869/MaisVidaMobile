@@ -35,9 +35,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
     
     // Update last saved values
     lastSavedName = nameController.text;
-    lastSavedEmail = emailController.text;
-    lastSavedCity = cityController.text;
+    lastSavedEmail = nameController.text;
+    lastSavedCity = nameController.text;
     lastSavedBirthday = birthdayController.text;
+
+    // Show a styled SnackBar with the success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white), // Success icon
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "Data saved successfully!",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green, // Green background for success
+        behavior: SnackBarBehavior.floating, // Makes the SnackBar float
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10), // Rounded corners
+        ),
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Add margin for floating effect
+        duration: Duration(seconds: 3), // Display for 3 seconds
+      ),
+    );
 
     toggleEditMode(); // After saving, exit edit mode
   }
@@ -64,7 +89,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [const Color.fromARGB(255, 255, 255, 255)!, const Color.fromARGB(255, 255, 255, 255)!],
+                  colors: [
+                    const Color(0xFFE3F2FD), // Light blue color
+                    const Color(0xFFFFFFFF), // White color
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -74,10 +102,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
           // Starfish Image between the background and content
           Positioned(
-            left: 80,
-            top: 340,
-            width: 600,
-            height: 600,
+            left: 30,
+            top: 240,
+            width: 700,
+            height: 700,
             child: Opacity(
               opacity: 0.9, // Adjust opacity for starfish image
               child: Container(
@@ -111,7 +139,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                   SizedBox(height: 40),
 
-                  // User Info Fields (No FadeInUp animation anymore)
+                  // User Info Fields
                   _buildUserInfo("Full Name", nameController),
                   SizedBox(height: 20),
                   _buildUserInfo("Email", emailController),
@@ -139,7 +167,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         width: double.infinity,
                         padding: EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.white.withOpacity(0.90),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.grey[400]!),
                           boxShadow: [
@@ -156,7 +184,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           style: TextStyle(color: Colors.grey[700], fontSize: 16),
                         ),
                       ),
-                      SizedBox(height: 30), // Adding some space after the "About Me" container for better separation
+                      SizedBox(height: 70), // Adding some space after the "About Me" container for better separation
                     ],
                   ),
                 ],
@@ -259,7 +287,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.white.withOpacity(0.90), // Add slight transparency
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey[400]!),
             boxShadow: [
