@@ -11,14 +11,6 @@ class VCard extends StatefulWidget {
 }
 
 class _VCardState extends State<VCard> {
-  final avatars = [4, 5, 6];
-
-  @override
-  void initState() {
-    avatars.shuffle();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,52 +36,42 @@ class _VCardState extends State<VCard> {
         ],
         borderRadius: BorderRadius.circular(30),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                constraints: const BoxConstraints(maxWidth: 170),
-                child: Text(
-                  widget.course.title,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontFamily: "Poppins",
-                    color: Colors.white,
-                  ),
-                ),
+          Container(
+            constraints: const BoxConstraints(maxWidth: 170),
+            child: Text(
+              widget.course.title,
+              style: const TextStyle(
+                fontSize: 24,
+                fontFamily: "Poppins",
+                color: Colors.white,
               ),
-              const SizedBox(height: 8),
-              Text(
-                widget.course.subtitle!,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-                softWrap: false,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.course.caption.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontFamily: "Inter",
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              const Spacer(),
-            ],
+            ),
           ),
-          Positioned(
-            right: -10,
-            top: -10,
-            child: Image.asset(widget.course.image),
+          const SizedBox(height: 8),
+          Text(
+            widget.course.subtitle!,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+            softWrap: false,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 15,
+            ),
           ),
+          const SizedBox(height: 8),
+          Text(
+            widget.course.caption.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 13,
+              fontFamily: "Inter",
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const Spacer(),
         ],
       ),
     );
