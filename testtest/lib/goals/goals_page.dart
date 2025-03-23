@@ -151,30 +151,45 @@ class _GoalsPageState extends State<GoalsPage> {
                             icon: const Icon(Icons.arrow_back, color: Colors.white),
                           ),
                           Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: weekDays.map((day) {
-                                return Column(
-                                  children: [
-                                    Text(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder: (child, animation) {
+                                return FadeTransition(opacity: animation, child: child);
+                              },
+                              child: Row(
+                                key: ValueKey(_currentWeekStart),
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: weekDays.map((day) {
+                                  return Column(
+                                    children: [
+                                      Text(
                                         "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
+                                      const SizedBox(height: 4),
+                                      Text(
                                         day.day.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              }).toList(),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
                             ),
                           ),
                           IconButton(
