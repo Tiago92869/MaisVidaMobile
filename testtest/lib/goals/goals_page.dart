@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:testtest/goals/goal_details_page.dart';
+
 enum Subject {
   PERSONAL,
   WORK,
@@ -257,56 +259,67 @@ class _GoalsPageState extends State<GoalsPage> {
                                 itemCount: _goals.length,
                                 itemBuilder: (context, index) {
                                   final goal = _goals[index];
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 20),
-                                    padding: const EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        // Goal Title
-                                        Text(
-                                          goal.title,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Navigate to GoalDetailPage for visualizing the goal
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => GoalDetailPage(goal: goal),
                                         ),
-                                        const SizedBox(height: 8),
-
-                                        // Goal Description (limited to 2 lines)
-                                        Text(
-                                          goal.description,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-
-                                        // Subject as a button-like style
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.2),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: Text(
-                                            goal.subject.toString().split('.').last.capitalizeFirstLetter(),
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 20),
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Goal Title
+                                          Text(
+                                            goal.title,
                                             style: const TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(height: 8),
+
+                                          // Goal Description (limited to 2 lines)
+                                          Text(
+                                            goal.description,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+
+                                          // Subject as a button-like style
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              goal.subject.toString().split('.').last.capitalizeFirstLetter(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
@@ -317,7 +330,13 @@ class _GoalsPageState extends State<GoalsPage> {
                                 right: 0,
                                 child: FloatingActionButton(
                                   onPressed: () {
-                                    // Add logic for the button here
+                                    // Navigate to GoalDetailPage for creating a new goal
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const GoalDetailPage(isEditing: true),
+                                      ),
+                                    );
                                   },
                                   backgroundColor: Colors.white,
                                   child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
