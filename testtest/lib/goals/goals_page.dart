@@ -35,6 +35,7 @@ class _GoalsPageState extends State<GoalsPage> {
       title: "Finish Flutter Project",
       description: "Complete the Flutter project by the end of the week.",
       goalDate: DateTime.now().add(const Duration(days: 2)),
+      completedDate: null, // Not completed yet
       completed: false,
       hasNotifications: true,
       subject: Subject.WORK,
@@ -43,41 +44,19 @@ class _GoalsPageState extends State<GoalsPage> {
       title: "Read a Book",
       description: "Read at least 50 pages of a book.",
       goalDate: DateTime.now().add(const Duration(days: 4)),
+      completedDate: null, // Not completed yet
       completed: false,
       hasNotifications: false,
       subject: Subject.PERSONAL,
     ),
     GoalDTO(
-      title: "Finish Flutter Project",
-      description: "Complete the Flutter project by the end of the week.",
-      goalDate: DateTime.now().add(const Duration(days: 2)),
-      completed: false,
-      hasNotifications: true,
-      subject: Subject.WORK,
-    ),
-    GoalDTO(
-      title: "Read a Book",
-      description: "Read at least 50 pages of a book.",
-      goalDate: DateTime.now().add(const Duration(days: 4)),
-      completed: false,
+      title: "Submit Assignment",
+      description: "Submit the assignment before the deadline.",
+      goalDate: DateTime.now().add(const Duration(days: 1)),
+      completedDate: DateTime.now(), // Completed today
+      completed: true,
       hasNotifications: false,
-      subject: Subject.PERSONAL,
-    ),
-    GoalDTO(
-      title: "Finish Flutter Project",
-      description: "Complete the Flutter project by the end of the week.",
-      goalDate: DateTime.now().add(const Duration(days: 2)),
-      completed: false,
-      hasNotifications: true,
-      subject: Subject.WORK,
-    ),
-    GoalDTO(
-      title: "Read a Book",
-      description: "Read at least 50 pages of a book.",
-      goalDate: DateTime.now().add(const Duration(days: 4)),
-      completed: false,
-      hasNotifications: false,
-      subject: Subject.PERSONAL,
+      subject: Subject.STUDIES,
     ),
   ];
 
@@ -334,7 +313,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const GoalDetailPage(isEditing: true),
+                                        builder: (context) => const GoalDetailPage(isEditing: true), // No goal passed
                                       ),
                                     );
                                   },
@@ -510,15 +489,17 @@ class _GoalsPageState extends State<GoalsPage> {
 class GoalDTO {
   final String title;
   final String description;
-  final DateTime goalDate;
-  final bool completed;
-  final bool hasNotifications;
+  final DateTime goalDate; // The target date for the goal
+  final DateTime? completedDate; // Nullable field for completed date
+  late final bool completed; // Indicates if the goal is completed
+  late final bool hasNotifications; // Indicates if the goal has notifications
   final Subject subject;
 
   GoalDTO({
     required this.title,
     required this.description,
     required this.goalDate,
+    this.completedDate, // Optional field
     required this.completed,
     required this.hasNotifications,
     required this.subject,

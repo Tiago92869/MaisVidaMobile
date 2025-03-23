@@ -15,6 +15,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   bool editMode = false; // Tracks if the user is editing
   late TextEditingController titleController;
   late TextEditingController descriptionController;
+  late TextEditingController goalDateController;
   Subject? selectedSubject;
 
   @override
@@ -23,6 +24,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     editMode = widget.isEditing;
     titleController = TextEditingController(text: widget.goal?.title ?? "");
     descriptionController = TextEditingController(text: widget.goal?.description ?? "");
+    goalDateController = TextEditingController(
+      text: widget.goal?.goalDate != null
+          ? "${widget.goal!.goalDate.day.toString().padLeft(2, '0')}-${widget.goal!.goalDate.month.toString().padLeft(2, '0')}-${widget.goal!.goalDate.year}"
+          : "",
+    );
     selectedSubject = widget.goal?.subject ?? Subject.PERSONAL;
   }
 
@@ -30,13 +36,26 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     // Save the goal (in a real app, you'd save it to a database or API)
     print("Goal saved: ${titleController.text}, ${descriptionController.text}, $selectedSubject");
 
-    // Navigate back to the goals page
+    // Close the page after saving
     Navigator.pop(context);
   }
 
   void toggleEditMode() {
     setState(() {
       editMode = !editMode;
+    });
+  }
+
+  void cancelEdit() {
+    setState(() {
+      // Revert changes and exit edit mode
+      titleController.text = widget.goal?.title ?? "";
+      descriptionController.text = widget.goal?.description ?? "";
+      goalDateController.text = widget.goal?.goalDate != null
+          ? "${widget.goal!.goalDate.day.toString().padLeft(2, '0')}-${widget.goal!.goalDate.month.toString().padLeft(2, '0')}-${widget.goal!.goalDate.year}"
+          : "";
+      selectedSubject = widget.goal?.subject ?? Subject.PERSONAL;
+      editMode = false;
     });
   }
 
@@ -133,6 +152,89 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     ),
                   const SizedBox(height: 20),
 
+                  // Goal Date
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Goal Date",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: goalDateController,
+                        enabled: editMode,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: "Enter Goal Date",
+                          hintStyle: TextStyle(color: Colors.white70),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+
+                  // Completed Toggle
+                  if (widget.goal != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Completed",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        Switch(
+                          value: widget.goal!.completed,
+                          onChanged: editMode
+                              ? (value) {
+                                  setState(() {
+                                    widget.goal!.completed = value;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 20),
+
+                  // Notifications Toggle
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Notifications",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      Switch(
+                        value: widget.goal?.hasNotifications ?? false,
+                        onChanged: editMode
+                            ? (value) {
+                                setState(() {
+                                  widget.goal!.hasNotifications = value;
+                                });
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
                   // Description
                   Expanded(
                     child: TextField(
@@ -154,6 +256,36 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ),
             ),
           ),
+
+          // Cancel Icon (only show in editing mode and when editing an existing goal)
+          if (editMode && widget.goal != null)
+            Positioned(
+              top: 58,
+              right: 90, // Position to the left of the save/edit icon
+              child: GestureDetector(
+                onTap: cancelEdit,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 5,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
 
           // Edit/Save Icons
           Positioned(
