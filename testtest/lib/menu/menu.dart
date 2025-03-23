@@ -3,6 +3,7 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:testtest/activities/activities_page.dart';
+import 'package:testtest/goals/goals_page.dart';
 import 'dart:math' as math;
 import 'package:testtest/menu/navigation/custom_tab_bar.dart';
 import 'package:testtest/menu/navigation/home_tab_view.dart';
@@ -22,6 +23,9 @@ Widget commonTabScene(String tabName) {
   }
   if (tabName == "Diary") {
     return const ActivitiesPage(); // Return the activities page directly
+  }
+  if (tabName == "Goals") {
+    return const GoalsPage(); // Return the activities page directly
   }
   return Container(
     color: RiveAppTheme.background,
