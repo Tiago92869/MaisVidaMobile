@@ -17,8 +17,15 @@ class GoalsPage extends StatefulWidget {
 
 class _GoalsPageState extends State<GoalsPage> {
   DateTime _currentWeekStart = DateTime.now();
+  DateTime? _selectedDay; // Track the selected day
   Set<Subject> _selectedSubjects = {}; // Selected filter subjects
   bool _isFilterPanelVisible = false; // Filter panel visibility
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDay = _currentWeekStart; // Default to the first day of the week
+  }
 
   // Dummy goals data
   final List<GoalDTO> _goals = [
@@ -146,10 +153,13 @@ class _GoalsPageState extends State<GoalsPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          // Left Arrow
                           IconButton(
                             onPressed: () => _moveWeek(-1),
                             icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            iconSize: 30, // Arrow size
                           ),
+                          // Week Days
                           Expanded(
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
@@ -158,43 +168,76 @@ class _GoalsPageState extends State<GoalsPage> {
                               },
                               child: Row(
                                 key: ValueKey(_currentWeekStart),
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment: MainAxisAlignment.spaceAround, // Adjust spacing
                                 children: weekDays.map((day) {
-                                  return Column(
-                                    children: [
-                                      Text(
-                                        "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white,
+                                  final isSelected = _selectedDay?.day == day.day &&
+                                      _selectedDay?.month == day.month &&
+                                      _selectedDay?.year == day.year;
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (isSelected) {
+                                          // Deselect the date if it's already selected
+                                          _selectedDay = null;
+                                        } else {
+                                          // Select the new date
+                                          _selectedDay = day;
+                                        }
+                                      });
+                                    },
+                                    child: Column(
+                                      children: [
+                                        // Day of the week
+                                        Text(
+                                          "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        day.day.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                        const SizedBox(height: 4),
+
+                                        // Date with conditional purple container
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced horizontal padding
+                                          decoration: isSelected
+                                              ? BoxDecoration(
+                                                  color: const Color.fromRGBO(85, 123, 233, 1), // Purple background
+                                                  borderRadius: BorderRadius.circular(12),
+                                                )
+                                              : null, // No decoration if not selected
+                                          child: Text(
+                                            day.day.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white70,
+                                        const SizedBox(height: 4),
+
+                                        // Month abbreviation
+                                        Text(
+                                          "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   );
                                 }).toList(),
                               ),
                             ),
                           ),
+                          // Right Arrow
                           IconButton(
                             onPressed: () => _moveWeek(1),
                             icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                            iconSize: 30, // Arrow size
                           ),
                         ],
                       ),
@@ -224,6 +267,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+                                        // Goal Title
                                         Text(
                                           goal.title,
                                           style: const TextStyle(
@@ -233,27 +277,33 @@ class _GoalsPageState extends State<GoalsPage> {
                                           ),
                                         ),
                                         const SizedBox(height: 8),
+
+                                        // Goal Description (limited to 2 lines)
                                         Text(
                                           goal.description,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.white70,
                                           ),
                                         ),
                                         const SizedBox(height: 8),
-                                        Text(
-                                          "Goal Date: ${goal.goalDate.day.toString().padLeft(2, '0')}-${goal.goalDate.month.toString().padLeft(2, '0')}-${goal.goalDate.year}",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white70,
+
+                                        // Subject as a button-like style
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(20),
                                           ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          "Subject: ${goal.subject.toString().split('.').last.capitalizeFirstLetter()}",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white70,
+                                          child: Text(
+                                            goal.subject.toString().split('.').last.capitalizeFirstLetter(),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                       ],
