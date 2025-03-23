@@ -117,6 +117,30 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  // Resource Types (in activity details)
+                  if (!_isViewingResources)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: activity.resources.map((resource) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            resource.type.toString().split('.').last.capitalizeFirstLetter(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  const SizedBox(height: 20),
                   // Description or Resource View
                   Expanded(
                     child: _isViewingResources
@@ -216,6 +240,23 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
             color: Colors.white,
           ),
         ),
+        const SizedBox(height: 10),
+        // Resource Type
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            resource.type.toString().split('.').last.capitalizeFirstLetter(),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
         Text(
           resource.description,
@@ -250,5 +291,13 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         ),
       ),
     );
+  }
+}
+
+// Extension to capitalize the first letter of a string
+extension StringCapitalization on String {
+  String capitalizeFirstLetter() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }
