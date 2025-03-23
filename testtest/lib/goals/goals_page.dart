@@ -38,6 +38,38 @@ class _GoalsPageState extends State<GoalsPage> {
       hasNotifications: false,
       subject: Subject.PERSONAL,
     ),
+    GoalDTO(
+      title: "Finish Flutter Project",
+      description: "Complete the Flutter project by the end of the week.",
+      goalDate: DateTime.now().add(const Duration(days: 2)),
+      completed: false,
+      hasNotifications: true,
+      subject: Subject.WORK,
+    ),
+    GoalDTO(
+      title: "Read a Book",
+      description: "Read at least 50 pages of a book.",
+      goalDate: DateTime.now().add(const Duration(days: 4)),
+      completed: false,
+      hasNotifications: false,
+      subject: Subject.PERSONAL,
+    ),
+    GoalDTO(
+      title: "Finish Flutter Project",
+      description: "Complete the Flutter project by the end of the week.",
+      goalDate: DateTime.now().add(const Duration(days: 2)),
+      completed: false,
+      hasNotifications: true,
+      subject: Subject.WORK,
+    ),
+    GoalDTO(
+      title: "Read a Book",
+      description: "Read at least 50 pages of a book.",
+      goalDate: DateTime.now().add(const Duration(days: 4)),
+      completed: false,
+      hasNotifications: false,
+      subject: Subject.PERSONAL,
+    ),
   ];
 
   void _moveWeek(int direction) {
@@ -160,56 +192,73 @@ class _GoalsPageState extends State<GoalsPage> {
                             color: const Color.fromRGBO(72, 85, 204, 1),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: ListView.builder(
-                            itemCount: _goals.length,
-                            itemBuilder: (context, index) {
-                              final goal = _goals[index];
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
+                          child: Stack(
+                            children: [
+                              // List of goals
+                              ListView.builder(
+                                itemCount: _goals.length,
+                                itemBuilder: (context, index) {
+                                  final goal = _goals[index];
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          goal.title,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          goal.description,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Goal Date: ${goal.goalDate.day.toString().padLeft(2, '0')}-${goal.goalDate.month.toString().padLeft(2, '0')}-${goal.goalDate.year}",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Subject: ${goal.subject.toString().split('.').last.capitalizeFirstLetter()}",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              // Button in the bottom-right corner
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    // Add logic for the button here
+                                  },
+                                  backgroundColor: Colors.white,
+                                  child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      goal.title,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      goal.description,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                        "Goal Date: ${goal.goalDate.day.toString().padLeft(2, '0')}-${goal.goalDate.month.toString().padLeft(2, '0')}-${goal.goalDate.year}",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Subject: ${goal.subject.toString().split('.').last.capitalizeFirstLetter()}",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -248,18 +297,6 @@ class _GoalsPageState extends State<GoalsPage> {
                   ),
                 ),
               ),
-            ),
-          ),
-          // Add Goal Button
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                // Add goal logic here
-              },
-              backgroundColor: Colors.white,
-              child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
             ),
           ),
           // Sliding filter panel
