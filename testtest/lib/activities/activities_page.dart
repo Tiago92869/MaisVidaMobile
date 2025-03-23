@@ -1,5 +1,6 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
+import 'activity_details_page.dart';
 
 enum ResourceType {
   ARTICLE,
@@ -59,6 +60,34 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       description: "A relaxing yoga session to start your day. This session will help you stretch and relax your body while preparing for the day ahead.",
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
       resources: [
+        ResourceModel(
+          title: "Yoga Mat",
+          description: "A high-quality yoga mat for your practice.",
+          type: ResourceType.EXERCISE,
+          createdAt: DateTime.now().subtract(const Duration(days: 10)),
+          updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+        ResourceModel(
+          title: "Water Bottle",
+          description: "Stay hydrated during your yoga session.",
+          type: ResourceType.OTHER,
+          createdAt: DateTime.now().subtract(const Duration(days: 12)),
+          updatedAt: DateTime.now().subtract(const Duration(days: 6)),
+        ),
+        ResourceModel(
+          title: "Yoga Mat",
+          description: "A high-quality yoga mat for your practice.",
+          type: ResourceType.EXERCISE,
+          createdAt: DateTime.now().subtract(const Duration(days: 10)),
+          updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+        ResourceModel(
+          title: "Water Bottle",
+          description: "Stay hydrated during your yoga session.",
+          type: ResourceType.OTHER,
+          createdAt: DateTime.now().subtract(const Duration(days: 12)),
+          updatedAt: DateTime.now().subtract(const Duration(days: 6)),
+        ),
         ResourceModel(
           title: "Yoga Mat",
           description: "A high-quality yoga mat for your practice.",
@@ -282,6 +311,33 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                                 ),
                                               ),
                                               const Spacer(),
+                                              Center(
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => ActivityDetailsPage(
+                                                          activity: activity,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    foregroundColor: backgroundColor, backgroundColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    "Start",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -350,8 +406,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(50, 75, 200, 1), // Start color (darker blue)
+                    Color.fromRGBO(100, 130, 255, 1), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -420,7 +476,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                   color: isSelected
-                                      ? const Color.fromRGBO(85, 123, 233, 1) // Selected button color
+                                      ? const Color.fromRGBO(70, 100, 200, 1) // Selected button color (blueish)
                                       : Colors.white, // Default button color
                                   boxShadow: [
                                     BoxShadow(
@@ -438,7 +494,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                     style: TextStyle(
                                       color: isSelected
                                           ? Colors.white
-                                          : const Color.fromRGBO(72, 85, 204, 1),
+                                          : const Color.fromRGBO(50, 75, 200, 1), // Text color for unselected buttons
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: "Poppins",
