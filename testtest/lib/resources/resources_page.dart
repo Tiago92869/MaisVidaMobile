@@ -1,7 +1,8 @@
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:testtest/menu/models/courses.dart'; // Import the CourseModel
-import 'package:testtest/menu/components/hcard.dart'; // Import the HCard widget
+import 'package:testtest/menu/components/hcard.dart';
+import 'package:testtest/resources/resource_detail_page.dart'; // Import the HCard widget
 
 enum ResourceType {
   ARTICLE,
@@ -107,7 +108,23 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                   .map(
                                     (section) => Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 10),
-                                      child: HCard(section: section),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ResourceDetailPage(
+                                                title: section.title,
+                                                description: "This is a detailed description of the resource.",
+                                                type: section.category,
+                                                createdAt: DateTime.now().subtract(Duration(days: 10)), // Example date
+                                                updatedAt: DateTime.now(), // Example date
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: HCard(section: section),
+                                      ),
                                     ),
                                   )
                                   .toList(),
@@ -256,7 +273,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                 margin: EdgeInsets.symmetric(vertical: 8),
                                 child: Center(
                                   child: Text(
-                                    resourceType.toString().split('.').last.capitalizeFirstLetter(),
+                                    StringCapitalization(resourceType.toString().split('.').last).capitalizeFirstLetter(),
                                     style: TextStyle(
                                       color: isSelected ? Colors.white : Color.fromRGBO(72, 85, 204, 1),
                                       fontSize: 14,
