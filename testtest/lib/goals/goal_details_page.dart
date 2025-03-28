@@ -17,6 +17,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   late TextEditingController descriptionController;
   late TextEditingController goalDateController;
   Subject? selectedSubject;
+  bool hasNotifications = false; // Local variable for notifications toggle
 
   @override
   void initState() {
@@ -30,11 +31,12 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           : "",
     );
     selectedSubject = widget.goal?.subject ?? Subject.PERSONAL;
+    hasNotifications = widget.goal?.hasNotifications ?? false; // Initialize from goal or default to false
   }
 
   void saveGoal() {
     // Save the goal (in a real app, you'd save it to a database or API)
-    print("Goal saved: ${titleController.text}, ${descriptionController.text}, $selectedSubject");
+    print("Goal saved: ${titleController.text}, ${descriptionController.text}, $selectedSubject, Notifications: $hasNotifications");
 
     // Close the page after saving
     Navigator.pop(context);
@@ -70,8 +72,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
+                    Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -222,11 +224,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                         ),
                       ),
                       Switch(
-                        value: widget.goal?.hasNotifications ?? false,
+                        value: hasNotifications,
                         onChanged: editMode
                             ? (value) {
                                 setState(() {
-                                  widget.goal!.hasNotifications = value;
+                                  hasNotifications = value;
                                 });
                               }
                             : null,

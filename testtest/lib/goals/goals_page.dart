@@ -281,21 +281,51 @@ class _GoalsPageState extends State<GoalsPage> {
                                           ),
                                           const SizedBox(height: 8),
 
-                                          // Subject as a button-like style
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              goal.subject.toString().split('.').last.capitalizeFirstLetter(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                          // Subject and Completed Toggle
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              // Subject
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withOpacity(0.2),
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Text(
+                                                  goal.subject.toString().split('.').last.capitalizeFirstLetter(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+
+                                              // Status Toggle
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    goal.completed ? "Completed" : "Not Completed",
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white70,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Switch(
+                                                    value: goal.completed,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        goal.completed = value;
+                                                        goal.completedDate = value ? DateTime.now() : null;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -303,6 +333,8 @@ class _GoalsPageState extends State<GoalsPage> {
                                   );
                                 },
                               ),
+                              
+                              SizedBox(height: 30,),
                               // Button in the bottom-right corner
                               Positioned(
                                 bottom: 0,
@@ -321,6 +353,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                   child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
                                 ),
                               ),
+                              SizedBox(height: 30,),
                             ],
                           ),
                         ),
@@ -490,9 +523,9 @@ class GoalDTO {
   final String title;
   final String description;
   final DateTime goalDate; // The target date for the goal
-  final DateTime? completedDate; // Nullable field for completed date
-  late final bool completed; // Indicates if the goal is completed
-  late final bool hasNotifications; // Indicates if the goal has notifications
+  DateTime? completedDate; // Nullable field for completed date
+  bool completed; // Indicates if the goal is completed
+  bool hasNotifications; // Indicates if the goal has notifications
   final Subject subject;
 
   GoalDTO({
