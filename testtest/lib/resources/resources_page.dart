@@ -37,6 +37,12 @@ class _ResourcesPageState extends State<ResourcesPage> {
   // Control the visibility of the sliding filter panel
   bool _isFilterPanelVisible = false;
 
+  // Set to track favorite resources
+  final Set<String> _favoriteResources = {};
+
+  // Set to track if the star icon is glowing
+  bool _isStarGlowing = false;
+
   // Function to toggle the filter panel visibility
   void _toggleFilterPanel() {
     setState(() {
@@ -51,6 +57,13 @@ class _ResourcesPageState extends State<ResourcesPage> {
         _isFilterPanelVisible = false;
       });
     }
+  }
+
+  // Function to toggle the star glow
+  void _toggleStarGlow() {
+    setState(() {
+      _isStarGlowing = !_isStarGlowing;
+    });
   }
 
   @override
@@ -73,9 +86,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: 60), // Add spacing between the top of the screen and the title
+                            const SizedBox(height: 60), // Add spacing between the top of the screen and the title
                             // Title (Resources) centered at the top
-                            Center(
+                            const Center(
                               child: Text(
                                 "Resources",
                                 style: TextStyle(
@@ -86,50 +99,77 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 40),
+                            const SizedBox(height: 40),
                             // Input TextField with Search icon
                             TextField(
                               decoration: InputDecoration(
                                 labelText: "Search Resources",
-                                labelStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                                prefixIcon: Icon(Icons.search, color: Colors.grey, size: 20),
+                                labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                                prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20),
-                                  borderSide: BorderSide(color: Colors.grey),
+                                  borderSide: const BorderSide(color: Colors.grey),
                                 ),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                               ),
-                              style: TextStyle(fontSize: 14),
+                              style: const TextStyle(fontSize: 14),
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             // Display the courseSections as HCards
                             Column(
                               children: _courseSections
                                   .map(
-                                    (section) => Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => ResourceDetailPage(
-                                                title: section.title,
-                                                description: "This is a detailed description of the resource.",
-                                                type: section.category,
-                                                createdAt: DateTime.now().subtract(Duration(days: 10)), // Example date
-                                                updatedAt: DateTime.now(), // Example date
+                                    (section) {
+                                      final isFavorite = _favoriteResources.contains(section.title);
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ResourceDetailPage(
+                                                  title: section.title,
+                                                  description: "This is a detailed description of the resource.",
+                                                  type: section.category,
+                                                  createdAt: DateTime.now().subtract(const Duration(days: 10)), // Example date
+                                                  updatedAt: DateTime.now(), // Example date
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                        child: HCard(section: section),
-                                      ),
-                                    ),
+                                            );
+                                          },
+                                          child: Stack(
+                                            children: [
+                                              HCard(section: section),
+                                              Positioned(
+                                                top: 10,
+                                                right: 10,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (isFavorite) {
+                                                        _favoriteResources.remove(section.title);
+                                                      } else {
+                                                        _favoriteResources.add(section.title);
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    isFavorite ? Icons.star : Icons.star_border,
+                                                    color: isFavorite ? Colors.yellow : Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   )
                                   .toList(),
                             ),
-                            SizedBox(height: 30),
+                            const SizedBox(height: 30),
                           ],
                         ),
                       ),
@@ -151,43 +191,79 @@ class _ResourcesPageState extends State<ResourcesPage> {
           Positioned(
             top: 58,
             right: 20,
-            child: GestureDetector(
-              onTap: _toggleFilterPanel,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: Offset(0, 5),
+            child: Row(
+              children: [
+                // Star Icon
+                GestureDetector(
+                  onTap: _toggleStarGlow,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _isStarGlowing
+                                ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
+                                : Colors.black.withOpacity(0.2), // Default shadow when not pressed
+                            blurRadius: _isStarGlowing ? 15 : 5,
+                            spreadRadius: _isStarGlowing ? 5 : 0,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.filter_alt,
-                    color: Colors.blue,
-                    size: 28,
+                      child: Icon(
+                        Icons.star,
+                        color: _isStarGlowing ? Colors.blue : Colors.grey,
+                        size: 28,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                // Filter Icon
+                GestureDetector(
+                  onTap: _toggleFilterPanel,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.filter_alt,
+                        color: Colors.blue,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           // Sliding filter panel
           AnimatedPositioned(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             right: _isFilterPanelVisible ? 0 : -230, // Slide in/out effect
             top: 0,
             bottom: 0,
             child: Container(
               width: 230,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
                     Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
                     Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
@@ -199,27 +275,27 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
                     blurRadius: 10,
-                    offset: Offset(-5, 0), // Shadow on the left side
+                    offset: const Offset(-5, 0), // Shadow on the left side
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  SizedBox(height: 40), // Space between the arrow and text
+                  const SizedBox(height: 40), // Space between the arrow and text
                   Padding(
                     padding: const EdgeInsets.only(top: 20, left: 15),
                     child: Row(
                       children: [
                         GestureDetector(
                           onTap: _toggleFilterPanel,
-                          child: Icon(
+                          child: const Icon(
                             Icons.arrow_forward,
                             size: 30,
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(width: 30),
-                        Text(
+                        const SizedBox(width: 30),
+                        const Text(
                           "Filter by Type",
                           style: TextStyle(
                             fontSize: 18,
@@ -231,7 +307,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Padding(
@@ -250,7 +326,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                 });
                               },
                               child: AnimatedContainer(
-                                duration: Duration(milliseconds: 200),
+                                duration: const Duration(milliseconds: 200),
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   border: Border.all(
@@ -259,23 +335,23 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                   color: isSelected
-                                      ? Color.fromRGBO(85, 123, 233, 1) // Selected button color
+                                      ? const Color.fromRGBO(85, 123, 233, 1) // Selected button color
                                       : Colors.white, // Default button color
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.1),
                                       blurRadius: 5,
-                                      offset: Offset(0, 3),
+                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                                margin: EdgeInsets.symmetric(vertical: 8),
+                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                                margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: Center(
                                   child: Text(
                                     StringCapitalization(resourceType.toString().split('.').last).capitalizeFirstLetter(),
                                     style: TextStyle(
-                                      color: isSelected ? Colors.white : Color.fromRGBO(72, 85, 204, 1),
+                                      color: isSelected ? Colors.white : const Color.fromRGBO(72, 85, 204, 1),
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: "Poppins",
@@ -289,7 +365,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

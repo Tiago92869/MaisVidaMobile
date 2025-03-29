@@ -181,6 +181,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     const Color(0xFFBBA6FF),
   ];
 
+  // Set to track favorite activities
+  final Set<String> _favoriteActivities = {};
+
+  // Variable to track the glowing state of the star icon
+  bool _isStarGlowing = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,6 +246,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                       final index = entry.key;
                                       final activity = entry.value;
                                       final backgroundColor = _activityColors[index % _activityColors.length];
+                                      final isFavorite = _favoriteActivities.contains(activity.title);
+
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 15), // Increased spacing
                                         child: Container(
@@ -265,14 +273,34 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               // Title
-                                              Text(
-                                                activity.title,
-                                                style: const TextStyle(
-                                                  fontSize: 24,
-                                                  fontFamily: "Poppins",
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    activity.title,
+                                                    style: const TextStyle(
+                                                      fontSize: 24,
+                                                      fontFamily: "Poppins",
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (isFavorite) {
+                                                          _favoriteActivities.remove(activity.title);
+                                                        } else {
+                                                          _favoriteActivities.add(activity.title);
+                                                        }
+                                                      });
+                                                    },
+                                                    child: Icon(
+                                                      isFavorite ? Icons.star : Icons.star_border,
+                                                      color: isFavorite ? Colors.yellow : Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               const SizedBox(height: 8),
 
@@ -368,31 +396,71 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           Positioned(
             top: 58,
             right: 20,
-            child: GestureDetector(
-              onTap: _toggleFilterPanel,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: const Offset(0, 5),
+            child: Row(
+              children: [
+                // Star Icon
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isStarGlowing = !_isStarGlowing;
+                    });
+                  },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _isStarGlowing
+                                ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
+                                : Colors.black.withOpacity(0.2), // Default shadow when not pressed
+                            blurRadius: _isStarGlowing ? 15 : 5,
+                            spreadRadius: _isStarGlowing ? 5 : 0,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.filter_alt,
-                    color: Colors.blue,
-                    size: 28,
+                      child: Icon(
+                        Icons.star,
+                        color: _isStarGlowing ? Colors.blue : Colors.grey,
+                        size: 28,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                // Filter Icon
+                GestureDetector(
+                  onTap: _toggleFilterPanel,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.filter_alt,
+                        color: Colors.blue,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           // Sliding filter panel

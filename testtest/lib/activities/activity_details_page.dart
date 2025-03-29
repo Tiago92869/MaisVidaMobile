@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'activities_page.dart';
-import 'dart:math'; // Import for randomization
+import 'dart:math';
 
 class ActivityDetailsPage extends StatefulWidget {
   final ActivityModel activity;
+
+  static final Set<String> favoriteActivities = {}; // Track favorite activities
 
   const ActivityDetailsPage({Key? key, required this.activity}) : super(key: key);
 
@@ -14,7 +16,7 @@ class ActivityDetailsPage extends StatefulWidget {
 class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   int _currentResourceIndex = 0;
   bool _isViewingResources = false;
-  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
+  bool _showFirstStarfish = Random().nextBool();
 
   void _startActivity() {
     setState(() {
@@ -27,7 +29,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     setState(() {
       if (_currentResourceIndex < widget.activity.resources.length - 1) {
         _currentResourceIndex++;
-        _showFirstStarfish = Random().nextBool(); // Randomize the image again
+        _showFirstStarfish = Random().nextBool();
       }
     });
   }
@@ -35,6 +37,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final activity = widget.activity;
+    final isFavorite = ActivityDetailsPage.favoriteActivities.contains(widget.activity.title);
 
     return Scaffold(
       body: Stack(
@@ -45,8 +48,8 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color(0xFF0D1B2A),
+                    Color(0xFF1B263B),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -64,7 +67,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
               child: Opacity(
                 opacity: 0.2,
                 child: Transform.rotate(
-                  angle: 0.7, // Rotation angle in radians
+                  angle: 0.7,
                   child: Image.asset(
                     'assets/images/starfish2.png',
                     fit: BoxFit.contain,
@@ -81,7 +84,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
               child: Opacity(
                 opacity: 0.2,
                 child: Transform.rotate(
-                  angle: 0.5, // Rotation angle in radians
+                  angle: 0.5,
                   child: Image.asset(
                     'assets/images/starfish1.png',
                     fit: BoxFit.contain,
@@ -106,15 +109,45 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Title
-                  Text(
-                    activity.title,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Poppins",
-                      color: Colors.white,
-                    ),
+                  // Title and Favorite Icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.activity.title,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Poppins",
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (isFavorite) {
+                              ActivityDetailsPage.favoriteActivities.remove(widget.activity.title);
+                            } else {
+                              ActivityDetailsPage.favoriteActivities.add(widget.activity.title);
+                            }
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isFavorite ? Colors.yellow : Colors.transparent,
+                            border: Border.all(color: Colors.yellow, width: 2),
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.star : Icons.star_border,
+                            color: isFavorite ? Colors.white : Colors.yellow,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   // Resource Types (in activity details)

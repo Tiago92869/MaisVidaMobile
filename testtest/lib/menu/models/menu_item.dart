@@ -46,13 +46,6 @@ class MenuItemModel {
 
   static List<MenuItemModel> menuItems2 = [
     MenuItemModel(
-      title: "Favorites",
-      riveIcon: TabItem(
-        stateMachine: "STAR_Interactivity",
-        artboard: "LIKE/STAR",
-      ),
-    ),
-    MenuItemModel(
       title: "Notification",
       riveIcon: TabItem(stateMachine: "BELL_Interactivity", artboard: "BELL"),
     ),

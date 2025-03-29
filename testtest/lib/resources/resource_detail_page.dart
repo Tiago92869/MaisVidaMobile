@@ -8,6 +8,8 @@ class ResourceDetailPage extends StatelessWidget {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  static final Set<String> favoriteResources = {}; // Track favorite resources
+
   const ResourceDetailPage({
     Key? key,
     required this.title,
@@ -19,6 +21,8 @@ class ResourceDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isFavorite = favoriteResources.contains(title);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -43,15 +47,15 @@ class ResourceDetailPage extends StatelessWidget {
             width: 400,
             height: 400,
             child: Opacity(
-    opacity: 0.2,
-    child: Transform.rotate(
-      angle: 0.7, // Rotation angle in radians (e.g., 0.5 radians ≈ 28.65 degrees)
-      child: Image.asset(
-        'assets/images/starfish2.png',
-        fit: BoxFit.contain,
-      ),
-    ),
-  ),
+              opacity: 0.2,
+              child: Transform.rotate(
+                angle: 0.7, // Rotation angle in radians (e.g., 0.5 radians ≈ 28.65 degrees)
+                child: Image.asset(
+                  'assets/images/starfish2.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
           ),
 
           // Content
@@ -72,15 +76,44 @@ class ResourceDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Title
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Poppins",
-                      color: Colors.white,
-                    ),
+                  // Title and Favorite Icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Poppins",
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          if (isFavorite) {
+                            favoriteResources.remove(title);
+                          } else {
+                            favoriteResources.add(title);
+                          }
+                          (context as Element).markNeedsBuild(); // Rebuild widget
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isFavorite ? Colors.yellow : Colors.transparent,
+                            border: Border.all(color: Colors.yellow, width: 2),
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.star : Icons.star_border,
+                            color: isFavorite ? Colors.white : Colors.yellow,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
 
