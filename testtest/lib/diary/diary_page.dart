@@ -57,7 +57,61 @@ class _DiaryPageState extends State<DiaryPage> {
     DiaryDTO(
       id: "2",
       title: "Work Presentation",
-      description: "Delivered a successful presentation at work.",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
+      recordedAt: DateTime.now(),
+      emotion: Emotion.FANTASTIC,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    DiaryDTO(
+      id: "2",
+      title: "Work Presentation",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
+      recordedAt: DateTime.now(),
+      emotion: Emotion.FANTASTIC,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    DiaryDTO(
+      id: "2",
+      title: "Work Presentation",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
+      recordedAt: DateTime.now(),
+      emotion: Emotion.FANTASTIC,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    DiaryDTO(
+      id: "2",
+      title: "Work Presentation",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
+      recordedAt: DateTime.now(),
+      emotion: Emotion.FANTASTIC,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    DiaryDTO(
+      id: "2",
+      title: "Work Presentation",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
+      recordedAt: DateTime.now(),
+      emotion: Emotion.FANTASTIC,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    DiaryDTO(
+      id: "2",
+      title: "Work Presentation",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
+      recordedAt: DateTime.now(),
+      emotion: Emotion.FANTASTIC,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ),
+    DiaryDTO(
+      id: "2",
+      title: "Work Presentation",
+      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
       recordedAt: DateTime.now(),
       emotion: Emotion.FANTASTIC,
       createdAt: DateTime.now(),
@@ -282,14 +336,27 @@ class _DiaryPageState extends State<DiaryPage> {
                                 margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: ListTile(
                                   title: Text(entry.title),
-                                  subtitle: Text(entry.description),
-                                  trailing: Text(
-                                    StringCapitalization(entry.emotion.name).capitalizeFirstLetter(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue,
-                                    ),
+                                  subtitle: Text(
+                                    entry.description,
+                                    maxLines: 2, // Show only 2 lines of the description
+                                    overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
+                                    style: const TextStyle(color: Colors.black54),
                                   ),
+                                  trailing: Icon(
+                                    _getEmotionIcon(entry.emotion),
+                                    color: Colors.blue,
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DiaryDetailPage(
+                                          diary: entry,
+                                          isEditing: false,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               );
                             },
@@ -457,7 +524,7 @@ class _DiaryPageState extends State<DiaryPage> {
                   MaterialPageRoute(
                     builder: (context) => DiaryDetailPage(
                       diary: null, // Pass null for creating a new entry
-                      isEditing: false,
+                      isEditing: true,
                     ),
                   ),
                 );
@@ -469,6 +536,29 @@ class _DiaryPageState extends State<DiaryPage> {
         ],
       ),
     );
+  }
+}
+
+IconData _getEmotionIcon(Emotion emotion) {
+  switch (emotion) {
+    case Emotion.LOVE:
+      return Icons.favorite;
+    case Emotion.FANTASTIC:
+      return Icons.star;
+    case Emotion.HAPPY:
+      return Icons.sentiment_satisfied;
+    case Emotion.NEUTRAL:
+      return Icons.sentiment_neutral;
+    case Emotion.DISAPPOINTED:
+      return Icons.sentiment_dissatisfied;
+    case Emotion.SAD:
+      return Icons.sentiment_very_dissatisfied;
+    case Emotion.ANGRY:
+      return Icons.mood_bad;
+    case Emotion.SICK:
+      return Icons.sick;
+    default:
+      return Icons.sentiment_neutral;
   }
 }
 
