@@ -92,40 +92,40 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Back button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Name
-                  TextField(
-                    controller: nameController,
-                    enabled: editMode,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    // Name
+                    TextField(
+                      controller: nameController,
+                      enabled: editMode,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      decoration: const InputDecoration(
+                        hintText: "Enter Medicine Name",
+                        hintStyle: TextStyle(color: Colors.white70),
+                        border: InputBorder.none,
+                      ),
                     ),
-                    decoration: const InputDecoration(
-                      hintText: "Enter Medicine Name",
-                      hintStyle: TextStyle(color: Colors.white70),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  // Description
-                  Expanded(
-                    child: TextField(
+                    // Description
+                    TextField(
                       controller: descriptionController,
                       enabled: editMode,
                       maxLines: null,
@@ -139,65 +139,148 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         border: InputBorder.none,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Start Date
-                  TextField(
-                    controller: startDateController,
-                    enabled: editMode,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                    decoration: const InputDecoration(
-                      labelText: "Start Date",
-                      labelStyle: TextStyle(color: Colors.white70),
-                      border: UnderlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // End Date
-                  TextField(
-                    controller: endDateController,
-                    enabled: editMode,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                    decoration: const InputDecoration(
-                      labelText: "End Date",
-                      labelStyle: TextStyle(color: Colors.white70),
-                      border: UnderlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Notifications Toggle
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    // Plans Section
+                    if (widget.medicine?.plans != null && widget.medicine!.plans.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Weekly Plan",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ...WeekDay.values.map((weekDay) {
+                            final plan = widget.medicine!.plans.firstWhere(
+                              (p) => p.weekDay == weekDay,
+                              orElse: () => PlanDTO(id: "", weekDay: weekDay, dosages: []),
+                            );
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  weekDay.name,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                if (plan.dosages.isNotEmpty)
+                                  ...plan.dosages.map((dosage) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(left: 16.0, bottom: 4.0),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "Time: ${dosage.time.format(context)}",
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Text(
+                                            "Quantity: ${dosage.dosage}",
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList()
+                                else
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 16.0),
+                                    child: Text(
+                                      "No dosage scheduled.",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ),
+                                const SizedBox(height: 10),
+                              ],
+                            );
+                          }).toList(),
+                        ],
+                      )
+                    else
                       const Text(
-                        "Notifications",
+                        "No plans available.",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white,
+                          color: Colors.white70,
                         ),
                       ),
-                      Switch(
-                        value: hasNotifications,
-                        onChanged: editMode
-                            ? (value) {
-                                setState(() {
-                                  hasNotifications = value;
-                                });
-                              }
-                            : null,
+                    const SizedBox(height: 20),
+
+                    // Start Date
+                    TextField(
+                      controller: startDateController,
+                      enabled: editMode,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
-                ],
+                      decoration: const InputDecoration(
+                        labelText: "Start Date",
+                        labelStyle: TextStyle(color: Colors.white70),
+                        border: UnderlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // End Date
+                    TextField(
+                      controller: endDateController,
+                      enabled: editMode,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                      decoration: const InputDecoration(
+                        labelText: "End Date",
+                        labelStyle: TextStyle(color: Colors.white70),
+                        border: UnderlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Notifications Toggle
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Notifications",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Switch(
+                          value: hasNotifications,
+                          onChanged: editMode
+                              ? (value) {
+                                  setState(() {
+                                    hasNotifications = value;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
