@@ -328,6 +328,7 @@ class _DiaryPageState extends State<DiaryPage> {
                             ),
                           )
                         : ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 60), // Add padding to the bottom
                             itemCount: entriesForSelectedDate.length,
                             itemBuilder: (context, index) {
                               final entry = entriesForSelectedDate[index];
@@ -344,7 +345,8 @@ class _DiaryPageState extends State<DiaryPage> {
                                   ),
                                   trailing: Icon(
                                     _getEmotionIcon(entry.emotion),
-                                    color: Colors.blue,
+                                    color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
+                                    size: 32, // Increased size
                                   ),
                                   onTap: () {
                                     Navigator.push(
@@ -490,16 +492,24 @@ class _DiaryPageState extends State<DiaryPage> {
                                 ),
                                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
                                 margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: Center(
-                                  child: Text(
-                                    StringCapitalization(emotion.name).capitalizeFirstLetter(),
-                                    style: TextStyle(
-                                      color: isSelected ? Colors.white : const Color.fromRGBO(72, 85, 204, 1),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Poppins",
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      _getEmotionIcon(emotion),
+                                      color: const Color.fromRGBO(123, 50, 250, 1), // Purplish color
+                                      size: 28, // Increased size
                                     ),
-                                  ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      StringCapitalization(emotion.name).capitalizeFirstLetter(),
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.white : const Color.fromRGBO(72, 85, 204, 1),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: "Poppins",
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );

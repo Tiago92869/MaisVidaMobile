@@ -145,6 +145,7 @@ class SosDetailsPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   Expanded(
                     child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 30), // Add padding to the bottom
                       itemCount: emergencyResources.length,
                       itemBuilder: (context, index) {
                         final resource = emergencyResources[index];
