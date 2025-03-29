@@ -82,102 +82,205 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              title: const Text("Add Weekly Plan"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Days of the Week Selector
-                  Wrap(
-                    spacing: 8.0,
-                    children: WeekDay.values.map((day) {
-                      return FilterChip(
-                        label: Text(
-                          "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}", // Capitalize only the first letter
-                        ),
-                        selected: selectedDays.contains(day),
-                        onSelected: (isSelected) {
-                          setState(() {
-                            if (isSelected) {
-                              selectedDays.add(day);
-                            } else {
-                              selectedDays.remove(day);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
+                      Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  const SizedBox(height: 16),
-
-                  // Time Picker
-                  Row(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Time: "),
-                      TextButton(
-                        onPressed: () async {
-                          final time = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.now(),
+                      // Title
+                      const Text(
+                        "Add Weekly Plan",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Days of the Week Selector
+                      const Text(
+                        "Select Days:",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8.0,
+                        children: WeekDay.values.map((day) {
+                          return FilterChip(
+                            label: Text(
+                              "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}", // Capitalize only the first letter
+                              style: TextStyle(
+                                color: selectedDays.contains(day)
+                                    ? Colors.white
+                                    : Colors.black87, // Darker text when unselected
+                              ),
+                            ),
+                            selected: selectedDays.contains(day),
+                            selectedColor: const Color.fromRGBO(123, 144, 255, 1), // Purpleish color
+                            backgroundColor: Colors.white10,
+                            onSelected: (isSelected) {
+                              setState(() {
+                                if (isSelected) {
+                                  selectedDays.add(day);
+                                } else {
+                                  selectedDays.remove(day);
+                                }
+                              });
+                            },
                           );
-                          if (time != null) {
-                            setState(() {
-                              selectedTime = time;
-                            });
-                          }
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Time Picker
+                      const Text(
+                        "Select Time:",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              selectedTime != null
+                                  ? selectedTime!.format(context)
+                                  : "No time selected",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final time = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (time != null) {
+                                setState(() {
+                                  selectedTime = time;
+                                });
+                              }
+                            },
+                            child: const Text(
+                              "Select Time",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Dosage Input
+                      const Text(
+                        "Enter Dosage:",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          labelText: "Dosage",
+                          labelStyle: TextStyle(color: Colors.white70),
+                          filled: true,
+                          fillColor: Colors.white10,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white70),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white70),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          dosage = double.tryParse(value);
                         },
-                        child: Text(selectedTime != null
-                            ? selectedTime!.format(context)
-                            : "Select Time"),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Actions
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              if (selectedDays.isNotEmpty &&
+                                  selectedTime != null &&
+                                  dosage != null) {
+                                setState(() {
+                                  for (var day in selectedDays) {
+                                    widget.medicine?.plans.add(
+                                      PlanDTO(
+                                        id: UniqueKey().toString(),
+                                        weekDay: day,
+                                        dosages: [
+                                          DosageDTO(
+                                            id: UniqueKey().toString(),
+                                            time: selectedTime!,
+                                            dosage: dosage!,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                });
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Text("Add"),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-
-                  // Dosage Input
-                  TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: "Dosage",
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (value) {
-                      dosage = double.tryParse(value);
-                    },
-                  ),
-                ],
+                ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    if (selectedDays.isNotEmpty && selectedTime != null && dosage != null) {
-                      setState(() {
-                        for (var day in selectedDays) {
-                          widget.medicine?.plans.add(
-                            PlanDTO(
-                              id: UniqueKey().toString(),
-                              weekDay: day,
-                              dosages: [
-                                DosageDTO(
-                                  id: UniqueKey().toString(),
-                                  time: selectedTime!,
-                                  dosage: dosage!,
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      });
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text("Add"),
-                ),
-              ],
             );
           },
         );
