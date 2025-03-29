@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/models/courses.dart'; // Import ResourceType for type
+import 'package:testtest/resources/resources_page.dart';
 
 class ResourceDetailPage extends StatelessWidget {
-  final String title;
-  final String description;
-  final ResourceType type;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final ResourceDTO resource;
 
   static final Set<String> favoriteResources = {}; // Track favorite resources
 
-  const ResourceDetailPage({
-    Key? key,
-    required this.title,
-    required this.description,
-    required this.type,
-    required this.createdAt,
-    required this.updatedAt,
-  }) : super(key: key);
+  const ResourceDetailPage({Key? key, required this.resource}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final isFavorite = favoriteResources.contains(title);
+    final isFavorite = favoriteResources.contains(resource.title);
 
     return Scaffold(
       body: Stack(
@@ -82,7 +71,7 @@ class ResourceDetailPage extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          title,
+                          resource.title,
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -94,9 +83,9 @@ class ResourceDetailPage extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           if (isFavorite) {
-                            favoriteResources.remove(title);
+                            favoriteResources.remove(resource.title);
                           } else {
-                            favoriteResources.add(title);
+                            favoriteResources.add(resource.title);
                           }
                           (context as Element).markNeedsBuild(); // Rebuild widget
                         },
@@ -125,7 +114,7 @@ class ResourceDetailPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      type.toString().split('.').last.capitalizeFirstLetter(),
+                      StringCapitalization(resource.type.toString().split('.').last).capitalizeFirstLetter(),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -139,7 +128,7 @@ class ResourceDetailPage extends StatelessWidget {
                   Expanded(
                     child: SingleChildScrollView(
                       child: Text(
-                        description,
+                        resource.description,
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: "Inter",
@@ -155,8 +144,8 @@ class ResourceDetailPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildDateInfo("Created At", createdAt),
-                      _buildDateInfo("Updated At", updatedAt),
+                      _buildDateInfo("Created At", resource.createdAt),
+                      _buildDateInfo("Updated At", resource.updatedAt),
                     ],
                   ),
                 ],
@@ -198,6 +187,6 @@ class ResourceDetailPage extends StatelessWidget {
 extension StringCapitalization on String {
   String capitalizeFirstLetter() {
     if (isEmpty) return this;
-    return this[0].toUpperCase() + substring(1).toLowerCase();
+    return this[0].toUpperCase() + this.substring(1).toLowerCase();
   }
 }

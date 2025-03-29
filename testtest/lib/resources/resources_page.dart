@@ -1,8 +1,8 @@
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/models/courses.dart'; // Import the CourseModel
-import 'package:testtest/menu/components/hcard.dart';
-import 'package:testtest/resources/resource_detail_page.dart'; // Import the HCard widget
+import 'dart:math';
+
+import 'package:testtest/resources/resource_detail_page.dart';
 
 enum ResourceType {
   ARTICLE,
@@ -15,6 +15,24 @@ enum ResourceType {
   MUSIC,
   SOS,
   OTHER,
+}
+
+class ResourceDTO {
+  final String id;
+  final String title;
+  final String description;
+  final ResourceType type;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  ResourceDTO({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.type,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 }
 
 class ResourcesPage extends StatefulWidget {
@@ -31,8 +49,18 @@ class _ResourcesPageState extends State<ResourcesPage> {
   // List of all available resource types for the filter
   final List<ResourceType> _resourceTypes = ResourceType.values;
 
-  // Dummy course data
-  final List<CourseModel> _courseSections = CourseModel.courseSections;
+  // Dummy resource data
+  final List<ResourceDTO> _resources = List.generate(
+    10,
+    (index) => ResourceDTO(
+      id: "1",
+      title: "Resource $index",
+      description: "Description for ResourceResourceResourceResource  ResourceResourceResourceResource ResourceResourceResourceResource ResourceResourceResourceResource ResourceResourceResourceResource$index",
+      type: ResourceType.values[Random().nextInt(ResourceType.values.length)],
+      createdAt: DateTime.now().subtract(Duration(days: index * 2)),
+      updatedAt: DateTime.now(),
+    ),
+  );
 
   // Control the visibility of the sliding filter panel
   bool _isFilterPanelVisible = false;
@@ -64,6 +92,34 @@ class _ResourcesPageState extends State<ResourcesPage> {
     setState(() {
       _isStarGlowing = !_isStarGlowing;
     });
+  }
+
+  // Function to map ResourceType to image paths
+  static String getImageForResourceType(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return 'assets/images/resources/newspaper.png';
+      case ResourceType.VIDEO:
+        return 'assets/images/resources/video.png';
+      case ResourceType.PODCAST:
+        return 'assets/images/resources/recording.png';
+      case ResourceType.PHRASE:
+        return 'assets/images/resources/training-phrase.png';
+      case ResourceType.CARE:
+        return 'assets/images/resources/healthcare.png';
+      case ResourceType.EXERCISE:
+        return 'assets/images/resources/physical-wellbeing.png';
+      case ResourceType.RECIPE:
+        return 'assets/images/resources/recipe.png';
+      case ResourceType.MUSIC:
+        return 'assets/images/resources/headphones.png';
+      case ResourceType.SOS:
+        return 'assets/images/resources/sos.png';
+      case ResourceType.OTHER:
+        return 'assets/images/resources/other.png';
+      default:
+        return 'assets/samples/ui/rive_app/images/topics/topic_1.png';
+    }
   }
 
   @override
@@ -115,12 +171,12 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               style: const TextStyle(fontSize: 14),
                             ),
                             const SizedBox(height: 20),
-                            // Display the courseSections as HCards
+                            // Display the resources as HCards
                             Column(
-                              children: _courseSections
+                              children: _resources
                                   .map(
-                                    (section) {
-                                      final isFavorite = _favoriteResources.contains(section.title);
+                                    (resource) {
+                                      final isFavorite = _favoriteResources.contains(resource.id);
 
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -129,19 +185,13 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => ResourceDetailPage(
-                                                  title: section.title,
-                                                  description: "This is a detailed description of the resource.",
-                                                  type: section.category,
-                                                  createdAt: DateTime.now().subtract(const Duration(days: 10)), // Example date
-                                                  updatedAt: DateTime.now(), // Example date
-                                                ),
+                                                builder: (context) => ResourceDetailPage(resource: resource),
                                               ),
                                             );
                                           },
                                           child: Stack(
                                             children: [
-                                              HCard(section: section),
+                                              _buildHCard(resource),
                                               Positioned(
                                                 top: 10,
                                                 right: 10,
@@ -149,9 +199,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                                   onTap: () {
                                                     setState(() {
                                                       if (isFavorite) {
-                                                        _favoriteResources.remove(section.title);
+                                                        _favoriteResources.remove(resource.id);
                                                       } else {
-                                                        _favoriteResources.add(section.title);
+                                                        _favoriteResources.add(resource.id);
                                                       }
                                                     });
                                                   },
@@ -368,6 +418,67 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   const SizedBox(height: 30),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHCard(ResourceDTO resource) {
+    const int maxDescriptionLength = 30; // Maximum length for the description (fits around two lines)
+
+    String truncatedDescription = resource.description.length > maxDescriptionLength
+        ? '${resource.description.substring(0, maxDescriptionLength)}...'
+        : resource.description;
+
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 110),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blueAccent, // Replace with a dynamic color if needed
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  resource.title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontFamily: "Poppins",
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  truncatedDescription,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontFamily: "Inter",
+                    color: Colors.white,
+                  ),
+                  maxLines: 2, // Ensure it doesn't exceed two lines
+                  overflow: TextOverflow.ellipsis, // Add ellipsis if it overflows
+                ),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: VerticalDivider(thickness: 0.8, width: 0),
+          ),
+          Opacity(
+            opacity: 0.9,
+            child: Image.asset(
+              getImageForResourceType(resource.type),
+              width: 48, // Set the width to 48
+              height: 48, // Set the height to 48
+              fit: BoxFit.contain, // Ensure the image fits within the bounds
             ),
           ),
         ],

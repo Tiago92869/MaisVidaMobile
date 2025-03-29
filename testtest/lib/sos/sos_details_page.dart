@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:testtest/resources/resource_detail_page.dart';
-import 'package:testtest/menu/models/courses.dart'; // Import CourseModel for resources
+import 'dart:math';
+
+import 'package:testtest/resources/resources_page.dart';
 
 class SosDetailsPage extends StatelessWidget {
-  final List<CourseModel> emergencyResources = CourseModel.courseSections; // Dummy resources
+  final List<ResourceDTO> emergencyResources = List.generate(
+    10,
+    (index) => ResourceDTO(
+      id: "1",
+      title: "Emergency Resource $index",
+      description: "Description for Emergency Resource $index",
+      type: ResourceType.SOS,
+      createdAt: DateTime.now().subtract(Duration(days: index * 2)),
+      updatedAt: DateTime.now(),
+    ),
+  );
 
   SosDetailsPage({Key? key}) : super(key: key);
 
-  void _navigateToResourceDetail(BuildContext context, CourseModel resource) {
+  void _navigateToResourceDetail(BuildContext context, ResourceDTO resource) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ResourceDetailPage(
-          title: resource.title,
-          description: resource.subtitle ?? "No description available",
-          type: resource.category,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
+        builder: (context) => ResourceDetailPage(resource: resource),
       ),
     );
   }
@@ -55,7 +61,7 @@ class SosDetailsPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255), // Highlighted urgent color
+                      color: Colors.white, // Highlighted urgent color
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -168,7 +174,7 @@ class SosDetailsPage extends StatelessWidget {
                             child: Row(
                               children: [
                                 CircleAvatar(
-                                  backgroundColor: resource.color,
+                                  backgroundColor: Colors.redAccent,
                                   radius: 25,
                                   child: const Icon(
                                     Icons.info,
