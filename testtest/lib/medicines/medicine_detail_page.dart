@@ -39,6 +39,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           : "",
     );
     hasNotifications = widget.medicine?.hasNotifications ?? false; // Initialize from medicine or default to false
+    isArchived = widget.medicine?.archived ?? false;
   }
 
   void saveMedicine() {
@@ -69,6 +70,119 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       hasNotifications = widget.medicine?.hasNotifications ?? false;
       editMode = false;
     });
+  }
+
+  void _showAddPlanDialog() {
+    List<WeekDay> selectedDays = [];
+    TimeOfDay? selectedTime;
+    double? dosage;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Add Weekly Plan"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Days of the Week Selector
+                  Wrap(
+                    spacing: 8.0,
+                    children: WeekDay.values.map((day) {
+                      return FilterChip(
+                        label: Text(
+                          "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}", // Capitalize only the first letter
+                        ),
+                        selected: selectedDays.contains(day),
+                        onSelected: (isSelected) {
+                          setState(() {
+                            if (isSelected) {
+                              selectedDays.add(day);
+                            } else {
+                              selectedDays.remove(day);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Time Picker
+                  Row(
+                    children: [
+                      const Text("Time: "),
+                      TextButton(
+                        onPressed: () async {
+                          final time = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (time != null) {
+                            setState(() {
+                              selectedTime = time;
+                            });
+                          }
+                        },
+                        child: Text(selectedTime != null
+                            ? selectedTime!.format(context)
+                            : "Select Time"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Dosage Input
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: "Dosage",
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      dosage = double.tryParse(value);
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedDays.isNotEmpty && selectedTime != null && dosage != null) {
+                      setState(() {
+                        for (var day in selectedDays) {
+                          widget.medicine?.plans.add(
+                            PlanDTO(
+                              id: UniqueKey().toString(),
+                              weekDay: day,
+                              dosages: [
+                                DosageDTO(
+                                  id: UniqueKey().toString(),
+                                  time: selectedTime!,
+                                  dosage: dosage!,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      });
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text("Add"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -189,13 +303,23 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  "Weekly Plan",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Weekly Plan",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (editMode)
+                                      IconButton(
+                                        icon: const Icon(Icons.add, color: Colors.white),
+                                        onPressed: _showAddPlanDialog,
+                                      ),
+                                  ],
                                 ),
                                 const SizedBox(height: 10),
                                 ...widget.medicine!.plans
