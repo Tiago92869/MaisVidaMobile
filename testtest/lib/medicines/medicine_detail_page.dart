@@ -19,6 +19,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   late TextEditingController startDateController;
   late TextEditingController endDateController;
   bool hasNotifications = false; // Local variable for notifications toggle
+  bool isArchived = false; // Local variable for archived toggle
   bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
 
   @override
@@ -326,6 +327,29 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                     ? (value) {
                                         setState(() {
                                           hasNotifications = value;
+                                        });
+                                      }
+                                    : null,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10), // Add spacing between switches
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Archived",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Switch(
+                                value: isArchived,
+                                onChanged: editMode
+                                    ? (value) {
+                                        setState(() {
+                                          isArchived = value;
                                         });
                                       }
                                     : null,
