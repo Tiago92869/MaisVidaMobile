@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'package:testtest/menu/navigation/custom_tab_bar.dart';
 import 'package:testtest/menu/navigation/home_tab_view.dart';
 import 'package:testtest/menu/navigation/side_menu.dart';
+import 'package:testtest/notifications/notifications_page.dart';
 import 'package:testtest/resources/resources_page.dart';
 import 'package:testtest/sos/sos_details_page.dart';
 import 'package:testtest/menu/theme.dart';
@@ -17,7 +18,8 @@ import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
   if (tabName == "Profile") {
-    return UserProfilePage(); // Return the user profile page directly
+    //return UserProfilePage(); // Return the user profile page directly
+    return SosDetailsPage(); // Return the activities page directly
   }
   if (tabName == "Resources") {
     return ResourcesPage(); // Return the resources page directly
@@ -26,8 +28,10 @@ Widget commonTabScene(String tabName) {
     return const ActivitiesPage(); // Return the activities page directly
   }
   if (tabName == "Goals") {
-    return SosDetailsPage(); // Return the activities page directly
+    return NotificationsPage(); // Return the activities page directly
+    //return SosDetailsPage(); // Return the activities page directly
     //return const GoalsPage(); // Return the activities page directly
+    
   }
   return Container(
     color: RiveAppTheme.background,
