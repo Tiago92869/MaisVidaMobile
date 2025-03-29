@@ -21,7 +21,7 @@ import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.
 Widget commonTabScene(String tabName) {
   if (tabName == "Profile") {
     //return UserProfilePage(); // Return the user profile page directly
-    return SosDetailsPage(); // Return the activities page directly
+    return const GoalsPage(); // Return the activities page directly
   }
   if (tabName == "Resources") {
     return ResourcesPage(); // Return the resources page directly
@@ -32,7 +32,7 @@ Widget commonTabScene(String tabName) {
   if (tabName == "Goals") {
     return MedicinesPage(); // Return the activities page directly
     //return SosDetailsPage(); // Return the activities page directly
-    //return const GoalsPage(); // Return the activities page directly
+    //; // Return the activities page directly
     
   }
   return Container(

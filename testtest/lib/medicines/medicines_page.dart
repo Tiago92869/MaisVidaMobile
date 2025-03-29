@@ -3,66 +3,6 @@ import 'dart:math';
 
 import 'medicine_detail_page.dart';
 
-class MedicineDTO {
-  final String id;
-  final String name;
-  final String description;
-  final bool archived;
-  final DateTime startedAt;
-  final DateTime endedAt;
-  final bool hasNotifications;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final List<PlanDTO> plans;
-
-  MedicineDTO({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.archived,
-    required this.startedAt,
-    required this.endedAt,
-    required this.hasNotifications,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.plans,
-  });
-}
-
-class PlanDTO {
-  final String id;
-  final WeekDay weekDay;
-  final List<DosageDTO> dosages;
-
-  PlanDTO({
-    required this.id,
-    required this.weekDay,
-    required this.dosages,
-  });
-}
-
-class DosageDTO {
-  final String id;
-  final TimeOfDay time;
-  final double dosage;
-
-  DosageDTO({
-    required this.id,
-    required this.time,
-    required this.dosage,
-  });
-}
-
-enum WeekDay {
-  MONDAY,
-  TUESDAY,
-  WEDNESDAY,
-  THURSDAY,
-  FRIDAY,
-  SATURDAY,
-  SUNDAY,
-}
-
 class MedicinesPage extends StatefulWidget {
   const MedicinesPage({Key? key}) : super(key: key);
 
@@ -75,10 +15,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
   DateTime? _selectedDay; // Track the selected day
   bool _isFilterPanelVisible = false; // Filter panel visibility
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedDay = _currentWeekStart; // Default to the first day of the week
+void initState() {
+  super.initState();
+  _selectedDay = null; // No day is selected initially
+  _currentWeekStart = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1)); // Start of the current week
   }
 
   // Dummy medicines data
@@ -102,6 +42,13 @@ class _MedicinesPageState extends State<MedicinesPage> {
             DosageDTO(id: "2", time: const TimeOfDay(hour: 20, minute: 0), dosage: 1.0),
           ],
         ),
+        PlanDTO(
+          id: "2",
+          weekDay: WeekDay.WEDNESDAY,
+          dosages: [
+            DosageDTO(id: "3", time: const TimeOfDay(hour: 9, minute: 30), dosage: 0.5),
+          ],
+        ),
       ],
     ),
     MedicineDTO(
@@ -116,10 +63,17 @@ class _MedicinesPageState extends State<MedicinesPage> {
       updatedAt: DateTime.now(),
       plans: [
         PlanDTO(
-          id: "2",
+          id: "3",
           weekDay: WeekDay.TUESDAY,
           dosages: [
-            DosageDTO(id: "3", time: const TimeOfDay(hour: 9, minute: 0), dosage: 1.0),
+            DosageDTO(id: "4", time: const TimeOfDay(hour: 9, minute: 0), dosage: 1.0),
+          ],
+        ),
+        PlanDTO(
+          id: "4",
+          weekDay: WeekDay.THURSDAY,
+          dosages: [
+            DosageDTO(id: "5", time: const TimeOfDay(hour: 10, minute: 0), dosage: 1.0),
           ],
         ),
       ],
@@ -307,7 +261,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => MedicineDetailPage(medicine: medicine),
+                                      builder: (context) => MedicineDetailPage(
+                                        medicine: medicine,
+                                        isEditing: false,
+                                      ),
                                     ),
                                   );
                                 },
@@ -344,20 +301,17 @@ class _MedicinesPageState extends State<MedicinesPage> {
                                       ),
                                       const SizedBox(height: 8),
 
-                                      // Notifications and End Date
+                                      // Start and End Dates
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Notifications
                                           Text(
-                                            medicine.hasNotifications ? "Notifications: On" : "Notifications: Off",
+                                            "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.white70,
                                             ),
                                           ),
-
-                                          // End Date
                                           Text(
                                             "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
                                             style: const TextStyle(
@@ -383,6 +337,86 @@ class _MedicinesPageState extends State<MedicinesPage> {
           ),
         ],
       ),
+      floatingActionButton: Padding(
+  padding: const EdgeInsets.only(bottom: 90.0, right: 20), // Move the button 40 pixels upwards
+  child: FloatingActionButton(
+        onPressed: () {
+          // Navigate to MedicineDetailPage for creating a new medicine
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MedicineDetailPage(
+                medicine: null,
+                isEditing: true,
+              ),
+            ),
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+      ),
+      ),
     );
   }
+}
+
+// Dummy MedicineDTO model
+class MedicineDTO {
+  final String id;
+  final String name;
+  final String description;
+  final bool archived;
+  final DateTime startedAt;
+  final DateTime endedAt;
+  final bool hasNotifications;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final List<PlanDTO> plans;
+
+  MedicineDTO({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.archived,
+    required this.startedAt,
+    required this.endedAt,
+    required this.hasNotifications,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.plans,
+  });
+}
+
+class PlanDTO {
+  final String id;
+  final WeekDay weekDay;
+  final List<DosageDTO> dosages;
+
+  PlanDTO({
+    required this.id,
+    required this.weekDay,
+    required this.dosages,
+  });
+}
+
+class DosageDTO {
+  final String id;
+  final TimeOfDay time;
+  final double dosage;
+
+  DosageDTO({
+    required this.id,
+    required this.time,
+    required this.dosage,
+  });
+}
+
+enum WeekDay {
+  MONDAY,
+  TUESDAY,
+  WEDNESDAY,
+  THURSDAY,
+  FRIDAY,
+  SATURDAY,
+  SUNDAY,
 }
