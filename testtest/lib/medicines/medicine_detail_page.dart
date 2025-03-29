@@ -155,16 +155,14 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          ...WeekDay.values.map((weekDay) {
-                            final plan = widget.medicine!.plans.firstWhere(
-                              (p) => p.weekDay == weekDay,
-                              orElse: () => PlanDTO(id: "", weekDay: weekDay, dosages: []),
-                            );
+                          ...widget.medicine!.plans
+                              .where((plan) => plan.dosages.isNotEmpty) // Filter out days without dosages
+                              .map((plan) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${weekDay.name[0].toUpperCase()}${weekDay.name.substring(1).toLowerCase()}", // Capitalize only the first letter
+                                  "${plan.weekDay.name[0].toUpperCase()}${plan.weekDay.name.substring(1).toLowerCase()}", // Capitalize only the first letter
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -172,58 +170,55 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 5),
-                                if (plan.dosages.isNotEmpty)
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: plan.dosages.map((dosage) {
-                                        return Container(
-                                          margin: const EdgeInsets.only(right: 10),
-                                          padding: const EdgeInsets.all(8.0),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromRGBO(255, 255, 255, 0.1), // Slightly brighter background
-                                            border: Border.all(color: Colors.white), // Brighter border
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                dosage.time.format(context),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold, // Make the text bold
-                                                  color: Colors.white, // Bright white for better contrast
-                                                ),
-                                                textAlign: TextAlign.center,
+                                Stack(
+                                  children: [
+                                    // Medicine row with horizontal scrolling
+                                    Scrollbar(
+                                      controller: ScrollController(), // Add a controller for the scrollbar
+                                      thumbVisibility: true, // Ensure the scrollbar is visible
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: plan.dosages.map((dosage) {
+                                            return Container(
+                                              margin: const EdgeInsets.only(right: 10),
+                                              padding: const EdgeInsets.all(8.0),
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromRGBO(255, 255, 255, 0.1), // Slightly brighter background
+                                                border: Border.all(color: Colors.white), // Brighter border
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
-                                              const SizedBox(height: 5),
-                                              Text(
-                                                "${dosage.dosage}",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold, // Make the text bold
-                                                  color: Colors.white, // Bright white for better contrast
-                                                ),
-                                                textAlign: TextAlign.center,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    dosage.time.format(context),
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold, // Make the text bold
+                                                      color: Colors.white, // Bright white for better contrast
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    "${dosage.dosage}",
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold, // Make the text bold
+                                                      color: Colors.white, // Bright white for better contrast
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  )
-                                else
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 16.0),
-                                    child: Text(
-                                      "No dosage scheduled.",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white70,
+                                            );
+                                          }).toList(),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
+                                ),
                                 const SizedBox(height: 10),
                               ],
                             );
