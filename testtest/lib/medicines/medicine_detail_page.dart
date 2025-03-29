@@ -1,3 +1,4 @@
+import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
 import 'medicines_page.dart';
 
@@ -18,6 +19,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   late TextEditingController startDateController;
   late TextEditingController endDateController;
   bool hasNotifications = false; // Local variable for notifications toggle
+  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
 
   @override
   void initState() {
@@ -88,211 +90,254 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               ),
             ),
           ),
+
+          // Randomly show one of the starfish images
+          if (_showFirstStarfish)
+            Positioned(
+              right: 80,
+              top: 320,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.7,
+                  child: Image.asset(
+                    'assets/images/starfish2.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            )
+          else
+            Positioned(
+              left: 100,
+              top: 250,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.5,
+                  child: Image.asset(
+                    'assets/images/starfish1.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+
           // Content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Back button
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Name
-                    TextField(
-                      controller: nameController,
-                      enabled: editMode,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "Enter Medicine Name",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Description
-                    TextField(
-                      controller: descriptionController,
-                      enabled: editMode,
-                      maxLines: null,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "Enter Medicine Description",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Plans Section
-                    if (widget.medicine?.plans != null && widget.medicine!.plans.isNotEmpty)
-                      Column(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: SingleChildScrollView(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Weekly Plan",
-                            style: TextStyle(
-                              fontSize: 20,
+                          // Back button
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Name
+                          TextField(
+                            controller: nameController,
+                            enabled: editMode,
+                            style: const TextStyle(
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
+                            decoration: const InputDecoration(
+                              hintText: "Enter Medicine Name",
+                              hintStyle: TextStyle(color: Colors.white70),
+                              border: InputBorder.none,
+                            ),
                           ),
                           const SizedBox(height: 10),
-                          ...widget.medicine!.plans
-                              .where((plan) => plan.dosages.isNotEmpty) // Filter out days without dosages
-                              .map((plan) {
-                            return Column(
+
+                          // Description
+                          TextField(
+                            controller: descriptionController,
+                            enabled: editMode,
+                            maxLines: null,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: "Enter Medicine Description",
+                              hintStyle: TextStyle(color: Colors.white70),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Plans Section
+                          if (widget.medicine?.plans != null && widget.medicine!.plans.isNotEmpty)
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "${plan.weekDay.name[0].toUpperCase()}${plan.weekDay.name.substring(1).toLowerCase()}", // Capitalize only the first letter
-                                  style: const TextStyle(
-                                    fontSize: 18,
+                                const Text(
+                                  "Weekly Plan",
+                                  style: TextStyle(
+                                    fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(height: 5),
-                                Stack(
-                                  children: [
-                                    // Medicine row with horizontal scrolling
-                                    Scrollbar(
-                                      controller: ScrollController(), // Add a controller for the scrollbar
-                                      thumbVisibility: true, // Ensure the scrollbar is visible
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: plan.dosages.map((dosage) {
-                                            return Container(
-                                              margin: const EdgeInsets.only(right: 10),
-                                              padding: const EdgeInsets.all(8.0),
-                                              decoration: BoxDecoration(
-                                                color: const Color.fromRGBO(255, 255, 255, 0.1), // Slightly brighter background
-                                                border: Border.all(color: Colors.white), // Brighter border
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    dosage.time.format(context),
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold, // Make the text bold
-                                                      color: Colors.white, // Bright white for better contrast
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  const SizedBox(height: 5),
-                                                  Text(
-                                                    "${dosage.dosage}",
-                                                    style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold, // Make the text bold
-                                                      color: Colors.white, // Bright white for better contrast
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }).toList(),
+                                const SizedBox(height: 10),
+                                ...widget.medicine!.plans
+                                    .where((plan) => plan.dosages.isNotEmpty) // Filter out days without dosages
+                                    .map((plan) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${plan.weekDay.name[0].toUpperCase()}${plan.weekDay.name.substring(1).toLowerCase()}", // Capitalize only the first letter
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
+                                      const SizedBox(height: 5),
+                                      Stack(
+                                        children: [
+                                          // Medicine row with horizontal scrolling
+                                          Scrollbar(
+                                            controller: ScrollController(), // Add a controller for the scrollbar
+                                            thumbVisibility: true, // Ensure the scrollbar is visible
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Row(
+                                                children: plan.dosages.map((dosage) {
+                                                  return Container(
+                                                    margin: const EdgeInsets.only(right: 10),
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color.fromRGBO(255, 255, 255, 0.1), // Slightly brighter background
+                                                      border: Border.all(color: Colors.white), // Brighter border
+                                                      borderRadius: BorderRadius.circular(8),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          dosage.time.format(context),
+                                                          style: const TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight: FontWeight.bold, // Make the text bold
+                                                            color: Colors.white, // Bright white for better contrast
+                                                          ),
+                                                          textAlign: TextAlign.center,
+                                                        ),
+                                                        const SizedBox(height: 5),
+                                                        Text(
+                                                          "${dosage.dosage}",
+                                                          style: const TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight: FontWeight.bold, // Make the text bold
+                                                            color: Colors.white, // Bright white for better contrast
+                                                          ),
+                                                          textAlign: TextAlign.center,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                    ],
+                                  );
+                                }).toList(),
                               ],
-                            );
-                          }).toList(),
-                        ],
-                      )
-                    else
-                      const Text(
-                        "No plans available.",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    const SizedBox(height: 20),
+                            )
+                          else
+                            const Text(
+                              "No plans available.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          const SizedBox(height: 20),
 
-                    // Start Date
-                    TextField(
-                      controller: startDateController,
-                      enabled: editMode,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: "Start Date",
-                        labelStyle: TextStyle(color: Colors.white70),
-                        border: UnderlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // End Date
-                    TextField(
-                      controller: endDateController,
-                      enabled: editMode,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: "End Date",
-                        labelStyle: TextStyle(color: Colors.white70),
-                        border: UnderlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Notifications Toggle
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Notifications",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                          // Start Date
+                          TextField(
+                            controller: startDateController,
+                            enabled: editMode,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: "Start Date",
+                              labelStyle: TextStyle(color: Colors.white70),
+                              border: UnderlineInputBorder(),
+                            ),
                           ),
-                        ),
-                        Switch(
-                          value: hasNotifications,
-                          onChanged: editMode
-                              ? (value) {
-                                  setState(() {
-                                    hasNotifications = value;
-                                  });
-                                }
-                              : null,
-                        ),
-                      ],
+                          const SizedBox(height: 10),
+
+                          // End Date
+                          TextField(
+                            controller: endDateController,
+                            enabled: editMode,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: "End Date",
+                              labelStyle: TextStyle(color: Colors.white70),
+                              border: UnderlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Notifications Toggle
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Notifications",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Switch(
+                                value: hasNotifications,
+                                onChanged: editMode
+                                    ? (value) {
+                                        setState(() {
+                                          hasNotifications = value;
+                                        });
+                                      }
+                                    : null,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
 

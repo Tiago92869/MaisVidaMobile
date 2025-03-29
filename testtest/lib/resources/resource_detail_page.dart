@@ -47,7 +47,7 @@ class ResourceDetailPage extends StatelessWidget {
             width: 400,
             height: 400,
             child: Opacity(
-              opacity: 0.2,
+              opacity: 0.1,
               child: Transform.rotate(
                 angle: 0.7, // Rotation angle in radians (e.g., 0.5 radians ≈ 28.65 degrees)
                 child: Image.asset(

@@ -42,7 +42,7 @@ class _NotificationDetailsPageState extends State<NotificationDetailsPage> {
                 width: 400,
                 height: 400,
                 child: Opacity(
-                  opacity: 0.2,
+                  opacity: 0.1,
                   child: Transform.rotate(
                     angle: 0.7, // Rotation angle in radians
                     child: Image.asset(
@@ -59,7 +59,7 @@ class _NotificationDetailsPageState extends State<NotificationDetailsPage> {
                 width: 400,
                 height: 400,
                 child: Opacity(
-                  opacity: 0.2,
+                  opacity: 0.1,
                   child: Transform.rotate(
                     angle: 0.5, // Rotation angle in radians
                     child: Image.asset(

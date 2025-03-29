@@ -65,7 +65,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
               width: 400,
               height: 400,
               child: Opacity(
-                opacity: 0.2,
+                opacity: 0.1,
                 child: Transform.rotate(
                   angle: 0.7,
                   child: Image.asset(
@@ -82,7 +82,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
               width: 400,
               height: 400,
               child: Opacity(
-                opacity: 0.2,
+                opacity: 0.1,
                 child: Transform.rotate(
                   angle: 0.5,
                   child: Image.asset(
