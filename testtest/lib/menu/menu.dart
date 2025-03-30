@@ -119,6 +119,15 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   void _updateTabBody(String menuTitle) {
     print('Updating tab body for menu title: $menuTitle'); // Debugging print
 
+    // Handle "User" menu title explicitly
+    if (menuTitle == "User") {
+      print('Menu title is "User", setting index to 8'); // Debugging print
+      setState(() {
+        _tabBody = _screens[8]; // Index for "User"
+      });
+      return;
+    }
+
     // Search in menuItems
     int index = MenuItemModel.menuItems
         .indexWhere((menuItem) => menuItem.title == menuTitle);
