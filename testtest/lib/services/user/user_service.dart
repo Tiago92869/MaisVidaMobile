@@ -1,0 +1,196 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:testtest/services/user/user_model.dart';
+import 'package:testtest/config/config.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart'; // Import the jwt_decoder package
+
+const Duration _timeoutDuration = Duration(seconds: 10);
+
+class UserService {
+  final String _baseUrl = Config.userUrl;
+  final String _tokenUrl = Config.tokenUrl;
+  final _storage = const FlutterSecureStorage();
+
+  String? _accessToken;
+  String? _userId;
+
+  Future<void> _loadStoredCredentials() async {
+    print('Loading stored credentials...');
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
+
+    if (_accessToken != null) {
+      print('Access token loaded: $_accessToken');
+    } else {
+      print('No access token found');
+    }
+
+    if (_userId != null) {
+      print('User ID loaded: $_userId');
+    } else {
+      print('No User ID found');
+    }
+  }
+
+  Future<User> getUserById() async {
+    print('Getting user by ID...');
+    await _loadStoredCredentials();
+
+    if (_accessToken == null) throw Exception('No access token found');
+
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/mine'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_accessToken',
+        },
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return User.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to load user');
+      }
+    } catch (e) {
+      print('Error getting user by ID: $e');
+      rethrow;
+    }
+  }
+
+  Future<Token> login(String username, String password) async {
+    print('Attempting login with username: $username');
+    final queryParameters = {'username': username, 'password': password};
+
+    final uri =
+        Uri.parse('$_tokenUrl').replace(queryParameters: queryParameters);
+    print('Uri: $uri');
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final token = Token.fromJson(json.decode(response.body));
+        _accessToken = token.accessToken;
+
+        // Decode the token to get the user ID
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(_accessToken!);
+        _userId = decodedToken['sub'];
+
+        print('Decoded User ID: $_userId');
+
+        await _storage.write(key: 'accessToken', value: _accessToken);
+        await _storage.write(key: 'userId', value: _userId);
+
+        print('Login successful, access token: $_accessToken');
+        return token;
+      } else {
+        throw Exception('Failed to load token');
+      }
+    } catch (e) {
+      print('Login error: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> logout() async {
+    print('Logging out...');
+    await _storage.delete(key: 'accessToken');
+    await _storage.delete(key: 'userId');
+    _accessToken = null;
+    _userId = null;
+    print('Logout successful');
+  }
+
+  Future<User> updateUser(User user) async {
+    await _loadStoredCredentials();
+    print('Updating user with ID: $_userId');
+    try {
+      final response = await http
+          .patch(
+        Uri.parse('$_baseUrl/$_userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_accessToken',
+        },
+        body: json.encode(user.toJson()),
+      )
+          .timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return User.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to update user');
+      }
+    } catch (e) {
+      print('Error updating user: $e');
+      rethrow;
+    }
+  }
+
+  Future<User> createUser(CreateUser user) async {
+    print('Creating user...');
+    try {
+      final response = await http
+          .post(
+        Uri.parse('$_baseUrl/create'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(user.toJson()),
+      )
+          .timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return User.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to create user');
+      }
+    } catch (e) {
+      print('Error creating user: $e');
+      rethrow;
+    }
+  }
+}
