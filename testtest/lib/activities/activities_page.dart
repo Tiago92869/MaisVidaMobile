@@ -1,49 +1,9 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
+import 'package:testtest/services/activity/activity_service.dart';
+import 'package:testtest/services/activity/activity_model.dart';
+import 'package:testtest/services/resource/resource_model.dart';
 import 'activity_details_page.dart';
-
-enum ResourceType {
-  ARTICLE,
-  VIDEO,
-  PODCAST,
-  PHRASE,
-  CARE,
-  EXERCISE,
-  RECIPE,
-  MUSIC,
-  SOS,
-  OTHER,
-}
-
-class ResourceModel {
-  final String title;
-  final String description;
-  final ResourceType type;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  ResourceModel({
-    required this.title,
-    required this.description,
-    required this.type,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-}
-
-class ActivityModel {
-  final String title;
-  final String description;
-  final DateTime createdAt;
-  final List<ResourceModel> resources;
-
-  ActivityModel({
-    required this.title,
-    required this.description,
-    required this.createdAt,
-    required this.resources,
-  });
-}
 
 class ActivitiesPage extends StatefulWidget {
   const ActivitiesPage({Key? key}) : super(key: key);
@@ -53,100 +13,20 @@ class ActivitiesPage extends StatefulWidget {
 }
 
 class _ActivitiesPageState extends State<ActivitiesPage> {
-  // Dummy activity data
-  final List<ActivityModel> _activities = [
-    ActivityModel(
-      title: "Morning Yoga",
-      description: "A relaxing yoga session to start your day. This session will help you stretch and relax your body while preparing for the day ahead.",
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      resources: [
-        ResourceModel(
-          title: "Yoga Mat",
-          description: "A high-quality yoga mat for your practice.",
-          type: ResourceType.EXERCISE,
-          createdAt: DateTime.now().subtract(const Duration(days: 10)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-        ),
-        ResourceModel(
-          title: "Water Bottle",
-          description: "Stay hydrated during your yoga session.",
-          type: ResourceType.OTHER,
-          createdAt: DateTime.now().subtract(const Duration(days: 12)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 6)),
-        ),
-        ResourceModel(
-          title: "Yoga Mat",
-          description: "A high-quality yoga mat for your practice.",
-          type: ResourceType.EXERCISE,
-          createdAt: DateTime.now().subtract(const Duration(days: 10)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-        ),
-        ResourceModel(
-          title: "Water Bottle",
-          description: "Stay hydrated during your yoga session.",
-          type: ResourceType.OTHER,
-          createdAt: DateTime.now().subtract(const Duration(days: 12)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 6)),
-        ),
-        ResourceModel(
-          title: "Yoga Mat",
-          description: "A high-quality yoga mat for your practice.",
-          type: ResourceType.EXERCISE,
-          createdAt: DateTime.now().subtract(const Duration(days: 10)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-        ),
-        ResourceModel(
-          title: "Water Bottle",
-          description: "Stay hydrated during your yoga session.",
-          type: ResourceType.OTHER,
-          createdAt: DateTime.now().subtract(const Duration(days: 12)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 6)),
-        ),
-      ],
-    ),
-    ActivityModel(
-      title: "Cooking Class",
-      description: "Learn to cook a delicious Italian pasta dish. This class will teach you the basics of Italian cuisine.",
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-      resources: [
-        ResourceModel(
-          title: "Recipe Book",
-          description: "A book with Italian pasta recipes.",
-          type: ResourceType.RECIPE,
-          createdAt: DateTime.now().subtract(const Duration(days: 15)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 7)),
-        ),
-        ResourceModel(
-          title: "Ingredients",
-          description: "Fresh ingredients for the pasta dish.",
-          type: ResourceType.OTHER,
-          createdAt: DateTime.now().subtract(const Duration(days: 14)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 8)),
-        ),
-      ],
-    ),
-    ActivityModel(
-      title: "Meditation Session",
-      description: "A guided meditation to help you relax and focus. This session is perfect for beginners and experienced meditators alike.",
-      createdAt: DateTime.now().subtract(const Duration(days: 10)),
-      resources: [
-        ResourceModel(
-          title: "Meditation App",
-          description: "An app with guided meditation sessions.",
-          type: ResourceType.CARE,
-          createdAt: DateTime.now().subtract(const Duration(days: 20)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 10)),
-        ),
-        ResourceModel(
-          title: "Headphones",
-          description: "Noise-canceling headphones for meditation.",
-          type: ResourceType.OTHER,
-          createdAt: DateTime.now().subtract(const Duration(days: 18)),
-          updatedAt: DateTime.now().subtract(const Duration(days: 9)),
-        ),
-      ],
-    ),
-  ];
+  final ActivityService _activityService = ActivityService();
+
+  // List of activities fetched from the service
+  List<Activity> _activities = [];
+
+  // Search input text
+  String _searchText = "";
+
+  // Loading state
+  bool _isLoading = false;
+
+  // Pagination state
+  int _currentPage = 0;
+  bool _isLastPage = false;
 
   // Set to store selected activity filter types
   Set<ResourceType> _selectedFilterTypes = {};
@@ -188,7 +68,131 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   bool _isStarGlowing = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Add mock activities for testing
+    _activities = [
+      Activity(
+        id: "1",
+        title: "Morning Yoga",
+        description: "Start your day with a refreshing yoga session.",
+        createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+        resources: [
+          Resource(
+            id: "r1",
+            title: "Yoga Basics",
+            description: "Learn the basics of yoga.",
+            type: ResourceType.VIDEO,
+            createdAt: DateTime.now().subtract(const Duration(days: 10)),
+            updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+          ),
+          Resource(
+            id: "r2",
+            title: "Breathing Techniques",
+            description: "Master breathing techniques for relaxation.",
+            type: ResourceType.ARTICLE,
+            createdAt: DateTime.now().subtract(const Duration(days: 8)),
+            updatedAt: DateTime.now().subtract(const Duration(days: 4)),
+          ),
+        ],
+      ),
+      Activity(
+        id: "2",
+        title: "Healthy Cooking",
+        description: "Learn to cook healthy and delicious meals.",
+        createdAt: DateTime.now().subtract(const Duration(days: 10)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 7)),
+        resources: [
+          Resource(
+            id: "r3",
+            title: "Quick Recipes",
+            description: "Prepare quick and healthy recipes.",
+            type: ResourceType.RECIPE,
+            createdAt: DateTime.now().subtract(const Duration(days: 15)),
+            updatedAt: DateTime.now().subtract(const Duration(days: 10)),
+          ),
+        ],
+      ),
+      Activity(
+        id: "3",
+        title: "Meditation for Beginners",
+        description: "A guide to help you start meditating.",
+        createdAt: DateTime.now().subtract(const Duration(days: 20)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 15)),
+        resources: [
+          Resource(
+            id: "r4",
+            title: "Meditation Basics",
+            description: "Learn the basics of meditation.",
+            type: ResourceType.PODCAST,
+            createdAt: DateTime.now().subtract(const Duration(days: 25)),
+            updatedAt: DateTime.now().subtract(const Duration(days: 20)),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  // Function to fetch activities
+  Future<void> _fetchActivities() async {
+    if (_isLoading || _isLastPage) return; // Prevent duplicate or unnecessary requests
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final activityPage = await _activityService.fetchActivities(
+        _currentPage, // Current page number
+        20, // Page size
+        _searchText, // Search query
+      );
+
+      setState(() {
+        _activities.addAll(activityPage.content); // Append new activities to the list
+        _isLastPage = activityPage.last; // Check if this is the last page
+        _currentPage++; // Increment the page number for the next fetch
+      });
+    } catch (e) {
+      print('Error fetching activities: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch activities. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Function to handle search input
+  void _onSearch(String text) {
+    setState(() {
+      _searchText = text;
+      _activities.clear(); // Clear the current list of activities
+      _currentPage = 0; // Reset to the first page
+      _isLastPage = false; // Reset the last page flag
+    });
+    _fetchActivities();
+  }
+
+  // Function to detect when the user scrolls to the bottom
+  void _onScroll(ScrollController controller) {
+    if (controller.position.pixels >= controller.position.maxScrollExtent - 200) {
+      _fetchActivities(); // Fetch the next page when near the bottom
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final ScrollController _scrollController = ScrollController();
+    _scrollController.addListener(() => _onScroll(_scrollController));
+
     return Scaffold(
       body: Stack(
         children: [
@@ -203,176 +207,178 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     color: Colors.transparent, // Detect taps anywhere on the screen
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center, // Center the cards
-                          children: [
-                            const SizedBox(height: 60), // Add spacing between the top of the screen and the title
-                            // Title (Activities) centered at the top
-                            const Center(
-                              child: Text(
-                                "Activities",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontFamily: "Poppins",
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          setState(() {
+                            _activities.clear(); // Clear current activities
+                            _currentPage = 0; // Reset pagination
+                            _isLastPage = false; // Reset last page flag
+                          });
+                          await _fetchActivities(); // Fetch activities again
+                        },
+                        child: SingleChildScrollView(
+                          controller: _scrollController, // Attach the scroll controller
+                          physics: const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center, // Center the cards
+                            children: [
+                              const SizedBox(height: 60), // Add spacing between the top of the screen and the title
+                              // Title (Activities) centered at the top
+                              const Center(
+                                child: Text(
+                                  "Activities",
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontFamily: "Poppins",
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 40),
-                            // Input TextField with Search icon
-                            TextField(
-                              decoration: InputDecoration(
-                                labelText: "Search Activities",
-                                labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                                prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: const BorderSide(color: Colors.grey),
+                              const SizedBox(height: 40),
+                              // Input TextField with Search icon
+                              TextField(
+                                onChanged: _onSearch, // Trigger search on input change
+                                decoration: InputDecoration(
+                                  labelText: "Search Activities",
+                                  labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                                  prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(color: Colors.grey),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                style: const TextStyle(fontSize: 14),
                               ),
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(height: 20),
-                            // Display the activities as cards
-                            Column(
-                              children: _activities
-                                  .asMap()
-                                  .entries
-                                  .map(
-                                    (entry) {
-                                      final index = entry.key;
-                                      final activity = entry.value;
-                                      final backgroundColor = _activityColors[index % _activityColors.length];
-                                      final isFavorite = _favoriteActivities.contains(activity.title);
+                              const SizedBox(height: 20),
+                              // Display the activities as cards
+                              Column(
+                                children: _activities
+                                    .asMap()
+                                    .entries
+                                    .map(
+                                      (entry) {
+                                        final index = entry.key;
+                                        final activity = entry.value;
+                                        final backgroundColor = _activityColors[index % _activityColors.length];
 
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 15), // Increased spacing
-                                        child: Container(
-                                          constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
-                                          padding: const EdgeInsets.all(20),
-                                          decoration: BoxDecoration(
-                                            color: backgroundColor,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: backgroundColor.withOpacity(0.3),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 12),
-                                              ),
-                                              BoxShadow(
-                                                color: backgroundColor.withOpacity(0.3),
-                                                blurRadius: 2,
-                                                offset: const Offset(0, 1),
-                                              ),
-                                            ],
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Title
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    activity.title,
-                                                    style: const TextStyle(
-                                                      fontSize: 24,
-                                                      fontFamily: "Poppins",
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 15),
+                                          child: Container(
+                                            constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
+                                            padding: const EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              color: backgroundColor,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: backgroundColor.withOpacity(0.3),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 12),
+                                                ),
+                                                BoxShadow(
+                                                  color: backgroundColor.withOpacity(0.3),
+                                                  blurRadius: 2,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ],
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                // Title
+                                                Text(
+                                                  activity.title,
+                                                  style: const TextStyle(
+                                                    fontSize: 24,
+                                                    fontFamily: "Poppins",
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 8),
-
-                                              // Description
-                                              Text(
-                                                activity.description,
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 2,
-                                                style: TextStyle(
-                                                  color: Colors.white.withOpacity(0.7),
-                                                  fontSize: 16,
                                                 ),
-                                              ),
-                                              const SizedBox(height: 8),
-
-                                              // Created At
-                                              Text(
-                                                "Created At: ${activity.createdAt.toLocal().toString().split(' ')[0]}",
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: "Inter",
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.white,
+                                                const SizedBox(height: 8),
+                                                // Description
+                                                Text(
+                                                  activity.description,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.7),
+                                                    fontSize: 16,
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(height: 8),
-
-                                              // Resources Count
-                                              Text(
-                                                "Resources: ${activity.resources.length}",
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: "Inter",
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.white,
+                                                const SizedBox(height: 8),
+                                                // Created At
+                                                Text(
+                                                  "Created At: ${activity.createdAt?.toLocal().toString().split(' ')[0]}",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily: "Inter",
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
-                                              ),
-                                              const Spacer(),
-                                              Center(
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => ActivityDetailsPage(
-                                                          activity: activity,
+                                                const SizedBox(height: 8),
+                                                // Resources Count
+                                                Text(
+                                                  "Resources: ${activity.resources?.length}",
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily: "Inter",
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                const Spacer(),
+                                                Center(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => ActivityDetailsPage(
+                                                            activity: activity,
+                                                          ),
                                                         ),
+                                                      );
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      foregroundColor: backgroundColor,
+                                                      backgroundColor: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12),
                                                       ),
-                                                    );
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                    foregroundColor: backgroundColor, backgroundColor: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(12),
                                                     ),
-                                                  ),
-                                                  child: const Text(
-                                                    "Start",
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
+                                                    child: const Text(
+                                                      "Start",
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  )
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 30),
-                          ],
+                                        );
+                                      },
+                                    )
+                                    .toList(),
+                              ),
+                              if (_isLoading)
+                                const Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              const SizedBox(height: 30),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  // Apply blur effect when filter panel is visible
-                  if (_isFilterPanelVisible)
-                    BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust blur intensity
-                      child: Container(
-                        color: Colors.black.withOpacity(0.2), // Optional: Add a semi-transparent overlay
-                      ),
-                    ),
                 ],
               ),
             ),

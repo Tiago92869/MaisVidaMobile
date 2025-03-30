@@ -4,14 +4,14 @@ import 'package:testtest/services/activity/activity_model.dart';
 class ActivityRepository {
   final ActivityService _activityService = ActivityService();
 
-  Future<List<Activity>> getActivitiesByUserId(
+  Future<ActivityPage> getActivitiesByUserId(
       int page, int size, String searchQuery) async {
     try {
       print('Fetching activities by user ID...');
-      final activities =
+      final activityPage =
           await _activityService.fetchActivities(page, size, searchQuery);
-      print('Fetched ${activities.length} activities.');
-      return activities;
+      print('Fetched ${activityPage.content.length} activities on page $page.');
+      return activityPage;
     } catch (e) {
       print('Error fetching activities by user ID: $e');
       rethrow;

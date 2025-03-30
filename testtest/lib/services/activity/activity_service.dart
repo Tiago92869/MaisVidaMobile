@@ -35,8 +35,7 @@ class ActivityService {
     }
   }
 
-  Future<List<Activity>> fetchActivities(
-      int page, int size, String searchQuery) async {
+  Future<ActivityPage> fetchActivities(int page, int size, String searchQuery) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl?page=$page&size=$size&search=$searchQuery';
     print('Request URL for fetchActivities: $url'); // Log the request URL
@@ -64,7 +63,7 @@ class ActivityService {
         final jsonResponse = jsonDecode(response.body);
         final activityPage = ActivityPage.fromJson(jsonResponse);
         print('Successfully fetched ${activityPage.content.length} activities.');
-        return activityPage.content;
+        return activityPage;
       } else {
         print('Failed to load activities. Status Code: ${response.statusCode}');
         throw Exception('Failed to load activities');

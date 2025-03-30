@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'activities_page.dart';
+import 'package:testtest/services/favorite/favorite_service.dart';
+import 'package:testtest/services/favorite/favorite_model.dart';
+import 'package:testtest/services/activity/activity_model.dart';
 import 'dart:math';
 
 class ActivityDetailsPage extends StatefulWidget {
-  final ActivityModel activity;
-
-  static final Set<String> favoriteActivities = {}; // Track favorite activities
+  final Activity activity;
 
   const ActivityDetailsPage({Key? key, required this.activity}) : super(key: key);
 
@@ -14,9 +14,67 @@ class ActivityDetailsPage extends StatefulWidget {
 }
 
 class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
+  final FavoriteService _favoriteService = FavoriteService();
+
+  bool _isFavorite = false;
+  bool _hasFavoriteChanged = false; // Track if the favorite status has changed
   int _currentResourceIndex = 0;
   bool _isViewingResources = false;
   bool _showFirstStarfish = Random().nextBool();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavorite(); // Check if the activity is marked as favorite
+  }
+
+  Future<void> _checkIfFavorite() async {
+    try {
+      final isFavorite = await _favoriteService.isFavorite(activityId: widget.activity.id);
+      setState(() {
+        _isFavorite = isFavorite;
+      });
+    } catch (e) {
+      print('Error checking favorite status: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to check favorite status. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _toggleFavoriteStatus() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+      _hasFavoriteChanged = true; // Mark that the favorite status has changed
+    });
+  }
+
+  Future<void> _updateFavoriteStatus() async {
+    if (_hasFavoriteChanged) {
+      try {
+        final favoriteInput = FavoriteInput(
+          activities: [widget.activity.id],
+          resources: [],
+        );
+
+        await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
+      } catch (e) {
+        print('Error updating favorite status: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update favorite status.')),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _updateFavoriteStatus(); // Update the favorite status when the page is closed
+    super.dispose();
+  }
 
   void _startActivity() {
     setState(() {
@@ -27,7 +85,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
 
   void _nextResource() {
     setState(() {
-      if (_currentResourceIndex < widget.activity.resources.length - 1) {
+      if (_currentResourceIndex < widget.activity.resources!.length - 1) {
         _currentResourceIndex++;
         _showFirstStarfish = Random().nextBool();
       }
@@ -37,7 +95,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final activity = widget.activity;
-    final isFavorite = ActivityDetailsPage.favoriteActivities.contains(widget.activity.title);
 
     return Scaffold(
       body: Stack(
@@ -115,7 +172,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.activity.title,
+                          activity.title,
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -125,25 +182,17 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (isFavorite) {
-                              ActivityDetailsPage.favoriteActivities.remove(widget.activity.title);
-                            } else {
-                              ActivityDetailsPage.favoriteActivities.add(widget.activity.title);
-                            }
-                          });
-                        },
+                        onTap: _toggleFavoriteStatus, // Toggle the favorite status locally
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: isFavorite ? Colors.yellow : Colors.transparent,
+                            color: _isFavorite ? Colors.yellow : Colors.transparent,
                             border: Border.all(color: Colors.yellow, width: 2),
                           ),
                           child: Icon(
-                            isFavorite ? Icons.star : Icons.star_border,
-                            color: isFavorite ? Colors.white : Colors.yellow,
+                            _isFavorite ? Icons.star : Icons.star_border,
+                            color: _isFavorite ? Colors.white : Colors.yellow,
                           ),
                         ),
                       ),
@@ -155,23 +204,24 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: activity.resources.map((resource) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            resource.type.toString().split('.').last.capitalizeFirstLetter(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      children: activity.resources?.map((resource) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                resource.type.toString().split('.').last.capitalizeFirstLetter(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          }).toList() ??
+                          [],
                     ),
                   const SizedBox(height: 20),
                   // Description or Resource View
@@ -197,7 +247,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildDateInfo("Created At", activity.createdAt),
-                        _buildDateInfo("Resources", activity.resources.length.toString()),
+                        _buildDateInfo("Resources", activity.resources?.length.toString() ?? "0"),
                       ],
                     ),
                   const SizedBox(height: 20),
@@ -260,52 +310,54 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   }
 
   Widget _buildResourceView() {
-    final resource = widget.activity.resources[_currentResourceIndex];
+    final resource = widget.activity.resources?[_currentResourceIndex];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          resource.title,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 10),
-        // Resource Type
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            resource.type.toString().split('.').last.capitalizeFirstLetter(),
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          resource.description,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
+    return resource == null
+        ? const Center(child: Text("No resources available", style: TextStyle(color: Colors.white)))
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                resource.title,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Resource Type
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  resource.type.toString().split('.').last.capitalizeFirstLetter(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                resource.description,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          );
   }
 
   Widget _buildNavigationButtons() {
     return Center(
       child: ElevatedButton(
-        onPressed: _currentResourceIndex < widget.activity.resources.length - 1
+        onPressed: _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
             ? _nextResource
             : () => Navigator.pop(context),
         style: ElevatedButton.styleFrom(
@@ -316,7 +368,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
           ),
         ),
         child: Text(
-          _currentResourceIndex < widget.activity.resources.length - 1 ? "Next" : "Finish",
+          _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1 ? "Next" : "Finish",
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
