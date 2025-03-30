@@ -339,7 +339,21 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               CustomTabBar(
                 onTabChange: (tabIndex) {
                   setState(() {
-                    _tabBody = _screens[tabIndex];
+                    if(tabIndex == 0){
+                      _tabBody = _screens.first;
+                    }
+                    if(tabIndex == 1){
+                      _tabBody = _screens[1];
+                    }
+                    if(tabIndex == 2){
+                      _tabBody = _screens[4];
+                    }
+                    if(tabIndex == 3){
+                      _tabBody = _screens[2];
+                    }
+                    if(tabIndex == 4){
+                      _tabBody = _screens[8];
+                    }
                   });
                 },
               ),

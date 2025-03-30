@@ -176,8 +176,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               children: _resources
                                   .map(
                                     (resource) {
-                                      final isFavorite = _favoriteResources.contains(resource.id);
-
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 10),
                                         child: GestureDetector(
@@ -189,30 +187,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                               ),
                                             );
                                           },
-                                          child: Stack(
-                                            children: [
-                                              _buildHCard(resource),
-                                              Positioned(
-                                                top: 10,
-                                                right: 10,
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      if (isFavorite) {
-                                                        _favoriteResources.remove(resource.id);
-                                                      } else {
-                                                        _favoriteResources.add(resource.id);
-                                                      }
-                                                    });
-                                                  },
-                                                  child: Icon(
-                                                    isFavorite ? Icons.star : Icons.star_border,
-                                                    color: isFavorite ? Colors.yellow : Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                          child: _buildHCard(resource), // Removed the Stack and star icon
                                         ),
                                       );
                                     },
