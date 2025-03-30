@@ -20,20 +20,28 @@ import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
   if (tabName == "Profile") {
-    //return UserProfilePage(); // Return the user profile page directly
-    return const GoalsPage(); // Return the activities page directly
+    return UserProfilePage(); // Return the user profile page directly
   }
   if (tabName == "Resources") {
     return ResourcesPage(); // Return the resources page directly
   }
   if (tabName == "Diary") {
-    return const ActivitiesPage(); // Return the activities page directly
+    return const DiaryPage(); // Return the activities page directly
   }
   if (tabName == "Goals") {
+    return const GoalsPage(); // Return the activities page directly
+  }
+  if (tabName == "Activities") {
+    return const ActivitiesPage(); // Return the activities page directly
+  }
+  if (tabName == "Medicine") {
     return MedicinesPage(); // Return the activities page directly
-    //return SosDetailsPage(); // Return the activities page directly
-    //; // Return the activities page directly
-    
+  }
+  if (tabName == "Notifications") {
+    return NotificationsPage(); // Return the resources page directly
+  }
+  if (tabName == "SOS") {
+    return SosDetailsPage(); // Return the activities page directly
   }
   return Container(
     color: RiveAppTheme.background,
