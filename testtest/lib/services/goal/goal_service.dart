@@ -17,8 +17,10 @@ class GoalService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -41,9 +43,7 @@ class GoalService {
   ) async {
     await _loadStoredCredentials();
     try {
-      print("GET ALL 1");
-
-      // Construct query parameters
+      print('Fetching goals...');
       final String subjectsQuery = goalSubjects
           .map((subject) =>
               'goalSubjects=${subject.toString().split('.').last.toUpperCase()}')
@@ -52,12 +52,128 @@ class GoalService {
           '$_baseUrl?&userId=$_userId&isCompleted=$isCompleted&$subjectsQuery'
           '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}';
 
-      print('URL: $url');
+      print('Request URL for fetchGoals: $url'); // Log the request URL
+
       final response = await http.get(
         Uri.parse(url),
         headers: {
-          'Authorization': 'Bearer ${_accessToken}',
+          'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
+        },
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          print('Request to $url timed out.');
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        final List<GoalDay> goalDays =
+            jsonList.map((json) => GoalDay.fromJson(json)).toList();
+        print('Goals fetched successfully. Total goals: ${goalDays.length}');
+        return goalDays;
+      } else {
+        print('Failed to load goals. Status Code: ${response.statusCode}');
+        throw Exception('Failed to load goals');
+      }
+    } catch (e) {
+      print('Error fetching goals: $e');
+      throw Exception('Failed to fetch goals');
+    }
+  }
+
+  Future<GoalInfoCard> createGoal(GoalInfoCard goal) async {
+    await _loadStoredCredentials();
+    try {
+      final requestBody = jsonEncode(goal.toJson());
+      print('Request Body for createGoal: $requestBody'); // Log the request body
+
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('Goal created successfully.');
+        return GoalInfoCard.fromJson(jsonDecode(response.body));
+      } else {
+        print('Failed to create goal. Status Code: ${response.statusCode}');
+        throw HttpException('Failed to create goal: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error creating goal: $e');
+      throw Exception('Failed to create goal');
+    }
+  }
+
+  Future<GoalInfoCard> updateGoal(String id, GoalInfoCard goal) async {
+    await _loadStoredCredentials();
+    try {
+      final requestBody = jsonEncode(goal.toJson());
+      final String requestUrl = '$_baseUrl/$id';
+      print('Request URL for updateGoal: $requestUrl'); // Log the request URL
+      print('Request Body for updateGoal: $requestBody'); // Log the request body
+
+      final response = await http.patch(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('Goal updated successfully.');
+        return GoalInfoCard.fromJson(jsonDecode(response.body));
+      } else {
+        print('Failed to update goal. Status Code: ${response.statusCode}');
+        throw Exception('Failed to update goal');
+      }
+    } catch (e) {
+      print('Error updating goal: $e');
+      throw Exception('Failed to update goal');
+    }
+  }
+
+  Future<void> deleteGoal(String id) async {
+    await _loadStoredCredentials();
+    try {
+      final String requestUrl = '$_baseUrl/$id';
+      print('Request URL for deleteGoal: $requestUrl'); // Log the request URL
+
+      final response = await http.delete(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
         },
       ).timeout(
         _timeoutDuration,
@@ -67,23 +183,16 @@ class GoalService {
         },
       );
 
-      print('STATUS CODE: ${response.statusCode}');
-      print('STATUS CODE: ${response.body}');
+      print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('STATUS CODE11111: ${response.statusCode}');
-        final List<dynamic> jsonList = jsonDecode(response.body);
-        print('STATUS CODE2222: ${response.statusCode}');
-        final List<GoalDay> goalDays =
-            jsonList.map((json) => GoalDay.fromJson(json)).toList();
-        print('RESPONSE SIZE: ${goalDays.length}');
-        return goalDays;
+        print('Goal deleted successfully.');
       } else {
-        throw Exception('Failed to load goals');
+        print('Failed to delete goal. Status Code: ${response.statusCode}');
+        throw HttpException('Failed to delete goal: ${response.reasonPhrase}');
       }
-    } on http.ClientException {
-      throw Exception('Failed to connect to the server');
     } catch (e) {
-      throw Exception('Failed to fetch goals');
+      print('Error deleting goal: $e');
+      throw Exception('Failed to delete goal');
     }
   }
 
@@ -93,113 +202,5 @@ class GoalService {
     final month = date.month.toString().padLeft(2, '0');
     final year = date.year;
     return '$year-$month-$day';
-  }
-
-  Future<GoalInfoCard> createGoal(GoalInfoCard goal) async {
-    await _loadStoredCredentials();
-    try {
-      final response = await http
-          .post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(goal.toJson()),
-      )
-          .timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return GoalInfoCard.fromJson(jsonDecode(response.body));
-      } else {
-        throw HttpException('Failed to create goal: ${response.reasonPhrase}');
-      }
-    } on TimeoutException catch (e) {
-      print('Timeout error: ${e.message}');
-      rethrow;
-    } on http.ClientException catch (e) {
-      print('Client exception: ${e.message}');
-      rethrow;
-    } catch (e) {
-      print('Unexpected error: $e');
-      rethrow;
-    }
-  }
-
-  Future<GoalInfoCard> updateGoal(String id, GoalInfoCard goal) async {
-    await _loadStoredCredentials();
-    try {
-      print("SAVED BODY!! ${goal.completed}");
-      final response = await http
-          .patch(
-        Uri.parse('$_baseUrl/$id'),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(goal.toJson()),
-      )
-          .timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        print("SAVED WITH SUCCESS!!");
-        return GoalInfoCard.fromJson(jsonDecode(response.body));
-      } else {
-        print("SAVED WITH FAIL!!");
-        throw HttpException('Failed to update goal: ${response.reasonPhrase}');
-      }
-    } on TimeoutException catch (e) {
-      print('Timeout error: ${e.message}');
-      rethrow;
-    } on http.ClientException catch (e) {
-      print('Client exception: ${e.message}');
-      rethrow;
-    } catch (e) {
-      print('Unexpected error: $e');
-      rethrow;
-    }
-  }
-
-  Future<void> deleteGoal(String id) async {
-    await _loadStoredCredentials();
-    try {
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/$id'),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
-
-      if (response.statusCode != 200) {
-        throw HttpException('Failed to delete goal: ${response.reasonPhrase}');
-      }
-    } on TimeoutException catch (e) {
-      print('Timeout error: ${e.message}');
-      rethrow;
-    } on http.ClientException catch (e) {
-      print('Client exception: ${e.message}');
-      rethrow;
-    } catch (e) {
-      print('Unexpected error: $e');
-      rethrow;
-    }
   }
 }

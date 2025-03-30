@@ -16,8 +16,10 @@ class MedicineService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -36,7 +38,7 @@ class MedicineService {
     await _loadStoredCredentials();
     try {
       final String url = '$_baseUrl?archived=$archived&page=$page&size=$size';
-      print('Fetching medicines from URL: $url');
+      print('Request URL for fetchMedicines: $url'); // Log the request URL
 
       final response = await http.get(
         Uri.parse(url),
@@ -44,22 +46,27 @@ class MedicineService {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
         },
-      ).timeout(_timeoutDuration);
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          print('Request to $url timed out.');
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        print('Successfully fetched medicines');
-        return MedicinePage.fromJson(jsonResponse);
+        print('Medicines fetched successfully.');
+        return MedicinePage.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            'Failed to load medicines. Status code: ${response.statusCode}');
+        print('Failed to load medicines. Status Code: ${response.statusCode}');
+        throw Exception('Failed to load medicines');
       }
-    } on TimeoutException {
-      print('Request timed out while fetching medicines');
-      throw Exception('Request timed out');
     } catch (e) {
       print('Error fetching medicines: $e');
-      throw Exception('Failed to fetch medicines: $e');
+      throw Exception('Failed to fetch medicines');
     }
   }
 
@@ -67,7 +74,7 @@ class MedicineService {
     await _loadStoredCredentials();
     try {
       final String url = '$_baseUrl/$id';
-      print('Fetching medicine by ID from URL: $url');
+      print('Request URL for fetchMedicineById: $url'); // Log the request URL
 
       final response = await http.get(
         Uri.parse(url),
@@ -75,109 +82,132 @@ class MedicineService {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
         },
-      ).timeout(_timeoutDuration);
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          print('Request to $url timed out.');
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('Successfully fetched medicine with ID: $id');
+        print('Medicine fetched successfully.');
         return Medicine.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            'Failed to load medicine. Status code: ${response.statusCode}');
+        print('Failed to load medicine. Status Code: ${response.statusCode}');
+        throw Exception('Failed to load medicine');
       }
-    } on TimeoutException {
-      print('Request timed out while fetching medicine with ID: $id');
-      throw Exception('Request timed out');
     } catch (e) {
       print('Error fetching medicine by ID: $e');
-      throw Exception('Failed to fetch medicine: $e');
+      throw Exception('Failed to fetch medicine');
     }
   }
 
   Future<Medicine> createMedicine(Medicine medicine) async {
     await _loadStoredCredentials();
     try {
-      final response = await http
-          .post(
-            Uri.parse(_baseUrl),
-            headers: {
-              'Authorization': 'Bearer $_accessToken',
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode(medicine.toJson()),
-          )
-          .timeout(_timeoutDuration);
+      final requestBody = jsonEncode(medicine.toJson());
+      print('Request Body for createMedicine: $requestBody'); // Log the request body
+
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('Successfully created medicine: ${medicine.name}');
+        print('Medicine created successfully.');
         return Medicine.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            'Failed to create medicine. Status code: ${response.statusCode}');
+        print('Failed to create medicine. Status Code: ${response.statusCode}');
+        throw Exception('Failed to create medicine');
       }
-    } on TimeoutException {
-      print('Request timed out while creating medicine');
-      throw Exception('Request timed out');
     } catch (e) {
       print('Error creating medicine: $e');
-      throw Exception('Failed to create medicine: $e');
+      throw Exception('Failed to create medicine');
     }
   }
 
   Future<Medicine> modifyMedicine(String id, Medicine medicine) async {
     await _loadStoredCredentials();
     try {
-      final String url = '$_baseUrl/$id';
-      print('Update medicine from URL: $url');
+      final requestBody = jsonEncode(medicine.toJson());
+      final String requestUrl = '$_baseUrl/$id';
+      print('Request URL for modifyMedicine: $requestUrl'); // Log the request URL
+      print('Request Body for modifyMedicine: $requestBody'); // Log the request body
 
-      final response = await http
-          .patch(
-            Uri.parse(url),
-            headers: {
-              'Authorization': 'Bearer $_accessToken',
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode(medicine.toJson()),
-          )
-          .timeout(_timeoutDuration);
+      final response = await http.patch(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: requestBody,
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('Successfully updated medicine ID: $id');
+        print('Medicine updated successfully.');
         return Medicine.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            'Failed to update medicine. Status code: ${response.statusCode}');
+        print('Failed to update medicine. Status Code: ${response.statusCode}');
+        throw Exception('Failed to update medicine');
       }
-    } on TimeoutException {
-      print('Request timed out while updating medicine ID: $id');
-      throw Exception('Request timed out');
     } catch (e) {
       print('Error updating medicine: $e');
-      throw Exception('Failed to update medicine: $e');
+      throw Exception('Failed to update medicine');
     }
   }
 
   Future<void> deleteMedicine(String id) async {
     await _loadStoredCredentials();
     try {
+      final String requestUrl = '$_baseUrl/$id';
+      print('Request URL for deleteMedicine: $requestUrl'); // Log the request URL
+
       final response = await http.delete(
-        Uri.parse('$_baseUrl/$id'),
+        Uri.parse(requestUrl),
         headers: {
           'Authorization': 'Bearer $_accessToken',
         },
-      ).timeout(_timeoutDuration);
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
 
+      print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('Successfully deleted medicine ID: $id');
+        print('Medicine deleted successfully.');
       } else {
-        throw Exception(
-            'Failed to delete medicine. Status code: ${response.statusCode}');
+        print('Failed to delete medicine. Status Code: ${response.statusCode}');
+        throw Exception('Failed to delete medicine');
       }
-    } on TimeoutException {
-      print('Request timed out while deleting medicine ID: $id');
-      throw Exception('Request timed out');
     } catch (e) {
       print('Error deleting medicine: $e');
-      throw Exception('Failed to delete medicine: $e');
+      throw Exception('Failed to delete medicine');
     }
   }
 }

@@ -18,8 +18,10 @@ class NotificationService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -28,7 +30,7 @@ class NotificationService {
     }
 
     if (_userId != null) {
-      print('User ID loaded: $_userId');
+      print('User ID loaded: $_userId'); 
     } else {
       print('No User ID found');
     }
@@ -36,56 +38,82 @@ class NotificationService {
 
   Future<List<NotificationModel>> fetchNotifications() async {
     await _loadStoredCredentials();
-    final response = await http.get(
-      Uri.parse('$_baseUrl?userId=$_userId'),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/json',
-      },
-    ).timeout(
-      _timeoutDuration,
-      onTimeout: () {
-        throw TimeoutException(
-            'The connection has timed out, please try again later.');
-      },
-    );
+    try {
+      final requestUrl = '$_baseUrl?userId=$_userId';
+      print('Request URL for fetchNotifications: $requestUrl'); // Log the request URL
 
-    print('Response body: ${response.body}');
+      final response = await http.get(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          print('Request to $requestUrl timed out.');
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> json = jsonDecode(response.body);
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
-      // Check the structure of the response
-      if (json.containsKey('content')) {
-        final List<dynamic> notificationsJson = json['content'];
-        return notificationsJson
-            .map((e) => NotificationModel.fromJson(e))
-            .toList();
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+
+        // Check the structure of the response
+        if (json.containsKey('content')) {
+          final List<dynamic> notificationsJson = json['content'];
+          print('Notifications fetched successfully.');
+          return notificationsJson
+              .map((e) => NotificationModel.fromJson(e))
+              .toList();
+        } else {
+          print('Unexpected response format: ${response.body}');
+          throw Exception('Unexpected response format');
+        }
       } else {
-        throw Exception('Unexpected response format');
+        print('Failed to load notifications. Status Code: ${response.statusCode}');
+        throw Exception('Failed to load notifications');
       }
-    } else {
-      throw Exception('Failed to load notifications');
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      throw Exception('Failed to fetch notifications');
     }
   }
 
   Future<void> deleteNotification(String id) async {
     await _loadStoredCredentials();
-    final response = await http.delete(
-      Uri.parse('$_baseUrl/$id'),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/json',
-      },
-    ).timeout(
-      _timeoutDuration,
-      onTimeout: () {
-        throw TimeoutException(
-            'The connection has timed out, please try again later.');
-      },
-    );
+    try {
+      final String requestUrl = '$_baseUrl/$id';
+      print('Request URL for deleteNotification: $requestUrl'); // Log the request URL
 
-    if (response.statusCode != 200) {
+      final response = await http.delete(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(
+        _timeoutDuration,
+        onTimeout: () {
+          print('Request to $requestUrl timed out.');
+          throw TimeoutException(
+              'The connection has timed out, please try again later.');
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        print('Notification deleted successfully.');
+      } else {
+        print('Failed to delete notification. Status Code: ${response.statusCode}');
+        throw Exception('Failed to delete notification');
+      }
+    } catch (e) {
+      print('Error deleting notification: $e');
       throw Exception('Failed to delete notification');
     }
   }

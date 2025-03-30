@@ -18,8 +18,8 @@ class UserService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    //_accessToken = await _storage.read(key: 'accessToken');
-    //_userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
     _accessToken = "testeste";
     _userId = "asdasd";
 
@@ -43,8 +43,11 @@ class UserService {
     if (_accessToken == null) throw Exception('No access token found');
 
     try {
+      final requestUrl = '$_baseUrl/mine';
+      print('Request URL for getUserById: $requestUrl'); // Log the request URL
+
       final response = await http.get(
-        Uri.parse('$_baseUrl/mine'),
+        Uri.parse(requestUrl),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $_accessToken',
@@ -77,7 +80,8 @@ class UserService {
 
     final uri =
         Uri.parse('$_tokenUrl').replace(queryParameters: queryParameters);
-    print('Uri: $uri');
+    print('Request URL for login: $uri'); // Log the request URL
+
     try {
       final response = await http.post(
         uri,
@@ -133,11 +137,13 @@ class UserService {
     print('Updating user with ID: $_userId');
     try {
       final requestBody = json.encode(user.toJson());
+      final requestUrl = '$_baseUrl/$_userId';
+      print('Request URL for updateUser: $requestUrl'); // Log the request URL
       print('Request body for updateUser: $requestBody'); // Log the request body
 
       final response = await http
           .patch(
-        Uri.parse('$_baseUrl/$_userId'),
+        Uri.parse(requestUrl),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $_accessToken',
@@ -170,11 +176,13 @@ class UserService {
     print('Creating user...');
     try {
       final requestBody = json.encode(user.toJson());
+      final requestUrl = '$_baseUrl/create';
+      print('Request URL for createUser: $requestUrl'); // Log the request URL
       print('Request body for createUser: $requestBody'); // Log the request body
 
       final response = await http
           .post(
-        Uri.parse('$_baseUrl/create'),
+        Uri.parse(requestUrl),
         headers: {
           'Content-Type': 'application/json',
         },

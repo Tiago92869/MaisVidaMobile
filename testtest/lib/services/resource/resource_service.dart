@@ -17,8 +17,10 @@ class ResourceService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -38,25 +40,8 @@ class ResourceService {
     await _loadStoredCredentials();
     try {
       print('Fetching resources...');
-
-      // Construct the types query part
-      final String typesQuery = resourceTypes != null &&
-              resourceTypes.isNotEmpty
-          ? resourceTypes
-              .map((type) =>
-                  'resourceType=${type.toString().split('.').last.toUpperCase()}')
-              .join('&')
-          : '';
-
-      // Construct the search query part
-      final String searchQuery =
-          search != null && search.isNotEmpty ? 'search=$search' : '';
-
-      // Combine the base URL with the parameters
-      final String url =
-          '$_baseUrl?&userId=$_userId&$typesQuery&$searchQuery&page=$page&size=$size';
-
-      print('Request URL: $url');
+      final String url = '$_baseUrl?userId=$_userId&page=$page&size=$size&search=$search';
+      print('Request URL for fetchResources: $url'); // Log the request URL
 
       final response = await http.get(
         Uri.parse(url),
@@ -74,6 +59,7 @@ class ResourceService {
       );
 
       print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Resources fetched successfully.');
@@ -82,12 +68,9 @@ class ResourceService {
         print('Failed to load resources. Status Code: ${response.statusCode}');
         throw Exception('Failed to load resources');
       }
-    } on http.ClientException catch (e) {
-      print('ClientException: Failed to connect to the server. Error: $e');
-      throw Exception('Failed to connect to the server');
     } catch (e) {
-      print('Exception: Failed to fetch resources. Error: $e');
-      throw Exception('Failed to fetch resources');
+      print('Error fetching resources: $e');
+      rethrow;
     }
   }
 
@@ -95,12 +78,11 @@ class ResourceService {
     await _loadStoredCredentials();
     try {
       print('Fetching resource with ID: $id');
-      final String url = '$_baseUrl/$id';
-
-      print('Request URL: $url');
+      final String requestUrl = '$_baseUrl/$id';
+      print('Request URL for fetchResourceById: $requestUrl'); // Log the request URL
 
       final response = await http.get(
-        Uri.parse(url),
+        Uri.parse(requestUrl),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
@@ -108,13 +90,14 @@ class ResourceService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('Request to $url timed out.');
+          print('Request to $requestUrl timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
       print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Resource fetched successfully.');
@@ -123,11 +106,8 @@ class ResourceService {
         print('Failed to load resource. Status Code: ${response.statusCode}');
         throw Exception('Failed to load resource');
       }
-    } on http.ClientException catch (e) {
-      print('ClientException: Failed to connect to the server. Error: $e');
-      throw Exception('Failed to connect to the server');
     } catch (e) {
-      print('Exception: Failed to fetch resource. Error: $e');
+      print('Error fetching resource by ID: $e');
       throw Exception('Failed to fetch resource');
     }
   }

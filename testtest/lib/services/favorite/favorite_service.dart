@@ -17,8 +17,10 @@ class FavoriteService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -36,6 +38,7 @@ class FavoriteService {
   Future<Favorite> fetchFavoriteByUserId() async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl';
+    print('Request URL for fetchFavoriteByUserId: $url'); // Log the request URL
 
     try {
       final response = await http.get(
@@ -47,28 +50,24 @@ class FavoriteService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('Timeout while fetching favorite');
+          print('Request to $url timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
-        print('Successfully fetched favorite: ${response.body}');
+        print('Successfully fetched favorite.');
         return Favorite.fromJson(jsonDecode(response.body));
       } else {
-        print('Failed to fetch favorite: ${response.reasonPhrase}');
-        throw HttpException(
-            'Failed to load favorite: ${response.reasonPhrase}');
+        print('Failed to fetch favorite. Status Code: ${response.statusCode}');
+        throw HttpException('Failed to load favorite: ${response.reasonPhrase}');
       }
-    } on TimeoutException catch (e) {
-      print('TimeoutException: ${e.message}');
-      rethrow;
-    } on http.ClientException catch (e) {
-      print('http.ClientException: ${e.message}');
-      rethrow;
     } catch (e) {
-      print('Unexpected error: $e');
+      print('Error fetching favorite: $e');
       rethrow;
     }
   }
@@ -76,43 +75,36 @@ class FavoriteService {
   Future<void> modifyFavorite(FavoriteInput favoriteInput, bool add) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl?add=$add';
-    print('Modifying favorite with input: $favoriteInput, add: $add');
+    final requestBody = jsonEncode(favoriteInput.toJson());
+    print('Request URL for modifyFavorite: $url'); // Log the request URL
+    print('Request Body for modifyFavorite: $requestBody'); // Log the request body
 
     try {
-      final response = await http
-          .patch(
+      final response = await http.patch(
         Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode(favoriteInput.toJson()),
-      )
-          .timeout(
+        body: requestBody,
+      ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print(
-              'Timeout while modifying favorite with input: $favoriteInput, add: $add');
+          print('Request to $url timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
+      print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
         print('Successfully modified favorite.');
       } else {
-        print('Failed to modify favorite: ${response.reasonPhrase}');
-        throw HttpException(
-            'Failed to update favorite: ${response.reasonPhrase}');
+        print('Failed to modify favorite. Status Code: ${response.statusCode}');
+        throw HttpException('Failed to update favorite: ${response.reasonPhrase}');
       }
-    } on TimeoutException catch (e) {
-      print('TimeoutException: ${e.message}');
-      rethrow;
-    } on http.ClientException catch (e) {
-      print('http.ClientException: ${e.message}');
-      rethrow;
     } catch (e) {
-      print('Unexpected error: $e');
+      print('Error modifying favorite: $e');
       rethrow;
     }
   }
@@ -129,10 +121,8 @@ class FavoriteService {
     };
 
     final uri = Uri.parse(url).replace(queryParameters: queryParameters);
-    print(
-        'Checking favorite status with resourceId: $resourceId, activityId: $activityId');
+    print('Request URL for isFavorite: $uri'); // Log the request URL
 
-    print(uri);
     try {
       final response = await http.head(
         uri,
@@ -143,35 +133,25 @@ class FavoriteService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print(
-              'Timeout while checking favorite status with resourceId: $resourceId, activityId: $activityId');
+          print('Request to $uri timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
+      print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('Resource is favorite');
+        print('Resource is favorite.');
         return true;
       } else if (response.statusCode == 404) {
-        print('Resource is not favorite');
+        print('Resource is not favorite.');
         return false;
-      } else if (response.statusCode == 400) {
-        print('Bad request while checking favorite status');
-        throw BadRequestException('Bad request: ${response.reasonPhrase}');
       } else {
-        print('Failed to check favorite status: ${response.reasonPhrase}');
-        throw HttpException(
-            'Failed to check favorite: ${response.reasonPhrase}');
+        print('Failed to check favorite status. Status Code: ${response.statusCode}');
+        throw HttpException('Failed to check favorite: ${response.reasonPhrase}');
       }
-    } on TimeoutException catch (e) {
-      print('TimeoutException: ${e.message}');
-      rethrow;
-    } on http.ClientException catch (e) {
-      print('http.ClientException: ${e.message}');
-      rethrow;
     } catch (e) {
-      print('Unexpected error: $e');
+      print('Error checking favorite status: $e');
       rethrow;
     }
   }

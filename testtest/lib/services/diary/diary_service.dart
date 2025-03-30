@@ -16,8 +16,10 @@ class DiaryService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    // _accessToken = await _storage.read(key: 'accessToken');
+    // _userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -38,31 +40,17 @@ class DiaryService {
     DateTime endDate,
   ) async {
     await _loadStoredCredentials();
-    print('fetchDiaries called with parameters:');
-    print('emotion: $emotions, startDate: $startDate, endDate: $endDate');
-
     final String subjectsQuery = emotions
         .map((emotion) =>
             'goalSubjects=${emotion.toString().split('.').last.toUpperCase()}')
         .join('&');
-
-    final queryParameters = {
-      'userId': _userId,
-      'emotion': subjectsQuery, // Convert enum to string
-      'startDate': _formatDate(startDate),
-      'endDate': _formatDate(endDate),
-    };
-
-    print('Query parameters: $queryParameters');
-
-    final uri =
-        Uri.parse('$_baseUrl').replace(queryParameters: queryParameters);
-
-    print('Requesting URI: $uri');
+    final String url =
+        '$_baseUrl?userId=$_userId&emotion=$subjectsQuery&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}';
+    print('Request URL for fetchDiaries: $url'); // Log the request URL
 
     try {
       final response = await http.get(
-        uri,
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
@@ -70,64 +58,65 @@ class DiaryService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('fetchDiaries request timed out.');
+          print('Request to $url timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
-      print('fetchDiaries response status code: ${response.statusCode}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body);
-        print('fetchDiaries response data: $data');
+        final List<dynamic> data = jsonDecode(response.body);
+        print('Successfully fetched ${data.length} diaries.');
         return data.map((json) => DiaryDay.fromJson(json)).toList();
       } else {
-        print(
-            'Failed to load diaries with status code: ${response.statusCode}');
+        print('Failed to load diaries. Status Code: ${response.statusCode}');
         throw Exception('Failed to load diaries');
       }
     } catch (e) {
-      print('Exception in fetchDiaries: $e');
+      print('Error fetching diaries: $e');
       rethrow;
     }
   }
 
   Future<Diary> createDiary(Diary diary) async {
     await _loadStoredCredentials();
-    print('createDiary called with diary: ${diary.toJson()}');
+    final String url = '$_baseUrl';
+    final requestBody = jsonEncode(diary.toJson());
+    print('Request URL for createDiary: $url'); // Log the request URL
+    print('Request Body for createDiary: $requestBody'); // Log the request body
 
     try {
-      final response = await http
-          .post(
-        Uri.parse('$_baseUrl'),
+      final response = await http.post(
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
         },
-        body: json.encode(diary.toJson()),
-      )
-          .timeout(
+        body: requestBody,
+      ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('createDiary request timed out.');
+          print('Request to $url timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
-      print('createDiary response status code: ${response.statusCode}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Diary created successfully.');
-        return Diary.fromJson(json.decode(response.body));
+        return Diary.fromJson(jsonDecode(response.body));
       } else {
-        print(
-            'Failed to create diary with status code: ${response.statusCode}');
+        print('Failed to create diary. Status Code: ${response.statusCode}');
         throw Exception('Failed to create diary');
       }
     } catch (e) {
-      print('Exception in createDiary: $e');
+      print('Error creating diary: $e');
       rethrow;
     }
   }
@@ -173,35 +162,33 @@ class DiaryService {
 
   Future<void> deleteDiary(String id) async {
     await _loadStoredCredentials();
-    print('deleteDiary called with id: $id');
+    final String url = '$_baseUrl/$id';
+    print('Request URL for deleteDiary: $url'); // Log the request URL
 
     try {
       final response = await http.delete(
-        Uri.parse('$_baseUrl/$id'),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
         },
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('deleteDiary request timed out.');
+          print('Request to $url timed out.');
           throw TimeoutException(
               'The connection has timed out, please try again later.');
         },
       );
 
-      print('deleteDiary response status code: ${response.statusCode}');
-
+      print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
         print('Diary deleted successfully.');
       } else {
-        print(
-            'Failed to delete diary with status code: ${response.statusCode}');
+        print('Failed to delete diary. Status Code: ${response.statusCode}');
         throw Exception('Failed to delete diary');
       }
     } catch (e) {
-      print('Exception in deleteDiary: $e');
+      print('Error deleting diary: $e');
       rethrow;
     }
   }
