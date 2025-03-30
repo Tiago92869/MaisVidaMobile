@@ -285,21 +285,6 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                                       fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        if (isFavorite) {
-                                                          _favoriteActivities.remove(activity.title);
-                                                        } else {
-                                                          _favoriteActivities.add(activity.title);
-                                                        }
-                                                      });
-                                                    },
-                                                    child: Icon(
-                                                      isFavorite ? Icons.star : Icons.star_border,
-                                                      color: isFavorite ? Colors.yellow : Colors.white,
-                                                    ),
-                                                  ),
                                                 ],
                                               ),
                                               const SizedBox(height: 8),

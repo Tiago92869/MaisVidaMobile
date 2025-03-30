@@ -1,39 +1,8 @@
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
-import 'dart:math';
-
+import 'package:testtest/services/resource/resource_service.dart';
+import 'package:testtest/services/resource/resource_model.dart';
 import 'package:testtest/resources/resource_detail_page.dart';
-
-enum ResourceType {
-  ARTICLE,
-  VIDEO,
-  PODCAST,
-  PHRASE,
-  CARE,
-  EXERCISE,
-  RECIPE,
-  MUSIC,
-  SOS,
-  OTHER,
-}
-
-class ResourceDTO {
-  final String id;
-  final String title;
-  final String description;
-  final ResourceType type;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  ResourceDTO({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.type,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-}
 
 class ResourcesPage extends StatefulWidget {
   const ResourcesPage({Key? key}) : super(key: key);
@@ -43,33 +12,79 @@ class ResourcesPage extends StatefulWidget {
 }
 
 class _ResourcesPageState extends State<ResourcesPage> {
+  final ResourceService _resourceService = ResourceService();
+
   // Set to store selected resource types
   Set<ResourceType> _selectedResourceTypes = {};
 
   // List of all available resource types for the filter
   final List<ResourceType> _resourceTypes = ResourceType.values;
 
-  // Dummy resource data
-  final List<ResourceDTO> _resources = List.generate(
-    10,
-    (index) => ResourceDTO(
-      id: "1",
-      title: "Resource $index",
-      description: "Description for ResourceResourceResourceResource  ResourceResourceResourceResource ResourceResourceResourceResource ResourceResourceResourceResource ResourceResourceResourceResource$index",
-      type: ResourceType.values[Random().nextInt(ResourceType.values.length)],
-      createdAt: DateTime.now().subtract(Duration(days: index * 2)),
-      updatedAt: DateTime.now(),
-    ),
-  );
+  // List of resources fetched from the service
+  List<Resource> _resources = [];
+
+  // Search input text
+  String _searchText = "";
+
+  // Loading state
+  bool _isLoading = false;
 
   // Control the visibility of the sliding filter panel
   bool _isFilterPanelVisible = false;
 
-  // Set to track favorite resources
-  final Set<String> _favoriteResources = {};
-
   // Set to track if the star icon is glowing
   bool _isStarGlowing = false;
+
+  // Function to fetch resources
+  Future<void> _fetchResources() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final resourcePage = await _resourceService.fetchResources(
+        _selectedResourceTypes.toList(),
+        0, // Page number
+        20, // Page size
+        _searchText,
+      );
+      setState(() {
+        _resources = resourcePage.content;
+      });
+    } catch (e) {
+      print('Error fetching resources: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch resources. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Function to toggle resource type selection
+  void _toggleResourceType(ResourceType type) {
+    setState(() {
+      if (_selectedResourceTypes.contains(type)) {
+        _selectedResourceTypes.remove(type);
+      } else {
+        _selectedResourceTypes.add(type);
+      }
+    });
+    _fetchResources();
+  }
+
+  // Function to handle search input
+  void _onSearch(String text) {
+    setState(() {
+      _searchText = text;
+    });
+    _fetchResources();
+  }
 
   // Function to toggle the filter panel visibility
   void _toggleFilterPanel() {
@@ -158,6 +173,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                             const SizedBox(height: 40),
                             // Input TextField with Search icon
                             TextField(
+                              onChanged: _onSearch,
                               decoration: InputDecoration(
                                 labelText: "Search Resources",
                                 labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
@@ -172,28 +188,30 @@ class _ResourcesPageState extends State<ResourcesPage> {
                             ),
                             const SizedBox(height: 20),
                             // Display the resources as HCards
-                            Column(
-                              children: _resources
-                                  .map(
-                                    (resource) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 10),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ResourceDetailPage(resource: resource),
+                            _isLoading
+                                ? const Center(child: CircularProgressIndicator())
+                                : Column(
+                                    children: _resources
+                                        .map(
+                                          (resource) {
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 10),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => ResourceDetailPage(resource: resource),
+                                                    ),
+                                                  );
+                                                },
+                                                child: _buildHCard(resource),
                                               ),
                                             );
                                           },
-                                          child: _buildHCard(resource), // Removed the Stack and star icon
-                                        ),
-                                      );
-                                    },
-                                  )
-                                  .toList(),
-                            ),
+                                        )
+                                        .toList(),
+                                  ),
                             const SizedBox(height: 30),
                           ],
                         ),
@@ -341,15 +359,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                           children: _resourceTypes.map((resourceType) {
                             bool isSelected = _selectedResourceTypes.contains(resourceType);
                             return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    _selectedResourceTypes.remove(resourceType);
-                                  } else {
-                                    _selectedResourceTypes.add(resourceType);
-                                  }
-                                });
-                              },
+                              onTap: () => _toggleResourceType(resourceType),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 width: double.infinity,
@@ -400,7 +410,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  Widget _buildHCard(ResourceDTO resource) {
+  Widget _buildHCard(Resource resource) {
     const int maxDescriptionLength = 30; // Maximum length for the description (fits around two lines)
 
     String truncatedDescription = resource.description.length > maxDescriptionLength
