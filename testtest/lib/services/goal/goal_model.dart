@@ -28,7 +28,7 @@ class GoalInfoCard {
   final String description;
   final DateTime goalDate;
   final DateTime? completedDate;
-  final bool? completed;
+  final bool completed;
   final bool? hasNotifications;
   final GoalSubject subject;
   final DateTime? createdAt;
@@ -40,7 +40,7 @@ class GoalInfoCard {
     required this.description,
     required this.goalDate,
     this.completedDate,
-    this.completed,
+    required this.completed,
     this.hasNotifications,
     required this.subject,
     this.createdAt,

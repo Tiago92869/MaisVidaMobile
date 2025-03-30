@@ -36,7 +36,7 @@ class GoalService {
   }
 
   Future<List<GoalDay>> fetchGoals(
-    bool isCompleted,
+    bool? isCompleted,
     DateTime startDate,
     DateTime endDate,
     List<GoalSubject> goalSubjects,

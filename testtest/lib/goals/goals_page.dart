@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'package:testtest/goals/goal_details_page.dart';
-
-enum Subject {
-  PERSONAL,
-  WORK,
-  STUDIES,
-  FAMILY,
-}
+import 'package:testtest/services/goal/goal_service.dart';
+import 'package:testtest/services/goal/goal_model.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({Key? key}) : super(key: key);
@@ -18,52 +13,129 @@ class GoalsPage extends StatefulWidget {
 }
 
 class _GoalsPageState extends State<GoalsPage> {
+  final GoalService _goalService = GoalService();
+
   DateTime _currentWeekStart = DateTime.now();
   DateTime? _selectedDay; // Track the selected day
-  Set<Subject> _selectedSubjects = {}; // Selected filter subjects
+  Set<GoalSubject> _selectedSubjects = {}; // Selected filter subjects
   bool _isFilterPanelVisible = false; // Filter panel visibility
+
+  List<GoalInfoCard> _goals = []; // List of goals to display
+  bool _isLoading = false; // Loading state
 
   @override
   void initState() {
     super.initState();
-    _selectedDay = _currentWeekStart; // Default to the first day of the week
+    _selectedDay = null; // Do not select any day when the page opens
+
+    // Add mock goals for testing
+    _goals = [
+      GoalInfoCard(
+        id: "1",
+        title: "Learn Flutter",
+        description: "Complete the Flutter tutorial and build a sample app.",
+        goalDate: DateTime.now().add(const Duration(days: 1)),
+        completedDate: null,
+        completed: false,
+        hasNotifications: true,
+        subject: GoalSubject.Studies,
+        createdAt: DateTime.now().subtract(const Duration(days: 10)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+      ),
+      GoalInfoCard(
+        id: "2",
+        title: "Workout",
+        description: "Do a 30-minute workout session.",
+        goalDate: DateTime.now().add(const Duration(days: 2)),
+        completedDate: null,
+        completed: false,
+        hasNotifications: false,
+        subject: GoalSubject.Personal,
+        createdAt: DateTime.now().subtract(const Duration(days: 15)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 10)),
+      ),
+      GoalInfoCard(
+        id: "3",
+        title: "Team Meeting",
+        description: "Attend the weekly team meeting and discuss project updates.",
+        goalDate: DateTime.now().add(const Duration(days: 3)),
+        completedDate: null,
+        completed: false,
+        hasNotifications: true,
+        subject: GoalSubject.Work,
+        createdAt: DateTime.now().subtract(const Duration(days: 20)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 15)),
+      ),
+      GoalInfoCard(
+        id: "4",
+        title: "Family Dinner",
+        description: "Have dinner with family and spend quality time together.",
+        goalDate: DateTime.now().add(const Duration(days: 4)),
+        completedDate: null,
+        completed: false,
+        hasNotifications: false,
+        subject: GoalSubject.Family,
+        createdAt: DateTime.now().subtract(const Duration(days: 25)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 20)),
+      ),
+    ];
+
+    _fetchGoalsForWeek(); // Fetch goals for the initial week
   }
 
-  // Dummy goals data
-  final List<GoalDTO> _goals = [
-    GoalDTO(
-      title: "Finish Flutter Project",
-      description: "Complete the Flutter project by the end of the week.",
-      goalDate: DateTime.now().add(const Duration(days: 2)),
-      completedDate: null, // Not completed yet
-      completed: false,
-      hasNotifications: true,
-      subject: Subject.WORK,
-    ),
-    GoalDTO(
-      title: "Read a Book",
-      description: "Read at least 50 pages of a book.",
-      goalDate: DateTime.now().add(const Duration(days: 4)),
-      completedDate: null, // Not completed yet
-      completed: false,
-      hasNotifications: false,
-      subject: Subject.PERSONAL,
-    ),
-    GoalDTO(
-      title: "Submit Assignment",
-      description: "Submit the assignment before the deadline.",
-      goalDate: DateTime.now().add(const Duration(days: 1)),
-      completedDate: DateTime.now(), // Completed today
-      completed: true,
-      hasNotifications: false,
-      subject: Subject.STUDIES,
-    ),
-  ];
+  // Function to fetch goals for the current week and selected subjects
+  Future<void> _fetchGoalsForWeek() async {
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
+      // Fetch goals for the current week
+      final startDate = _currentWeekStart;
+      final endDate = _currentWeekStart.add(const Duration(days: 6));
+      final goalDays = await _goalService.fetchGoals(
+        null,
+        startDate,
+        endDate,
+        _selectedSubjects.toList(), // Selected subjects
+      );
+
+      // Flatten the list of goals from all days
+      final fetchedGoals = goalDays.expand((goalDay) => goalDay.goals).toList();
+
+      setState(() {
+        _goals = fetchedGoals; // Update the goals list
+      });
+    } catch (e) {
+      print('Error fetching goals: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch goals. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Function to handle week navigation
   void _moveWeek(int direction) {
     setState(() {
       _currentWeekStart = _currentWeekStart.add(Duration(days: 7 * direction));
+      _selectedDay = null; // Deselect the selected day when the week changes
     });
+    _fetchGoalsForWeek(); // Fetch goals for the new week
+  }
+
+  // Function to handle filter updates
+  void _updateFilters(Set<GoalSubject> selectedSubjects) {
+    setState(() {
+      _selectedSubjects = selectedSubjects;
+    });
+    _fetchGoalsForWeek(); // Fetch goals with the updated filters
   }
 
   List<DateTime> _getWeekDays(DateTime start) {
@@ -225,116 +297,112 @@ class _GoalsPageState extends State<GoalsPage> {
                       const SizedBox(height: 20),
                       // Goals Container
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(72, 85, 204, 1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Stack(
-                            children: [
-                              // List of goals
-                              ListView.builder(
-                                itemCount: _goals.length,
-                                itemBuilder: (context, index) {
-                                  final goal = _goals[index];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // Navigate to GoalDetailPage for visualizing the goal
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => GoalDetailPage(goal: goal),
+                        child: RefreshIndicator(
+                          onRefresh: _fetchGoalsForWeek, // Refresh goals when pulled down
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(72, 85, 204, 1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Stack(
+                              children: [
+                                // List of goals
+                                ListView.builder(
+                                  itemCount: _goals.length,
+                                  itemBuilder: (context, index) {
+                                    final goal = _goals[index];
+                                    return GestureDetector(
+                                      onTap: () {
+                                        // Navigate to GoalDetailPage for visualizing the goal
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => GoalDetailPage(goal: goal, createResource: false,),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.only(bottom: 20),
+                                        padding: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
-                                      );
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.only(bottom: 20),
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          // Goal Title
-                                          Text(
-                                            goal.title,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-
-                                          // Goal Description (limited to 2 lines)
-                                          Text(
-                                            goal.description,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.white70,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-
-                                          // Subject and Completed Toggle
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              // Subject
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white.withOpacity(0.2),
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                child: Text(
-                                                  goal.subject.toString().split('.').last.capitalizeFirstLetter(),
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // Goal Title
+                                            Text(
+                                              goal.title,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
                                               ),
+                                            ),
+                                            const SizedBox(height: 8),
 
-                                              // Status Toggle
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    goal.completed ? "Completed" : "Not Completed",
+                                            // Goal Description (limited to 2 lines)
+                                            Text(
+                                              goal.description,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+
+                                            // Subject and Completed Toggle
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                // Subject
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white.withOpacity(0.2),
+                                                    borderRadius: BorderRadius.circular(20),
+                                                  ),
+                                                  child: Text(
+                                                    StringCapitalization(goal.subject.toString().split('.').last).capitalizeFirstLetter(),
                                                     style: const TextStyle(
                                                       fontSize: 14,
                                                       fontWeight: FontWeight.bold,
-                                                      color: Colors.white70,
+                                                      color: Colors.white,
                                                     ),
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  Switch(
-                                                    value: goal.completed,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        goal.completed = value;
-                                                        goal.completedDate = value ? DateTime.now() : null;
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                                                ),
+
+                                                // Status Toggle
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      goal.completed ? "Completed" : "Not Completed",
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white70,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Switch(
+                                                      value: goal.completed ?? false,
+                                                      onChanged: null,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              
-                              SizedBox(height: 30,),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 30,),
                               // Button in the bottom-right corner
                               Positioned(
                                 bottom: 0,
@@ -345,7 +413,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const GoalDetailPage(isEditing: true), // No goal passed
+                                        builder: (context) => const GoalDetailPage(goal: null, createResource: true,), // No goal passed
                                       ),
                                     );
                                   },
@@ -354,7 +422,8 @@ class _GoalsPageState extends State<GoalsPage> {
                                 ),
                               ),
                               SizedBox(height: 30,),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -454,7 +523,7 @@ class _GoalsPageState extends State<GoalsPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: Subject.values.map((subject) {
+                          children: GoalSubject.values.map((subject) {
                             bool isSelected = _selectedSubjects.contains(subject);
                             return GestureDetector(
                               onTap: () {
@@ -465,6 +534,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                     _selectedSubjects.add(subject);
                                   }
                                 });
+                                _updateFilters(_selectedSubjects); // Update filters and fetch goals
                               },
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
@@ -490,7 +560,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                 margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: Center(
                                   child: Text(
-                                    subject.toString().split('.').last.capitalizeFirstLetter(),
+                                    StringCapitalization(subject.toString().split('.').last).capitalizeFirstLetter(),
                                     style: TextStyle(
                                       color: isSelected
                                           ? Colors.white
@@ -516,27 +586,6 @@ class _GoalsPageState extends State<GoalsPage> {
       ),
     );
   }
-}
-
-// Dummy GoalDTO model
-class GoalDTO {
-  final String title;
-  final String description;
-  final DateTime goalDate; // The target date for the goal
-  DateTime? completedDate; // Nullable field for completed date
-  bool completed; // Indicates if the goal is completed
-  bool hasNotifications; // Indicates if the goal has notifications
-  final Subject subject;
-
-  GoalDTO({
-    required this.title,
-    required this.description,
-    required this.goalDate,
-    this.completedDate, // Optional field
-    required this.completed,
-    required this.hasNotifications,
-    required this.subject,
-  });
 }
 
 // Extension to capitalize the first letter of a string
