@@ -29,6 +29,10 @@ class _ResourcesPageState extends State<ResourcesPage> {
   // Loading state
   bool _isLoading = false;
 
+  // Pagination state
+  int _currentPage = 0;
+  bool _isLastPage = false;
+
   // Control the visibility of the sliding filter panel
   bool _isFilterPanelVisible = false;
 
@@ -82,10 +86,14 @@ class _ResourcesPageState extends State<ResourcesPage> {
         updatedAt: DateTime.now().subtract(const Duration(days: 45)),
       ),
     ];
+
+    _fetchResources(); // Fetch the first page of resources when the page opens
   }
 
   // Function to fetch resources
   Future<void> _fetchResources() async {
+    if (_isLoading || _isLastPage) return; // Prevent duplicate or unnecessary requests
+
     setState(() {
       _isLoading = true;
     });
@@ -93,12 +101,15 @@ class _ResourcesPageState extends State<ResourcesPage> {
     try {
       final resourcePage = await _resourceService.fetchResources(
         _selectedResourceTypes.toList(),
-        0, // Page number
+        _currentPage, // Current page number
         20, // Page size
-        _searchText,
+        _searchText, // Search query
       );
+
       setState(() {
-        _resources = resourcePage.content;
+        _resources.addAll(resourcePage.content); // Append new resources to the list
+        _isLastPage = resourcePage.last; // Check if this is the last page
+        _currentPage++; // Increment the page number for the next fetch
       });
     } catch (e) {
       print('Error fetching resources: $e');
@@ -131,6 +142,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
   void _onSearch(String text) {
     setState(() {
       _searchText = text;
+      _resources.clear(); // Clear the current list of resources
+      _currentPage = 0; // Reset to the first page
+      _isLastPage = false; // Reset the last page flag
     });
     _fetchResources();
   }
@@ -186,8 +200,18 @@ class _ResourcesPageState extends State<ResourcesPage> {
     }
   }
 
+  // Function to detect when the user scrolls to the bottom
+  void _onScroll(ScrollController controller) {
+    if (controller.position.pixels >= controller.position.maxScrollExtent - 200) {
+      _fetchResources(); // Fetch the next page when near the bottom
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ScrollController _scrollController = ScrollController();
+    _scrollController.addListener(() => _onScroll(_scrollController));
+
     return Scaffold(
       body: Stack(
         children: [
@@ -199,9 +223,17 @@ class _ResourcesPageState extends State<ResourcesPage> {
               child: Stack(
                 children: [
                   RefreshIndicator(
-                    onRefresh: _fetchResources, // Call _fetchResources on pull-down
+                    onRefresh: () async {
+                      setState(() {
+                        _resources.clear(); // Clear current resources
+                        _currentPage = 0; // Reset pagination
+                        _isLastPage = false; // Reset last page flag
+                      });
+                      await _fetchResources(); // Fetch resources again
+                    },
                     child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(), // Ensure pull-down is always possible
+                      controller: _scrollController, // Attach the scroll controller
+                      physics: const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
                       child: Container(
                         color: Colors.transparent, // Detect taps anywhere on the screen
                         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
@@ -224,7 +256,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                             const SizedBox(height: 40),
                             // Input TextField with Search icon
                             TextField(
-                              onChanged: _onSearch,
+                              onChanged: _onSearch, // Trigger search on input change
                               decoration: InputDecoration(
                                 labelText: "Search Resources",
                                 labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
@@ -239,30 +271,31 @@ class _ResourcesPageState extends State<ResourcesPage> {
                             ),
                             const SizedBox(height: 20),
                             // Display the resources as HCards
-                            _isLoading
-                                ? const Center(child: CircularProgressIndicator())
-                                : Column(
-                                    children: _resources
-                                        .map(
-                                          (resource) {
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 10),
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) => ResourceDetailPage(resource: resource),
-                                                    ),
-                                                  );
-                                                },
-                                                child: _buildHCard(resource),
-                                              ),
-                                            );
-                                          },
-                                        )
-                                        .toList(),
-                                  ),
+                            Column(
+                              children: _resources
+                                  .map(
+                                    (resource) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ResourceDetailPage(resource: resource),
+                                            ),
+                                          );
+                                        },
+                                        child: _buildHCard(resource),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                            if (_isLoading)
+                              const Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(),
+                              ),
                             const SizedBox(height: 30),
                           ],
                         ),

@@ -1,3 +1,4 @@
+import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
@@ -16,7 +17,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final FavoriteService _favoriteService = FavoriteService();
 
   bool _isFavorite = false;
-  bool _hasFavoriteChanged = false; // Track if the favorite status has changed
+  bool _initialFavoriteStatus = false; // Track the initial favorite status
+  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
 
   @override
   void initState() {
@@ -29,12 +31,13 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       final isFavorite = await _favoriteService.isFavorite(resourceId: widget.resource.id);
       setState(() {
         _isFavorite = isFavorite;
+        _initialFavoriteStatus = isFavorite; // Store the initial favorite status
       });
     } catch (e) {
       print('Error checking favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Failed to check favorite status. Please try again."),
+        const SnackBar(
+          content: Text("Failed to check favorite status. Please try again."),
           backgroundColor: Colors.red,
         ),
       );
@@ -44,12 +47,11 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   void _toggleFavoriteStatus() {
     setState(() {
       _isFavorite = !_isFavorite;
-      _hasFavoriteChanged = true; // Mark that the favorite status has changed
     });
   }
 
   Future<void> _updateFavoriteStatus() async {
-    if (_hasFavoriteChanged) {
+    if (_isFavorite != _initialFavoriteStatus) { // Only call modifyFavorite if the status has changed
       try {
         final favoriteInput = FavoriteInput(
           activities: [],
@@ -92,6 +94,41 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               ),
             ),
           ),
+          // Randomly show one of the starfish images
+          if (_showFirstStarfish)
+            Positioned(
+              right: 80,
+              top: 320,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.7,
+                  child: Image.asset(
+                    'assets/images/starfish2.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            )
+          else
+            Positioned(
+              left: 100,
+              top: 250,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.5,
+                  child: Image.asset(
+                    'assets/images/starfish1.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
