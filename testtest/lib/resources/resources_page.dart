@@ -35,6 +35,55 @@ class _ResourcesPageState extends State<ResourcesPage> {
   // Set to track if the star icon is glowing
   bool _isStarGlowing = false;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Add mock resources for testing
+    _resources = [
+      Resource(
+        id: "1",
+        title: "How to Stay Healthy",
+        description: "Learn the best practices for maintaining a healthy lifestyle.",
+        type: ResourceType.ARTICLE,
+        createdAt: DateTime.now().subtract(const Duration(days: 10)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+      ),
+      Resource(
+        id: "2",
+        title: "10-Minute Workout",
+        description: "A quick and effective workout routine for busy people.",
+        type: ResourceType.EXERCISE,
+        createdAt: DateTime.now().subtract(const Duration(days: 20)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 15)),
+      ),
+      Resource(
+        id: "3",
+        title: "Meditation for Beginners",
+        description: "A guide to help you start meditating and reduce stress.",
+        type: ResourceType.PODCAST,
+        createdAt: DateTime.now().subtract(const Duration(days: 30)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 25)),
+      ),
+      Resource(
+        id: "4",
+        title: "Healthy Recipes",
+        description: "Delicious and nutritious recipes for a balanced diet.",
+        type: ResourceType.RECIPE,
+        createdAt: DateTime.now().subtract(const Duration(days: 40)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 35)),
+      ),
+      Resource(
+        id: "5",
+        title: "Emergency Contacts",
+        description: "Important contacts to call in case of an emergency.",
+        type: ResourceType.SOS,
+        createdAt: DateTime.now().subtract(const Duration(days: 50)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 45)),
+      ),
+    ];
+  }
+
   // Function to fetch resources
   Future<void> _fetchResources() async {
     setState(() {
@@ -149,11 +198,13 @@ class _ResourcesPageState extends State<ResourcesPage> {
               ignoring: _isFilterPanelVisible, // Disable interactions when the filter is open
               child: Stack(
                 children: [
-                  Container(
-                    color: Colors.transparent, // Detect taps anywhere on the screen
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
-                      child: SingleChildScrollView(
+                  RefreshIndicator(
+                    onRefresh: _fetchResources, // Call _fetchResources on pull-down
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(), // Ensure pull-down is always possible
+                      child: Container(
+                        color: Colors.transparent, // Detect taps anywhere on the screen
+                        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -163,7 +214,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               child: Text(
                                 "Resources",
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 28,
                                   fontFamily: "Poppins",
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -434,7 +485,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 Text(
                   resource.title,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontFamily: "Poppins",
                     color: Colors.white,
                   ),
@@ -443,7 +494,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 Text(
                   truncatedDescription,
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontFamily: "Inter",
                     color: Colors.white,
                   ),

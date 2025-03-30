@@ -35,12 +35,19 @@ class ResourceService {
     }
   }
 
-  Future<ResourcePage> fetchResources(List<ResourceType> resourceTypes,
-      int page, int size, String search) async {
+  Future<ResourcePage> fetchResources(
+      List<ResourceType> resourceTypes, int page, int size, String search) async {
     await _loadStoredCredentials();
     try {
       print('Fetching resources...');
-      final String url = '$_baseUrl?userId=$_userId&page=$page&size=$size&search=$search';
+
+      // Convert resourceTypes to a comma-separated string
+      final String resourceTypesParam =
+          resourceTypes.map((type) => type.toString().split('.').last).join(',');
+
+      // Build the URL with query parameters
+      final String url =
+          '$_baseUrl?userId=$_userId&page=$page&size=$size&search=$search&resourceType=$resourceTypesParam';
       print('Request URL for fetchResources: $url'); // Log the request URL
 
       final response = await http.get(

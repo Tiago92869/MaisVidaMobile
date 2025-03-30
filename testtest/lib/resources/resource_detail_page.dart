@@ -16,6 +16,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final FavoriteService _favoriteService = FavoriteService();
 
   bool _isFavorite = false;
+  bool _hasFavoriteChanged = false; // Track if the favorite status has changed
 
   @override
   void initState() {
@@ -24,40 +25,51 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   }
 
   Future<void> _checkIfFavorite() async {
-  try {
-    final isFavorite = await _favoriteService.isFavorite(resourceId: widget.resource.id);
-    setState(() {
-      _isFavorite = isFavorite;
-    });
-  } catch (e) {
-    print('Error checking favorite status: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text("Failed to check favorite status. Please try again."),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
-
-  Future<void> _toggleFavorite() async {
     try {
-      final favoriteInput = FavoriteInput(
-        activities: [],
-        resources: [widget.resource.id],
-      );
-
-      await _favoriteService.modifyFavorite(favoriteInput, !_isFavorite);
-
+      final isFavorite = await _favoriteService.isFavorite(resourceId: widget.resource.id);
       setState(() {
-        _isFavorite = !_isFavorite;
+        _isFavorite = isFavorite;
       });
     } catch (e) {
-      print('Error updating favorite status: $e');
+      print('Error checking favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update favorite status.')),
+        SnackBar(
+          content: const Text("Failed to check favorite status. Please try again."),
+          backgroundColor: Colors.red,
+        ),
       );
     }
+  }
+
+  void _toggleFavoriteStatus() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+      _hasFavoriteChanged = true; // Mark that the favorite status has changed
+    });
+  }
+
+  Future<void> _updateFavoriteStatus() async {
+    if (_hasFavoriteChanged) {
+      try {
+        final favoriteInput = FavoriteInput(
+          activities: [],
+          resources: [widget.resource.id],
+        );
+
+        await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
+      } catch (e) {
+        print('Error updating favorite status: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update favorite status.')),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _updateFavoriteStatus(); // Call to update the favorite status when the page is closed
+    super.dispose();
   }
 
   @override
@@ -124,8 +136,9 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               ),
             ),
             GestureDetector(
-              onTap: _toggleFavorite,
-              child: Container(
+              onTap: _toggleFavoriteStatus, // Toggle the favorite status locally
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300), // Smooth transition for color change
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -135,6 +148,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                 child: Icon(
                   _isFavorite ? Icons.star : Icons.star_border,
                   color: _isFavorite ? Colors.white : Colors.yellow,
+                  size: 28, // Adjust size if needed
                 ),
               ),
             ),
