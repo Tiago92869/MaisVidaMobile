@@ -22,6 +22,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   bool hasNotifications = false; // Local variable for notifications toggle
   bool completed = false; // Local variable for completed toggle
   late bool editMode; // Tracks if the user is editing
+  bool _isLoading = false; // Tracks if a save operation is in progress
 
   @override
   void initState() {
@@ -63,6 +64,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       updatedAt: DateTime.now(),
     );
 
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+
     try {
       if (widget.createResource) {
         // Call createGoal if creating a new goal
@@ -81,7 +86,28 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading indicator
+      });
     }
+  }
+
+  Future<void> _handleBackButton() async {
+    if (_isLoading) return; // Prevent multiple operations
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(), // Show loading spinner
+        );
+      },
+    );
+
+    await _saveGoal(); // Save the goal (create or update)
+    Navigator.pop(context); // Close the dialog and the page
   }
 
   @override
@@ -113,10 +139,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 children: [
                   // Back button
                   GestureDetector(
-                    onTap: () async {
-                      await _saveGoal(); // Save the goal (create or update)
-                      Navigator.pop(context); // Close the page
-                    },
+                    onTap: _handleBackButton, // Handle back button with loading
                     child: const Icon(
                       Icons.arrow_back,
                       color: Colors.white,
