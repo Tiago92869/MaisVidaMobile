@@ -449,16 +449,16 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 Text(
                   resource.title,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontFamily: "Poppins",
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   truncatedDescription,
                   style: const TextStyle(
-                    fontSize: 17,
+                    fontSize: 15,
                     fontFamily: "Inter",
                     color: Colors.white,
                   ),
