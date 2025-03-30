@@ -18,8 +18,10 @@ class UserService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
+    //_accessToken = await _storage.read(key: 'accessToken');
+    //_userId = await _storage.read(key: 'userId');
+    _accessToken = "testeste";
+    _userId = "asdasd";
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -130,6 +132,9 @@ class UserService {
     await _loadStoredCredentials();
     print('Updating user with ID: $_userId');
     try {
+      final requestBody = json.encode(user.toJson());
+      print('Request body for updateUser: $requestBody'); // Log the request body
+
       final response = await http
           .patch(
         Uri.parse('$_baseUrl/$_userId'),
@@ -137,7 +142,7 @@ class UserService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $_accessToken',
         },
-        body: json.encode(user.toJson()),
+        body: requestBody,
       )
           .timeout(
         _timeoutDuration,
@@ -164,13 +169,16 @@ class UserService {
   Future<User> createUser(CreateUser user) async {
     print('Creating user...');
     try {
+      final requestBody = json.encode(user.toJson());
+      print('Request body for createUser: $requestBody'); // Log the request body
+
       final response = await http
           .post(
         Uri.parse('$_baseUrl/create'),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: json.encode(user.toJson()),
+        body: requestBody,
       )
           .timeout(
         _timeoutDuration,
