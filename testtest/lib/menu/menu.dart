@@ -6,6 +6,7 @@ import 'package:testtest/activities/activities_page.dart';
 import 'package:testtest/diary/diary_page.dart';
 import 'package:testtest/goals/goals_page.dart';
 import 'package:testtest/medicines/medicines_page.dart';
+import 'package:testtest/menu/models/menu_item.dart';
 import 'dart:math' as math;
 import 'package:testtest/menu/navigation/custom_tab_bar.dart';
 import 'package:testtest/menu/navigation/home_tab_view.dart';
@@ -80,8 +81,12 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   final List<Widget> _screens = [
     const HomeTabView(),
     commonTabScene("Diary"),
-    commonTabScene("Resources"),
     commonTabScene("Goals"),
+    commonTabScene("Medicine"),
+    commonTabScene("Resources"),
+    commonTabScene("Activities"),
+    commonTabScene("Notifications"),
+    commonTabScene("SOS"),
     commonTabScene("Profile"),
   ];
 
@@ -109,6 +114,34 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       _animationController?.reverse();
     }
     _menuBtn.change(!_menuBtn.value);
+  }
+
+  void _updateTabBody(String menuTitle) {
+    print('Updating tab body for menu title: $menuTitle'); // Debugging print
+
+    // Search in menuItems
+    int index = MenuItemModel.menuItems
+        .indexWhere((menuItem) => menuItem.title == menuTitle);
+
+    if (index == -1) {
+      // If not found in menuItems, search in menuItems2
+      index = MenuItemModel.menuItems2
+          .indexWhere((menuItem) => menuItem.title == menuTitle);
+
+      if (index != -1) {
+        // Adjust the index to match the position in _screens
+        index += MenuItemModel.menuItems.length;
+      }
+    }
+
+    if (index != -1) {
+      print('Menu title found at index: $index'); // Debugging print
+      setState(() {
+        _tabBody = _screens[index];
+      });
+    } else {
+      print('Error: Menu title "$menuTitle" not found in menuItems or menuItems2'); // Debugging print
+    }
   }
 
   @override
@@ -168,7 +201,9 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               },
               child: FadeTransition(
                 opacity: _sidebarAnim,
-                child: const SideMenu(),
+                child: SideMenu(
+                  onMenuPress: _updateTabBody, // Pass the callback here
+                ),
               ),
             ),
           ),
