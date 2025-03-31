@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:testtest/services/notification/notification_model.dart';
 import 'dart:math'; // Import for randomization
-import 'notifications_page.dart' as custom;
 
 class NotificationDetailsPage extends StatefulWidget {
-  final custom.Notification notification;
+  final NotificationModel notification; // Receive the selected notification
 
   const NotificationDetailsPage({
     Key? key,
@@ -121,7 +121,7 @@ class _NotificationDetailsPageState extends State<NotificationDetailsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildDateInfo("Created At", widget.notification.createdAt),
-                        _buildDateInfo("Last Updated At", widget.notification.lastUpdatedAt),
+                        _buildDateInfo("Last Updated At", widget.notification.updatedAt),
                       ],
                     ),
                   ],

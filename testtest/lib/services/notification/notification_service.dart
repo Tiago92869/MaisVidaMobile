@@ -36,10 +36,10 @@ class NotificationService {
     }
   }
 
-  Future<List<NotificationModel>> fetchNotifications() async {
+  Future<List<NotificationModel>> fetchNotifications({int page = 0, int size = 10}) async {
     await _loadStoredCredentials();
     try {
-      final requestUrl = '$_baseUrl?userId=$_userId';
+      final requestUrl = '$_baseUrl?userId=$_userId&page=$page&size=$size';
       print('Request URL for fetchNotifications: $requestUrl'); // Log the request URL
 
       final response = await http.get(
