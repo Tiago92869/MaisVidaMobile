@@ -1,37 +1,8 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
+import 'package:testtest/services/diary/diary_service.dart'; // Import DiaryService
+import 'package:testtest/services/diary/diary_model.dart'; // Import DiaryModel
 import 'diary_detail_page.dart'; // Import the new page
-
-enum Emotion {
-  LOVE,
-  FANTASTIC,
-  HAPPY,
-  NEUTRAL,
-  DISAPPOINTED,
-  SAD,
-  ANGRY,
-  SICK,
-}
-
-class DiaryDTO {
-  final String id;
-  final String title;
-  final String description;
-  final DateTime recordedAt;
-  final Emotion emotion;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  DiaryDTO({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.recordedAt,
-    required this.emotion,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-}
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({Key? key}) : super(key: key);
@@ -41,157 +12,68 @@ class DiaryPage extends StatefulWidget {
 }
 
 class _DiaryPageState extends State<DiaryPage> {
+  final DiaryService _diaryService = DiaryService(); // Initialize DiaryService
+  bool _isLoading = false; // Tracks if data is being fetched
+  bool _hasError = false; // Tracks if there was an error during fetch
+
   DateTime _selectedDate = DateTime.now();
 
-  // Sample diary entries
-  final List<DiaryDTO> _diaryEntries = [
-    DiaryDTO(
-      id: "1",
-      title: "Morning Walk",
-      description: "Had a refreshing walk in the park.",
-      recordedAt: DateTime.now().subtract(const Duration(days: 1)),
-      emotion: Emotion.HAPPY,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "2",
-      title: "Work Presentation",
-      description: "Delivered a successful presentation at work.Delivered a successful presentation at work.Delivered a successful presentation at work.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.FANTASTIC,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "3",
-      title: "Evening Yoga",
-      description: "Relaxed with a yoga session in the evening.",
-      recordedAt: DateTime.now(),
-      emotion: Emotion.LOVE,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    DiaryDTO(
-      id: "4",
-      title: "Rainy Day",
-      description: "It rained all day, felt a bit gloomy.",
-      recordedAt: DateTime.now().subtract(const Duration(days: 2)),
-      emotion: Emotion.SAD,
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-  ];
-
-  final Set<Emotion> _selectedEmotions = {}; // Selected filter emotions
+  Set<DiaryType> _selectedEmotions = {}; // Selected filter emotions
   bool _isFilterPanelVisible = false; // Filter panel visibility
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  Emotion? _selectedEmotion;
+  DiaryType? _selectedEmotion;
 
-  // Function to add a new diary entry
-  void _addDiaryEntry() {
-    if (_titleController.text.isNotEmpty &&
-        _descriptionController.text.isNotEmpty &&
-        _selectedEmotion != null) {
-      setState(() {
-        _diaryEntries.add(
-          DiaryDTO(
-            id: UniqueKey().toString(),
-            title: _titleController.text,
-            description: _descriptionController.text,
-            recordedAt: _selectedDate,
-            emotion: _selectedEmotion!,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        );
-        _titleController.clear();
-        _descriptionController.clear();
-        _selectedEmotion = null;
-      });
-    }
-    Navigator.pop(context); // Close the add entry modal
-  }
+  List<Diary> _diaryEntries = []; // Initialize _diaryEntries as an empty list of Diary
 
-  // Function to filter diary entries by the selected date and emotions
-  List<DiaryDTO> _getEntriesForSelectedDate() {
-    return _diaryEntries
-        .where((entry) =>
-            entry.recordedAt.toLocal().year == _selectedDate.toLocal().year &&
-            entry.recordedAt.toLocal().month == _selectedDate.toLocal().month &&
-            entry.recordedAt.toLocal().day == _selectedDate.toLocal().day &&
-            (_selectedEmotions.isEmpty || _selectedEmotions.contains(entry.emotion)))
-        .toList();
-  }
+  @override
+  void initState() {
+    super.initState();
 
-  // Function to navigate to the previous day
-  void _goToPreviousDay() {
-    setState(() {
-      _selectedDate = _selectedDate.subtract(const Duration(days: 1));
-    });
-  }
+    // Add mock data directly to _diaryEntries
+    _diaryEntries = [
+      // Mock data for the current day
+      Diary(
+        id: "1",
+        title: "Morning Exercise",
+        description: "Did a 30-minute yoga session to start the day.",
+        recordedAt: DateTime.now(),
+        emotion: DiaryType.Happy,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      Diary(
+        id: "2",
+        title: "Team Meeting",
+        description: "Discussed project updates and next steps with the team.",
+        recordedAt: DateTime.now(),
+        emotion: DiaryType.Neutral,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      // Mock data for previous days
+      Diary(
+        id: "3",
+        title: "Dinner with Friends",
+        description: "Had a great time catching up with old friends.",
+        recordedAt: DateTime.now().subtract(const Duration(days: 1)),
+        emotion: DiaryType.Love,
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+      Diary(
+        id: "4",
+        title: "Feeling Unwell",
+        description: "Stayed in bed all day due to a headache.",
+        recordedAt: DateTime.now().subtract(const Duration(days: 2)),
+        emotion: DiaryType.Sick,
+        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+    ];
 
-  // Function to navigate to the next day
-  void _goToNextDay() {
-    setState(() {
-      _selectedDate = _selectedDate.add(const Duration(days: 1));
-    });
+   // _fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
   }
 
   // Function to toggle the filter panel visibility
@@ -201,55 +83,120 @@ class _DiaryPageState extends State<DiaryPage> {
     });
   }
 
-  // Function to show the add entry modal
-  void _showAddEntryModal() {
-    showModalBottomSheet(
+  // Function to handle emotion selection
+  void _toggleEmotion(DiaryType emotion) {
+    setState(() {
+      if (_selectedEmotions.contains(emotion)) {
+        _selectedEmotions.remove(emotion);
+      } else {
+        _selectedEmotions.add(emotion);
+      }
+    });
+
+    // Fetch diaries with the updated emotions
+    _fetchDiariesForSelectedDate();
+  }
+
+  // Function to filter diary entries by the selected date and emotions
+  List<Diary> _getEntriesForSelectedDate() {
+    return _diaryEntries
+        .where((entry) =>
+            entry.recordedAt.toLocal().year == _selectedDate.toLocal().year &&
+            entry.recordedAt.toLocal().month == _selectedDate.toLocal().month &&
+            entry.recordedAt.toLocal().day == _selectedDate.toLocal().day &&
+            (_selectedEmotions.isEmpty || _selectedEmotions.contains(entry.emotion)))
+        .toList();
+  }
+
+  // Function to fetch diaries for the selected date
+  Future<void> _fetchDiariesForSelectedDate() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
+    try {
+      // Fetch diaries from the DiaryService
+      final diaries = await _diaryService.fetchDiaries(
+        _selectedEmotions.toList(), // Pass selected emotions
+        _selectedDate, // Start date
+        _selectedDate, // End date (same as start date for a single day)
+      );
+
+      setState(() {
+        if (diaries.isNotEmpty) {
+          // Append fetched data to the existing diary entries
+          for (var diaryDay in diaries) {
+            _diaryEntries.addAll(diaryDay.diaries);
+          }
+        }
+      });
+    } catch (e) {
+      print("Error fetching diaries: $e");
+      setState(() {
+        _hasError = true;
+      });
+
+      // Show error message using SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch diaries. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Function to navigate to the previous day
+  void _goToPreviousDay() {
+    setState(() {
+      _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+    });
+    _fetchDiariesForSelectedDate(); // Fetch diaries for the new selected date
+  }
+
+  // Function to navigate to the next day
+  void _goToNextDay() {
+    setState(() {
+      _selectedDate = _selectedDate.add(const Duration(days: 1));
+    });
+    _fetchDiariesForSelectedDate(); // Fetch diaries for the new selected date
+  }
+
+  // Function to show a calendar for selecting a date
+  Future<void> _selectDate() async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(labelText: 'Title'),
-                ),
-                TextField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                DropdownButton<Emotion>(
-                  value: _selectedEmotion,
-                  hint: const Text('Select Emotion'),
-                  items: Emotion.values.map((Emotion emotion) {
-                    return DropdownMenuItem<Emotion>(
-                      value: emotion,
-                      child: Text(StringCapitalization(emotion.name).capitalizeFirstLetter()),
-                    );
-                  }).toList(),
-                  onChanged: (Emotion? newValue) {
-                    setState(() {
-                      _selectedEmotion = newValue;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _addDiaryEntry,
-                  child: const Text('Add Entry'),
-                ),
-              ],
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000), // Earliest selectable date
+      lastDate: DateTime(2100), // Latest selectable date
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color.fromRGBO(72, 85, 204, 1), // Header background color
+            hintColor: const Color.fromRGBO(123, 144, 255, 1), // Selected date color
+            colorScheme: const ColorScheme.light(
+              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              onPrimary: Colors.white, // Header text color
+              onSurface: Colors.black, // Body text color
             ),
+            dialogBackgroundColor: Colors.white, // Background color of the calendar
           ),
+          child: child!,
         );
       },
     );
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+      _fetchDiariesForSelectedDate(); // Fetch diaries for the newly selected date
+    }
   }
 
   @override
@@ -259,7 +206,7 @@ class _DiaryPageState extends State<DiaryPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
+          // Main content
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -302,12 +249,15 @@ class _DiaryPageState extends State<DiaryPage> {
                         icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: _goToPreviousDay,
                       ),
-                      Text(
-                        "${_selectedDate.toLocal().month}/${_selectedDate.toLocal().day}/${_selectedDate.toLocal().year}",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      GestureDetector(
+                        onTap: _selectDate, // Show calendar when the date is tapped
+                        child: Text(
+                          "${_selectedDate.toLocal().month}/${_selectedDate.toLocal().day}/${_selectedDate.toLocal().year}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       IconButton(
@@ -318,87 +268,91 @@ class _DiaryPageState extends State<DiaryPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Diary Entries List
+                  // Diary Entries List with Pull-to-Refresh
                   Expanded(
-                    child: entriesForSelectedDate.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No entries for this day.",
-                              style: TextStyle(fontSize: 16, color: Colors.white70),
-                            ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.only(bottom: 60), // Add padding to the bottom
-                            itemCount: entriesForSelectedDate.length,
-                            itemBuilder: (context, index) {
-                              final entry = entriesForSelectedDate[index];
-                              return Card(
-                                elevation: 4,
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: ListTile(
-                                  title: Text(entry.title),
-                                  subtitle: Text(
-                                    entry.description,
-                                    maxLines: 2, // Show only 2 lines of the description
-                                    overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
-                                    style: const TextStyle(color: Colors.black54),
-                                  ),
-                                  trailing: Icon(
-                                    _getEmotionIcon(entry.emotion),
-                                    color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
-                                    size: 32, // Increased size
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DiaryDetailPage(
-                                          diary: entry,
-                                          isEditing: false,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (!_isLoading && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                          // User has scrolled to the bottom, refresh the page
+                          _fetchDiariesForSelectedDate();
+                        }
+                        return false;
+                      },
+                      child: RefreshIndicator(
+                        onRefresh: _fetchDiariesForSelectedDate, // Refresh when pulled down
+                        child: _isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
                                 ),
-                              );
-                            },
-                          ),
+                              )
+                            : _hasError
+                                ? const Center(
+                                    child: Text(
+                                      "Failed to load entries. Please try again.",
+                                      style: TextStyle(fontSize: 16, color: Colors.white70),
+                                    ),
+                                  )
+                                : entriesForSelectedDate.isEmpty
+                                    ? const Center(
+                                        child: Text(
+                                          "No entries for this day.",
+                                          style: TextStyle(fontSize: 16, color: Colors.white70),
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        padding: const EdgeInsets.only(bottom: 60), // Add padding to the bottom
+                                        itemCount: entriesForSelectedDate.length,
+                                        itemBuilder: (context, index) {
+                                          final entry = entriesForSelectedDate[index];
+                                          return Card(
+                                            elevation: 4,
+                                            margin: const EdgeInsets.symmetric(vertical: 8),
+                                            child: ListTile(
+                                              title: Text(entry.title),
+                                              subtitle: Text(
+                                                entry.description,
+                                                maxLines: 2, // Show only 2 lines of the description
+                                                overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
+                                                style: const TextStyle(color: Colors.black54),
+                                              ),
+                                              trailing: Icon(
+                                                _getEmotionIcon(entry.emotion),
+                                                color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
+                                                size: 32, // Increased size
+                                              ),
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => DiaryDetailPage(
+                                                      diary: entry,
+                                                      createDiary: false,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          // Filter Icon Positioned
-          Positioned(
-            top: 58,
-            right: 20,
-            child: GestureDetector(
-              onTap: _toggleFilterPanel,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.filter_alt,
-                    color: Colors.blue,
-                    size: 28,
-                  ),
-                ),
+
+          // Apply blur effect when filter panel is visible
+          if (_isFilterPanelVisible)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust blur intensity
+              child: Container(
+                color: Colors.black.withOpacity(0.2), // Optional: Add a semi-transparent overlay
               ),
             ),
-          ),
+
           // Sliding filter panel
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
@@ -458,17 +412,11 @@ class _DiaryPageState extends State<DiaryPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: Emotion.values.map((emotion) {
+                          children: DiaryType.values.map((emotion) {
                             final isSelected = _selectedEmotions.contains(emotion);
                             return GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    _selectedEmotions.remove(emotion);
-                                  } else {
-                                    _selectedEmotions.add(emotion);
-                                  }
-                                });
+                                _toggleEmotion(emotion);
                               },
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
@@ -501,7 +449,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      StringCapitalization(emotion.name).capitalizeFirstLetter(),
+                                      emotion.name,
                                       style: TextStyle(
                                         color: isSelected ? Colors.white : const Color.fromRGBO(72, 85, 204, 1),
                                         fontSize: 14,
@@ -523,24 +471,61 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ),
           ),
+
+          // Filter Button
+          Positioned(
+            top: 58,
+            right: 20,
+            child: GestureDetector(
+              onTap: _toggleFilterPanel,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 5,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.filter_alt,
+                    color: Colors.blue,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // Floating Action Button Positioned Upwards
           Positioned(
-            bottom: 100, // Adjust this value to move the button upwards
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DiaryDetailPage(
-                      diary: null, // Pass null for creating a new entry
-                      isEditing: true,
+            bottom: 100, // Adjust the vertical position of the FAB
+            right: _isFilterPanelVisible ? -80 : 20, // Slide the FAB out when the filter panel is open
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: _isFilterPanelVisible ? 0.0 : 1.0, // Hide the FAB when the filter panel is open
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DiaryDetailPage(
+                        diary: null, // Pass null for creating a new entry
+                        createDiary: true,
+                      ),
                     ),
-                  ),
-                );
-              },
-              backgroundColor: Colors.white,
-              child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+                  );
+                },
+                backgroundColor: Colors.white,
+                child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+              ),
             ),
           ),
         ],
@@ -549,32 +534,25 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 }
 
-IconData _getEmotionIcon(Emotion emotion) {
+IconData _getEmotionIcon(DiaryType emotion) {
   switch (emotion) {
-    case Emotion.LOVE:
+    case DiaryType.Love:
       return Icons.favorite;
-    case Emotion.FANTASTIC:
+    case DiaryType.Fantastic:
       return Icons.star;
-    case Emotion.HAPPY:
+    case DiaryType.Happy:
       return Icons.sentiment_satisfied;
-    case Emotion.NEUTRAL:
+    case DiaryType.Neutral:
       return Icons.sentiment_neutral;
-    case Emotion.DISAPPOINTED:
+    case DiaryType.Disappointed:
       return Icons.sentiment_dissatisfied;
-    case Emotion.SAD:
+    case DiaryType.Sad:
       return Icons.sentiment_very_dissatisfied;
-    case Emotion.ANGRY:
+    case DiaryType.Angry:
       return Icons.mood_bad;
-    case Emotion.SICK:
+    case DiaryType.Sick:
       return Icons.sick;
     default:
       return Icons.sentiment_neutral;
-  }
-}
-
-extension StringCapitalization on String {
-  String capitalizeFirstLetter() {
-    if (isEmpty) return this;
-    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }

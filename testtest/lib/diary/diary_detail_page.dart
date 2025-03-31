@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'diary_page.dart';
+import 'package:testtest/services/diary/diary_model.dart';
+import 'package:testtest/services/diary/diary_service.dart';
 
 class DiaryDetailPage extends StatefulWidget {
-  final DiaryDTO? diary; // Pass a diary entry if editing or viewing, null if creating
-  final bool isEditing; // Indicates if the page is in editing mode
+  final Diary? diary; // Pass a diary entry if editing or viewing, null if creating
+  final bool createDiary; // Indicates if this is a new diary
 
-  const DiaryDetailPage({Key? key, this.diary, this.isEditing = false}) : super(key: key);
+  const DiaryDetailPage({
+    Key? key,
+    this.diary,
+    this.createDiary = false,
+  }) : super(key: key);
 
   @override
   _DiaryDetailPageState createState() => _DiaryDetailPageState();
@@ -16,23 +22,24 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   late TextEditingController titleController;
   late TextEditingController descriptionController;
   late DateTime recordedAt;
-  Emotion? selectedEmotion;
+  DiaryType? selectedEmotion;
+  final DiaryService _diaryService = DiaryService(); // Initialize DiaryService
 
   @override
   void initState() {
     super.initState();
-    editMode = widget.isEditing;
+    editMode = widget.createDiary; // Start in edit mode if creating a new diary
     titleController = TextEditingController(text: widget.diary?.title ?? "");
     descriptionController = TextEditingController(text: widget.diary?.description ?? "");
     recordedAt = widget.diary?.recordedAt ?? DateTime.now();
     selectedEmotion = widget.diary?.emotion;
   }
 
-  void saveDiary() {
+  Future<void> saveDiary() async {
     if (titleController.text.isNotEmpty &&
         descriptionController.text.isNotEmpty &&
         selectedEmotion != null) {
-      final newDiary = DiaryDTO(
+      final diary = Diary(
         id: widget.diary?.id ?? UniqueKey().toString(),
         title: titleController.text,
         description: descriptionController.text,
@@ -42,8 +49,25 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         updatedAt: DateTime.now(),
       );
 
-      // Return the new or updated diary entry to the previous page
-      Navigator.pop(context, newDiary);
+      try {
+        if (widget.createDiary) {
+          // Call createDiary if this is a new diary
+          final createdDiary = await _diaryService.createDiary(diary);
+          Navigator.pop(context, createdDiary); // Return the created diary
+        } else {
+          // Call updateDiary if editing an existing diary
+          final updatedDiary = await _diaryService.updateDiary(diary.id, diary);
+          Navigator.pop(context, updatedDiary); // Return the updated diary
+        }
+      } catch (e) {
+        // Handle errors (e.g., show a snackbar)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to save diary. Please try again."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -53,33 +77,23 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     });
   }
 
-  void cancelEdit() {
-    setState(() {
-      editMode = false;
-      titleController.text = widget.diary?.title ?? "";
-      descriptionController.text = widget.diary?.description ?? "";
-      recordedAt = widget.diary?.recordedAt ?? DateTime.now();
-      selectedEmotion = widget.diary?.emotion;
-    });
-  }
-
-  IconData _getEmotionIcon(Emotion emotion) {
+  IconData _getEmotionIcon(DiaryType emotion) {
     switch (emotion) {
-      case Emotion.LOVE:
+      case DiaryType.Love:
         return Icons.favorite;
-      case Emotion.FANTASTIC:
+      case DiaryType.Fantastic:
         return Icons.star;
-      case Emotion.HAPPY:
+      case DiaryType.Happy:
         return Icons.sentiment_satisfied;
-      case Emotion.NEUTRAL:
+      case DiaryType.Neutral:
         return Icons.sentiment_neutral;
-      case Emotion.DISAPPOINTED:
+      case DiaryType.Disappointed:
         return Icons.sentiment_dissatisfied;
-      case Emotion.SAD:
+      case DiaryType.Sad:
         return Icons.sentiment_very_dissatisfied;
-      case Emotion.ANGRY:
+      case DiaryType.Angry:
         return Icons.mood_bad;
-      case Emotion.SICK:
+      case DiaryType.Sick:
         return Icons.sick;
       default:
         return Icons.sentiment_neutral;
@@ -143,14 +157,14 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
                   // Emotion Dropdown
                   if (editMode)
-                    DropdownButton<Emotion>(
+                    DropdownButton<DiaryType>(
                       value: selectedEmotion,
                       dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
-                      items: Emotion.values.map((emotion) {
+                      items: DiaryType.values.map((emotion) {
                         return DropdownMenuItem(
                           value: emotion,
                           child: Text(
-                            StringCapitalization(emotion.name).capitalizeFirstLetter(),
+                            emotion.toString().split('.').last,
                             style: const TextStyle(color: Colors.white),
                           ),
                         );
@@ -171,7 +185,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          StringCapitalization(selectedEmotion!.name).capitalizeFirstLetter(),
+                          selectedEmotion!.toString().split('.').last,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -240,46 +254,24 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
             ),
           ),
 
-          // Cancel Icon (only show in editing mode and when editing an existing diary)
-          if (editMode && widget.diary != null)
-            Positioned(
-              top: 58,
-              right: 90, // Position to the left of the save/edit icon
-              child: GestureDetector(
-                onTap: cancelEdit,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.cancel,
-                    color: Colors.red,
-                    size: 28,
-                  ),
-                ),
-              ),
-            ),
-
-          // Edit/Save Icons
+          // Save/Edit Icons
           Positioned(
             top: 58,
             right: 30,
             child: GestureDetector(
-              onTap: editMode ? saveDiary : toggleEditMode,
+              onTap: () {
+                if (widget.createDiary || editMode) {
+                  // Save the diary if creating or in edit mode
+                  saveDiary();
+                } else {
+                  // Toggle edit mode if viewing
+                  toggleEditMode();
+                }
+              },
               child: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(
-                  editMode ? Icons.check : Icons.edit,
+                  widget.createDiary || editMode ? Icons.check : Icons.edit,
                   color: const Color.fromRGBO(72, 85, 204, 1),
                 ),
               ),
@@ -288,12 +280,5 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         ],
       ),
     );
-  }
-}
-
-extension StringCapitalization on String {
-  String capitalizeFirstLetter() {
-    if (isEmpty) return this;
-    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }

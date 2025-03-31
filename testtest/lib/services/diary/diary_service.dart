@@ -40,12 +40,15 @@ class DiaryService {
     DateTime endDate,
   ) async {
     await _loadStoredCredentials();
-    final String subjectsQuery = emotions
-        .map((emotion) =>
-            'goalSubjects=${emotion.toString().split('.').last.toUpperCase()}')
+
+    // Format the emotions as a query parameter
+    final String emotionsQuery = emotions
+        .map((emotion) => 'emotion=${emotion.toString().split('.').last.toUpperCase()}')
         .join('&');
+
+    // Construct the URL with the query parameters
     final String url =
-        '$_baseUrl?userId=$_userId&emotion=$subjectsQuery&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}';
+        '$_baseUrl?userId=$_userId&$emotionsQuery&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}';
     print('Request URL for fetchDiaries: $url'); // Log the request URL
 
     try {
@@ -125,10 +128,13 @@ class DiaryService {
     await _loadStoredCredentials();
     print('updateDiary called with id: $id, diary: ${diary.toJson()}');
 
+    final String url = '$_baseUrl/$id'; // Construct the URL
+    print('Request URL for updateDiary: $url'); // Log the request URL
+
     try {
       final response = await http
           .patch(
-        Uri.parse('$_baseUrl/$id'),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $_accessToken',
           'Content-Type': 'application/json',
