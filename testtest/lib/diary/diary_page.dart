@@ -73,7 +73,8 @@ class _DiaryPageState extends State<DiaryPage> {
       ),
     ];
 
-   // _fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
+    //FIXME REMOVE COMENT WHEN FINSIHED
+    //_fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
   }
 
   // Function to toggle the filter panel visibility
@@ -115,6 +116,17 @@ class _DiaryPageState extends State<DiaryPage> {
       _hasError = false;
     });
 
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
     try {
       // Fetch diaries from the DiaryService
       final diaries = await _diaryService.fetchDiaries(
@@ -145,6 +157,7 @@ class _DiaryPageState extends State<DiaryPage> {
         ),
       );
     } finally {
+      Navigator.pop(context); // Close the loading dialog
       setState(() {
         _isLoading = false;
       });
@@ -280,62 +293,56 @@ class _DiaryPageState extends State<DiaryPage> {
                       },
                       child: RefreshIndicator(
                         onRefresh: _fetchDiariesForSelectedDate, // Refresh when pulled down
-                        child: _isLoading
+                        child: _hasError
                             ? const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
+                                child: Text(
+                                  "Failed to load entries. Please try again.",
+                                  style: TextStyle(fontSize: 16, color: Colors.white70),
                                 ),
                               )
-                            : _hasError
+                            : entriesForSelectedDate.isEmpty
                                 ? const Center(
                                     child: Text(
-                                      "Failed to load entries. Please try again.",
+                                      "No entries for this day.",
                                       style: TextStyle(fontSize: 16, color: Colors.white70),
                                     ),
                                   )
-                                : entriesForSelectedDate.isEmpty
-                                    ? const Center(
-                                        child: Text(
-                                          "No entries for this day.",
-                                          style: TextStyle(fontSize: 16, color: Colors.white70),
+                                : ListView.builder(
+                                    padding: const EdgeInsets.only(bottom: 60), // Add padding to the bottom
+                                    itemCount: entriesForSelectedDate.length,
+                                    itemBuilder: (context, index) {
+                                      final entry = entriesForSelectedDate[index];
+                                      return Card(
+                                        elevation: 4,
+                                        margin: const EdgeInsets.symmetric(vertical: 8),
+                                        child: ListTile(
+                                          title: Text(entry.title),
+                                          subtitle: Text(
+                                            entry.description,
+                                            maxLines: 2, // Show only 2 lines of the description
+                                            overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
+                                            style: const TextStyle(color: Colors.black54),
+                                          ),
+                                          trailing: Icon(
+                                            _getEmotionIcon(entry.emotion),
+                                            color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
+                                            size: 32, // Increased size
+                                          ),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => DiaryDetailPage(
+                                                  diary: entry,
+                                                  createDiary: false,
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                      )
-                                    : ListView.builder(
-                                        padding: const EdgeInsets.only(bottom: 60), // Add padding to the bottom
-                                        itemCount: entriesForSelectedDate.length,
-                                        itemBuilder: (context, index) {
-                                          final entry = entriesForSelectedDate[index];
-                                          return Card(
-                                            elevation: 4,
-                                            margin: const EdgeInsets.symmetric(vertical: 8),
-                                            child: ListTile(
-                                              title: Text(entry.title),
-                                              subtitle: Text(
-                                                entry.description,
-                                                maxLines: 2, // Show only 2 lines of the description
-                                                overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
-                                                style: const TextStyle(color: Colors.black54),
-                                              ),
-                                              trailing: Icon(
-                                                _getEmotionIcon(entry.emotion),
-                                                color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
-                                                size: 32, // Increased size
-                                              ),
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => DiaryDetailPage(
-                                                      diary: entry,
-                                                      createDiary: false,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                      );
+                                    },
+                                  ),
                       ),
                     ),
                   ),

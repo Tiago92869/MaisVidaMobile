@@ -49,17 +49,31 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         updatedAt: DateTime.now(),
       );
 
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
       try {
         if (widget.createDiary) {
           // Call createDiary if this is a new diary
           final createdDiary = await _diaryService.createDiary(diary);
+          Navigator.pop(context); // Close the loading dialog
           Navigator.pop(context, createdDiary); // Return the created diary
         } else {
           // Call updateDiary if editing an existing diary
           final updatedDiary = await _diaryService.updateDiary(diary.id, diary);
+          Navigator.pop(context); // Close the loading dialog
           Navigator.pop(context, updatedDiary); // Return the updated diary
         }
       } catch (e) {
+        Navigator.pop(context); // Close the loading dialog
         // Handle errors (e.g., show a snackbar)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
