@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -402,26 +404,24 @@ class _GoalsPageState extends State<GoalsPage> {
                                     );
                                   },
                                 ),
-                                SizedBox(height: 30,),
-                              // Button in the bottom-right corner
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: FloatingActionButton(
-                                  onPressed: () {
-                                    // Navigate to GoalDetailPage for creating a new goal
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const GoalDetailPage(goal: null, createResource: true,), // No goal passed
-                                      ),
-                                    );
-                                  },
-                                  backgroundColor: Colors.white,
-                                  child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+                                // Button in the bottom-right corner
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: FloatingActionButton(
+                                    onPressed: () {
+                                      // Navigate to GoalDetailPage for creating a new goal
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const GoalDetailPage(goal: null, createResource: true,), // No goal passed
+                                        ),
+                                      );
+                                    },
+                                    backgroundColor: Colors.white,
+                                    child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 30,),
                               ],
                             ),
                           ),
@@ -433,6 +433,14 @@ class _GoalsPageState extends State<GoalsPage> {
               ),
             ),
           ),
+          // Apply blur effect when filter panel is visible
+          if (_isFilterPanelVisible)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust blur intensity
+              child: Container(
+                color: Colors.black.withOpacity(0.2), // Optional: Add a semi-transparent overlay
+              ),
+            ),
           // Filter Icon Positioned
           Positioned(
             top: 58,
