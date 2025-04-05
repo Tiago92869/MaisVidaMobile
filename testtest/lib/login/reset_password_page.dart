@@ -1,6 +1,5 @@
 // reset_password_page.dart
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'login_page.dart'; // Import the Login Page
 
 class ResetPasswordPage extends StatelessWidget {
@@ -11,7 +10,7 @@ class ResetPasswordPage extends StatelessWidget {
         children: [
           // Background Image
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/background3.png'),
                 fit: BoxFit.cover,
@@ -22,11 +21,11 @@ class ResetPasswordPage extends StatelessWidget {
           // Content
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(30.0),
+              padding: const EdgeInsets.all(30.0),
               child: Column(
                 children: <Widget>[
-                  SizedBox(height: 50),
-                  Center(
+                  const SizedBox(height: 50),
+                  const Center(
                     child: Text(
                       "Reset Password",
                       style: TextStyle(
@@ -36,8 +35,8 @@ class ResetPasswordPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Padding(
+                  const SizedBox(height: 20),
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       "Write your respective email address and a new password will be sent to you via email",
@@ -45,13 +44,13 @@ class ResetPasswordPage extends StatelessWidget {
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
                   // Input field
                   _buildInputField("Email"),
 
                   // Pushes everything above upwards, making buttons stay at the bottom
-                  Spacer(),
+                  const Spacer(),
 
                   // Buttons at the bottom
                   _buildButton(context, "Create New Password", () {
@@ -61,7 +60,7 @@ class ResetPasswordPage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => LoginPage()),
                     );
                   }),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   _buildButton(context, "Go Back", () {
                     Navigator.pop(context);
                   }),
@@ -75,54 +74,48 @@ class ResetPasswordPage extends StatelessWidget {
   }
 
   Widget _buildInputField(String hint) {
-    return FadeInUp(
-      duration: Duration(milliseconds: 1800),
-      child: Container(
-        padding: EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Color.fromRGBO(85, 123, 233, 1)),
-          boxShadow: [
-            BoxShadow(
-              color: Color.fromRGBO(125, 154, 238, .2),
-              blurRadius: 20.0,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: TextField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[700]),
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color.fromRGBO(85, 123, 233, 1)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(125, 154, 238, .2),
+            blurRadius: 20.0,
+            offset: Offset(0, 10),
           ),
+        ],
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.grey[700]),
         ),
       ),
     );
   }
 
   Widget _buildButton(BuildContext context, String text, Function() onTap) {
-    return FadeInUp(
-      duration: Duration(milliseconds: 1900),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 50,
-          width: double.infinity, // Makes button full width
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            gradient: LinearGradient(
-              colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 50,
+        width: double.infinity, // Makes button full width
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
           ),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),

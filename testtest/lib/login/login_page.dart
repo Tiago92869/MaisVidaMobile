@@ -25,6 +25,16 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
+      //FIXME REMOVE WHEN CODE IS READY
+      // Check if the email is "tt" and the password is empty
+      if (_emailController.text.trim() == "tt" && _passwordController.text.trim().isEmpty) {
+        // Redirect to the MenuScreen without calling the login method
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MenuScreen()),
+        );
+        return; // Exit the method early
+      }
       // Call the login method from UserService
       await _userService.login(
         _emailController.text.trim(),

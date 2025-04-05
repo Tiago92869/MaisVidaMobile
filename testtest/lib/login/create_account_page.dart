@@ -1,6 +1,5 @@
 // create_account_page.dart
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
 
@@ -100,7 +99,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           // Content
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(30.0),
+              padding: const EdgeInsets.only(left: 30.0, right: 30.0, bottom: 30.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -178,149 +177,137 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   Widget _buildInputField(String hint, TextEditingController controller,
       {bool obscureText = false, String? Function(String?)? validator}) {
-    return FadeInUp(
-      duration: const Duration(milliseconds: 1800),
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color.fromRGBO(85, 123, 233, 1)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromRGBO(125, 154, 238, .2),
-              blurRadius: 20.0,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[700]),
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color.fromRGBO(85, 123, 233, 1)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(125, 154, 238, .2),
+            blurRadius: 20.0,
+            offset: Offset(0, 10),
           ),
-          validator: validator,
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.grey[700]),
         ),
+        validator: validator,
       ),
     );
   }
 
   Widget _buildDateInputField(String hint, TextEditingController controller) {
-    return FadeInUp(
-      duration: const Duration(milliseconds: 1800),
-      child: GestureDetector(
-        onTap: () async {
-          final selectedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(1900),
-            lastDate: DateTime(2100),
-            builder: (context, child) {
-              return Theme(
-                data: Theme.of(context).copyWith(
-                  colorScheme: const ColorScheme.light(
-                    primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
-                    onPrimary: Colors.white, // Header text color
-                    onSurface: Colors.black, // Body text color
-                  ),
+    return GestureDetector(
+      onTap: () async {
+        final selectedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(1900),
+          lastDate: DateTime(2100),
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: const ColorScheme.light(
+                  primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
+                  onPrimary: Colors.white, // Header text color
+                  onSurface: Colors.black, // Body text color
                 ),
-                child: child!,
-              );
-            },
-          );
-          if (selectedDate != null) {
-            setState(() {
-              controller.text = "${selectedDate.toLocal()}".split(' ')[0];
-            });
+              ),
+              child: child!,
+            );
+          },
+        );
+        if (selectedDate != null) {
+          setState(() {
+            controller.text = "${selectedDate.toLocal()}".split(' ')[0];
+          });
+        }
+      },
+      child: AbsorbPointer(
+        child: _buildInputField(hint, controller, validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "Birthday date is required.";
           }
-        },
-        child: AbsorbPointer(
-          child: _buildInputField(hint, controller, validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "Birthday date is required.";
-            }
-            return null;
-          }),
-        ),
+          return null;
+        }),
       ),
     );
   }
 
   Widget _buildPasswordField(String hint, TextEditingController controller) {
-    return FadeInUp(
-      duration: const Duration(milliseconds: 1800),
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color.fromRGBO(85, 123, 233, 1)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromRGBO(125, 154, 238, .2),
-              blurRadius: 20.0,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: TextFormField(
-          controller: controller,
-          obscureText: !_isPasswordVisible,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[700]),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey[700],
-              ),
-              onPressed: () {
-                setState(() {
-                  _isPasswordVisible = !_isPasswordVisible;
-                });
-              },
-            ),
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color.fromRGBO(85, 123, 233, 1)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(125, 154, 238, .2),
+            blurRadius: 20.0,
+            offset: Offset(0, 10),
           ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "$hint is required.";
-            }
-            if (hint == "Password" && value.length < 6) {
-              return "Password must be at least 6 characters.";
-            }
-            return null;
-          },
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: !_isPasswordVisible,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.grey[700]),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              color: Colors.grey[700],
+            ),
+            onPressed: () {
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            },
+          ),
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "$hint is required.";
+          }
+          if (hint == "Password" && value.length < 6) {
+            return "Password must be at least 6 characters.";
+          }
+          return null;
+        },
       ),
     );
   }
 
   Widget _buildButton(BuildContext context, String text, Function() onTap) {
-    return FadeInUp(
-      duration: const Duration(milliseconds: 1900),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 50,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
           ),
-          child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
