@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       //FIXME REMOVE WHEN CODE IS READY
       // Check if the email is "tt" and the password is empty
-      if (_emailController.text.trim() == "tt" && _passwordController.text.trim().isEmpty) {
+      if (_emailController.text.trim().isEmpty && _passwordController.text.trim().isEmpty) {
         // Redirect to the MenuScreen without calling the login method
         Navigator.pushReplacement(
           context,
