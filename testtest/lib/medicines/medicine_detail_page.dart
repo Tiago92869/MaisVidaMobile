@@ -17,6 +17,7 @@ class MedicineDetailPage extends StatefulWidget {
 class _MedicineDetailPageState extends State<MedicineDetailPage> {
   final MedicineRepository _medicineRepository = MedicineRepository(); // Repository instance
   bool editMode = false; // Tracks if the user is editing
+  bool isSaving = false; // Tracks if the save operation is in progress
   late TextEditingController nameController;
   late TextEditingController descriptionController;
   late TextEditingController startDateController;
@@ -46,6 +47,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   }
 
   Future<void> saveMedicine() async {
+    setState(() {
+      isSaving = true; // Show loading indicator
+    });
+
     try {
       final String name = nameController.text.trim();
       final String description = descriptionController.text.trim();
@@ -64,6 +69,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             backgroundColor: Colors.red,
           ),
         );
+        setState(() {
+          isSaving = false; // Hide loading indicator
+        });
         return;
       }
 
@@ -75,6 +83,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             backgroundColor: Colors.red,
           ),
         );
+        setState(() {
+          isSaving = false; // Hide loading indicator
+        });
         return;
       }
 
@@ -120,6 +131,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      setState(() {
+        isSaving = false; // Hide loading indicator
+      });
     }
   }
 
@@ -146,211 +161,217 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   }
 
   void _showAddPlanDialog() {
-    List<WeekDay> selectedDays = [];
-    TimeOfDay? selectedTime;
-    double? dosage;
+  List<WeekDay> selectedDays = [];
+  TimeOfDay? selectedTime;
+  double? dosage;
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
+  showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
+                    Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
-                      Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Add Weekly Plan",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Add Weekly Plan",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Select Days:",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Select Days:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
                       ),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 8.0,
-                        children: WeekDay.values.map((day) {
-                          return FilterChip(
-                            label: Text(
-                              "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}",
-                              style: TextStyle(
-                                color: selectedDays.contains(day)
-                                    ? Colors.white
-                                    : Colors.black87,
-                              ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8.0,
+                      children: WeekDay.values.map((day) {
+                        return FilterChip(
+                          label: Text(
+                            "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}",
+                            style: TextStyle(
+                              color: selectedDays.contains(day)
+                                  ? Colors.white
+                                  : Colors.black87,
                             ),
-                            selected: selectedDays.contains(day),
-                            selectedColor: const Color.fromRGBO(123, 144, 255, 1),
-                            backgroundColor: Colors.white10,
-                            onSelected: (isSelected) {
-                              setState(() {
-                                if (isSelected) {
-                                  selectedDays.add(day);
-                                } else {
-                                  selectedDays.remove(day);
-                                }
+                          ),
+                          selected: selectedDays.contains(day),
+                          selectedColor: const Color.fromRGBO(123, 144, 255, 1),
+                          backgroundColor: Colors.white10,
+                          onSelected: (isSelected) {
+                            setState(() {
+                              if (isSelected) {
+                                selectedDays.add(day);
+                              } else {
+                                selectedDays.remove(day);
+                              }
                             });
-                            },
-                          );
-                        }).toList(),
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Select Time:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
                       ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Select Time:",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              selectedTime != null
-                                  ? selectedTime!.format(context)
-                                  : "No time selected",
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              final time = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (time != null) {
-                                setState(() {
-                                  selectedTime = time;
-                                });
-                              }
-                            },
-                            child: const Text(
-                              "Select Time",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Enter Dosage:",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          labelText: "Dosage",
-                          labelStyle: TextStyle(color: Colors.white70),
-                          filled: true,
-                          fillColor: Colors.white10,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white70),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white70),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            selectedTime != null
+                                ? selectedTime!.format(context)
+                                : "No time selected",
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        onChanged: (value) {
-                          dosage = double.tryParse(value);
-                        },
+                        TextButton(
+                          onPressed: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (time != null) {
+                              setState(() {
+                                selectedTime = time;
+                              });
+                            }
+                          },
+                          child: const Text(
+                            "Select Time",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Enter Dosage:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text(
-                              "Cancel",
-                              style: TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: "Dosage",
+                        labelStyle: TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.white10,
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white70),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        dosage = double.tryParse(value);
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (selectedDays.isNotEmpty &&
-                                  selectedTime != null &&
-                                  dosage != null) {
-                                setState(() {
-                                  for (var day in selectedDays) {
-                                    widget.medicine?.plans.add(
-                                      Plan(
-                                        id: UniqueKey().toString(),
-                                        weekDay: day,
-                                        dosages: [
-                                          Dosage(
-                                            id: UniqueKey().toString(),
-                                            time: selectedTime!,
-                                            dosage: dosage!,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                });
-                                Navigator.pop(context);
-                              }
-                            },
-                            child: const Text("Add"),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                          onPressed: () {
+                            if (selectedDays.isNotEmpty &&
+                                selectedTime != null &&
+                                dosage != null) {
+                              setState(() {
+                                for (var day in selectedDays) {
+                                  // Find the plan for the selected day
+                                  final plan = widget.medicine?.plans.firstWhere(
+                                    (p) => p.weekDay == day,
+                                    orElse: () => throw Exception(
+                                        "Plan for $day not found"),
+                                  );
+
+                                  // Add the dosage to the existing plan
+                                  plan?.dosages.add(
+                                    Dosage(
+                                      id: UniqueKey().toString(),
+                                      time: selectedTime!,
+                                      dosage: dosage!,
+                                    ),
+                                  );
+                                }
+                              });
+
+                              // Trigger a rebuild of the main UI
+                              this.setState(() {});
+
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: const Text("Add"),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
   DateTime? _parseDate(String dateString) {
     try {
@@ -387,6 +408,14 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               ),
             ),
           ),
+
+          // Loading Indicator
+          if (isSaving)
+            const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            ),
 
           // Randomly show one of the starfish images
           if (_showFirstStarfish)
@@ -726,13 +755,13 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                               ),
                               Switch(
                                 value: isArchived,
-                                onChanged: editMode
+                                onChanged: widget.medicine != null && editMode
                                     ? (value) {
                                         setState(() {
                                           isArchived = value;
                                         });
                                       }
-                                    : null,
+                                    : null, // Disable toggle when creating a new medicine
                               ),
                             ],
                           ),
