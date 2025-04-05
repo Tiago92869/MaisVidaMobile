@@ -209,4 +209,20 @@ class UserService {
       rethrow;
     }
   }
+
+  // Method to update the user's password
+  Future<void> updateUserPassword(String userId, PasswordUpdateDTO passwordUpdateDTO) async {
+    final url = Uri.parse('$_baseUrl/users/$userId/password');
+    final response = await http.patch(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(passwordUpdateDTO.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update password: ${response.body}');
+    }
+  }
 }

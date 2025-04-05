@@ -15,6 +15,23 @@ class Token {
   }
 }
 
+class PasswordUpdateDTO {
+  final String currentPassword;
+  final String newPassword;
+
+  PasswordUpdateDTO({
+    required this.currentPassword,
+    required this.newPassword,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+    };
+  }
+}
+
 class User {
   final String id;
   final String firstName;
