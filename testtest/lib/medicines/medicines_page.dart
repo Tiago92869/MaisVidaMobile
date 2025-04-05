@@ -17,6 +17,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
   DateTime? _selectedDay; // Track the selected day
   bool _isFilterPanelVisible = false; // Filter panel visibility
   bool _isLoading = false; // Track loading state
+  bool _showArchived = false; // Track whether to show archived medicines
 
   final MedicineRepository _medicineRepository = MedicineRepository();
 
@@ -47,7 +48,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
       Medicine(
         id: "2",
         name: "Ibuprofen",
-        description: "Anti-inflammatory medicine for pain relief.",
+        description: "Anti-inflammatory medicine for pain inflammatory medicine for pain reliefinflammatory medicine for pain reliefinflammatory medicine for pain reliefrelief.",
         archived: false,
         startedAt: DateTime.now().subtract(const Duration(days: 1)),
         endedAt: DateTime.now().add(const Duration(days: 10)),
@@ -87,7 +88,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
       }
 
       // Fetch medicines from the repository
-      final medicineDays = await _medicineRepository.getMedicines(false, startDate, endDate);
+      final medicineDays = await _medicineRepository.getMedicines(_showArchived, startDate, endDate);
 
       // Update the _medicines list with the fetched data
       setState(() {
@@ -390,6 +391,26 @@ class _MedicinesPageState extends State<MedicinesPage> {
               ),
             ),
           ),
+          // Open Medicines Icon
+          Positioned(
+  top: 58,
+  right: 30,
+  child: GestureDetector(
+    onTap: () {
+      setState(() {
+        _showArchived = !_showArchived; // Toggle between archived and open medicines
+      });
+      _fetchMedicines(); // Refresh the medicines list
+    },
+    child: CircleAvatar(
+      backgroundColor: Colors.white,
+      child: Icon(
+        _showArchived ? Icons.folder_open : Icons.archive, // Switch icon based on _showArchived
+        color: const Color.fromRGBO(72, 85, 204, 1),
+      ),
+    ),
+  ),
+),
         ],
       ),
       floatingActionButton: Padding(
