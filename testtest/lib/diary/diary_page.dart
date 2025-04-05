@@ -72,9 +72,8 @@ class _DiaryPageState extends State<DiaryPage> {
         updatedAt: DateTime.now().subtract(const Duration(days: 2)),
       ),
     ];
-
-    //FIXME REMOVE COMENT WHEN FINSIHED
-    //_fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
+    
+    _fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
   }
 
   // Function to toggle the filter panel visibility
