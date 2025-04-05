@@ -4,17 +4,21 @@ import 'package:testtest/services/medicine/medicine_model.dart';
 class MedicineRepository {
   final MedicineService _medicineService = MedicineService();
 
-  Future<MedicinePage> getMedicines(bool archived, int page, int size) async {
-    try {
-      print('Requesting medicines: archived=$archived, page=$page, size=$size');
-      final medicinePage = await _medicineService.fetchMedicines(archived, page, size);
-      print('Successfully fetched medicines: ${medicinePage.content.length} items');
-      return medicinePage;
-    } catch (e) {
-      print('Error fetching medicines: $e');
-      rethrow; // Re-throw the error to be handled by the caller
-    }
+  Future<List<MedicineDay>> getMedicines(
+  bool archived,
+  DateTime startDate,
+  DateTime endDate,
+) async {
+  try {
+    print('Requesting medicines: archived=$archived, startDate=$startDate, endDate=$endDate');
+    final medicineDays = await _medicineService.fetchMedicines(archived, startDate, endDate);
+    print('Successfully fetched medicines: ${medicineDays.length} days');
+    return medicineDays;
+  } catch (e) {
+    print('Error fetching medicines: $e');
+    rethrow; // Re-throw the error to be handled by the caller
   }
+}
 
   Future<Medicine> getMedicineById(String id) async {
     try {

@@ -34,10 +34,15 @@ class MedicineService {
     }
   }
 
-  Future<MedicinePage> fetchMedicines(bool archived, int page, int size) async {
+  Future<List<MedicineDay>> fetchMedicines(
+    bool archived,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
     await _loadStoredCredentials();
     try {
-      final String url = '$_baseUrl?archived=$archived&page=$page&size=$size';
+      final String url =
+          '$_baseUrl?archived=$archived&startDate=${startDate.toIso8601String()}&endDate=${endDate.toIso8601String()}';
       print('Request URL for fetchMedicines: $url'); // Log the request URL
 
       final response = await http.get(
@@ -59,7 +64,8 @@ class MedicineService {
 
       if (response.statusCode == 200) {
         print('Medicines fetched successfully.');
-        return MedicinePage.fromJson(jsonDecode(response.body));
+        var jsonList = jsonDecode(response.body) as List;
+        return jsonList.map((json) => MedicineDay.fromJson(json)).toList();
       } else {
         print('Failed to load medicines. Status Code: ${response.statusCode}');
         throw Exception('Failed to load medicines');

@@ -1,9 +1,11 @@
 import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
+import 'package:testtest/services/medicine/medicine_model.dart'; // Import the models
+import 'package:testtest/services/medicine/medicine_repository.dart'; // Import the repository
 import 'medicines_page.dart';
 
 class MedicineDetailPage extends StatefulWidget {
-  final MedicineDTO? medicine; // Pass a medicine if editing or visualizing, null if creating
+  final Medicine? medicine; // Use the Medicine model
   final bool isEditing; // Indicates if the page is in editing mode
 
   const MedicineDetailPage({Key? key, this.medicine, this.isEditing = false}) : super(key: key);
@@ -13,6 +15,7 @@ class MedicineDetailPage extends StatefulWidget {
 }
 
 class _MedicineDetailPageState extends State<MedicineDetailPage> {
+  final MedicineRepository _medicineRepository = MedicineRepository(); // Repository instance
   bool editMode = false; // Tracks if the user is editing
   late TextEditingController nameController;
   late TextEditingController descriptionController;
@@ -42,12 +45,82 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     isArchived = widget.medicine?.archived ?? false;
   }
 
-  void saveMedicine() {
-    // Save the medicine (in a real app, you'd save it to a database or API)
-    print("Medicine saved: ${nameController.text}, ${descriptionController.text}, Notifications: $hasNotifications");
+  Future<void> saveMedicine() async {
+    try {
+      final String name = nameController.text.trim();
+      final String description = descriptionController.text.trim();
+      final DateTime? startedAt = startDateController.text.isNotEmpty
+          ? _parseDate(startDateController.text)
+          : null;
+      final DateTime? endedAt = endDateController.text.isNotEmpty
+          ? _parseDate(endDateController.text)
+          : null;
 
-    // Close the page after saving
-    Navigator.pop(context);
+      // Validation: Check if required fields are filled
+      if (name.isEmpty || description.isEmpty || startedAt == null || endedAt == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please fill in all required fields: Name, Description, Start Date, and End Date."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Validation: Check if start date is earlier than or equal to end date
+      if (startedAt.isAfter(endedAt)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Start Date must be earlier than or equal to End Date."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      if (widget.medicine == null) {
+        // Creating a new medicine
+        final newMedicine = Medicine(
+          id: UniqueKey().toString(),
+          name: name,
+          description: description,
+          archived: isArchived,
+          startedAt: startedAt,
+          endedAt: endedAt,
+          hasNotifications: hasNotifications,
+          plans: [],
+        );
+        await _medicineRepository.addMedicine(newMedicine);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Medicine created successfully!")),
+        );
+      } else {
+        // Updating an existing medicine
+        final updatedMedicine = widget.medicine!.copyWith(
+          name: name,
+          description: description,
+          archived: isArchived,
+          startedAt: startedAt,
+          endedAt: endedAt,
+          hasNotifications: hasNotifications,
+        );
+        await _medicineRepository.updateMedicine(updatedMedicine.id, updatedMedicine);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Medicine updated successfully!")),
+        );
+      }
+
+      // Close the page after saving
+      Navigator.pop(context);
+    } catch (e) {
+      print("Error saving medicine: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to save medicine. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void toggleEditMode() {
@@ -104,7 +177,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
                       const Text(
                         "Add Weekly Plan",
                         style: TextStyle(
@@ -114,8 +186,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // Days of the Week Selector
                       const Text(
                         "Select Days:",
                         style: TextStyle(
@@ -130,15 +200,15 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         children: WeekDay.values.map((day) {
                           return FilterChip(
                             label: Text(
-                              "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}", // Capitalize only the first letter
+                              "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}",
                               style: TextStyle(
                                 color: selectedDays.contains(day)
                                     ? Colors.white
-                                    : Colors.black87, // Darker text when unselected
+                                    : Colors.black87,
                               ),
                             ),
                             selected: selectedDays.contains(day),
-                            selectedColor: const Color.fromRGBO(123, 144, 255, 1), // Purpleish color
+                            selectedColor: const Color.fromRGBO(123, 144, 255, 1),
                             backgroundColor: Colors.white10,
                             onSelected: (isSelected) {
                               setState(() {
@@ -147,14 +217,12 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                 } else {
                                   selectedDays.remove(day);
                                 }
-                              });
+                            });
                             },
                           );
                         }).toList(),
                       ),
                       const SizedBox(height: 20),
-
-                      // Time Picker
                       const Text(
                         "Select Time:",
                         style: TextStyle(
@@ -194,8 +262,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-
-                      // Dosage Input
                       const Text(
                         "Enter Dosage:",
                         style: TextStyle(
@@ -228,8 +294,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         },
                       ),
                       const SizedBox(height: 20),
-
-                      // Actions
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -256,11 +320,11 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                 setState(() {
                                   for (var day in selectedDays) {
                                     widget.medicine?.plans.add(
-                                      PlanDTO(
+                                      Plan(
                                         id: UniqueKey().toString(),
                                         weekDay: day,
                                         dosages: [
-                                          DosageDTO(
+                                          Dosage(
                                             id: UniqueKey().toString(),
                                             time: selectedTime!,
                                             dosage: dosage!,
@@ -286,6 +350,21 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         );
       },
     );
+  }
+
+  DateTime? _parseDate(String dateString) {
+    try {
+      final parts = dateString.split('-');
+      if (parts.length == 3) {
+        final day = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final year = int.parse(parts[2]);
+        return DateTime(year, month, day);
+      }
+    } catch (e) {
+      print("Error parsing date: $e");
+    }
+    return null;
   }
 
   @override
@@ -506,33 +585,107 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           const SizedBox(height: 20),
 
                           // Start Date
-                          TextField(
-                            controller: startDateController,
-                            enabled: editMode,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                            decoration: const InputDecoration(
-                              labelText: "Start Date",
-                              labelStyle: TextStyle(color: Colors.white70),
-                              border: UnderlineInputBorder(),
+                          InkWell(
+                            onTap: editMode
+                                ? () async {
+                                    final selectedDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: _parseDate(startDateController.text) ?? DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                      builder: (context, child) {
+                                        return Theme(
+                                          data: Theme.of(context).copyWith(
+                                            colorScheme: const ColorScheme.light(
+                                              primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
+                                              onPrimary: Colors.white, // Header text color
+                                              onSurface: Colors.black, // Body text color
+                                            ),
+                                            textButtonTheme: TextButtonThemeData(
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Color.fromRGBO(72, 85, 204, 1), // Button text color
+                                              ),
+                                            ),
+                                          ),
+                                          child: child!,
+                                        );
+                                      },
+                                    );
+                                    if (selectedDate != null) {
+                                      setState(() {
+                                        startDateController.text =
+                                            "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}";
+                                      });
+                                    }
+                                  }
+                                : null,
+                            child: IgnorePointer(
+                              child: TextField(
+                                controller: startDateController,
+                                enabled: false,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                                decoration: const InputDecoration(
+                                  labelText: "Start Date",
+                                  labelStyle: TextStyle(color: Colors.white70),
+                                  border: UnderlineInputBorder(),
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),
 
                           // End Date
-                          TextField(
-                            controller: endDateController,
-                            enabled: editMode,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                            decoration: const InputDecoration(
-                              labelText: "End Date",
-                              labelStyle: TextStyle(color: Colors.white70),
-                              border: UnderlineInputBorder(),
+                          InkWell(
+                            onTap: editMode
+                                ? () async {
+                                    final selectedDate = await showDatePicker(
+                                      context: context,
+                                      initialDate: _parseDate(endDateController.text) ?? DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                      builder: (context, child) {
+                                        return Theme(
+                                          data: Theme.of(context).copyWith(
+                                            colorScheme: const ColorScheme.light(
+                                              primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
+                                              onPrimary: Colors.white, // Header text color
+                                              onSurface: Colors.black, // Body text color
+                                            ),
+                                            textButtonTheme: TextButtonThemeData(
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Color.fromRGBO(72, 85, 204, 1), // Button text color
+                                              ),
+                                            ),
+                                          ),
+                                          child: child!,
+                                        );
+                                      },
+                                    );
+                                    if (selectedDate != null) {
+                                      setState(() {
+                                        endDateController.text =
+                                            "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}";
+                                      });
+                                    }
+                                  }
+                                : null,
+                            child: IgnorePointer(
+                              child: TextField(
+                                controller: endDateController,
+                                enabled: false,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                                decoration: const InputDecoration(
+                                  labelText: "End Date",
+                                  labelStyle: TextStyle(color: Colors.white70),
+                                  border: UnderlineInputBorder(),
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 20),

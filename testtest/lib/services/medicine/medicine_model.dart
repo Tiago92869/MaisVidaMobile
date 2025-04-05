@@ -194,4 +194,47 @@ class Medicine {
       'plans': plans.map((p) => p.toJson()).toList(),
     };
   }
+
+  Medicine copyWith({
+    String? id,
+    String? name,
+    String? description,
+    bool? archived,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    bool? hasNotifications,
+    List<Plan>? plans,
+  }) {
+    return Medicine(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      archived: archived ?? this.archived,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      hasNotifications: hasNotifications ?? this.hasNotifications,
+      plans: plans ?? this.plans,
+    );
+  }
+}
+
+class MedicineDay {
+  final DateTime day;
+  final List<Medicine> medicines;
+
+  MedicineDay({
+    required this.day,
+    required this.medicines,
+  });
+
+  factory MedicineDay.fromJson(Map<String, dynamic> json) {
+    var medicinesJson = json['medicines'] as List;
+    List<Medicine> medicinesList =
+        medicinesJson.map((i) => Medicine.fromJson(i)).toList();
+
+    return MedicineDay(
+      day: DateTime.parse(json['day'] as String),
+      medicines: medicinesList,
+    );
+  }
 }
