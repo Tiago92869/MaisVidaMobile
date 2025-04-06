@@ -7,7 +7,8 @@ import 'package:testtest/services/favorite/favorite_model.dart';
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
 
-  const ResourceDetailPage({Key? key, required this.resource}) : super(key: key);
+  const ResourceDetailPage({Key? key, required this.resource})
+    : super(key: key);
 
   @override
   _ResourceDetailPageState createState() => _ResourceDetailPageState();
@@ -18,7 +19,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
   bool _isFavorite = false;
   bool _initialFavoriteStatus = false; // Track the initial favorite status
-  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
+  bool _showFirstStarfish =
+      Random().nextBool(); // Randomly decide which starfish to show
 
   @override
   void initState() {
@@ -28,10 +30,13 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
   Future<void> _checkIfFavorite() async {
     try {
-      final isFavorite = await _favoriteService.isFavorite(resourceId: widget.resource.id);
+      final isFavorite = await _favoriteService.isFavorite(
+        resourceId: widget.resource.id,
+      );
       setState(() {
         _isFavorite = isFavorite;
-        _initialFavoriteStatus = isFavorite; // Store the initial favorite status
+        _initialFavoriteStatus =
+            isFavorite; // Store the initial favorite status
       });
     } catch (e) {
       print('Error checking favorite status: $e');
@@ -51,7 +56,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   }
 
   Future<void> _updateFavoriteStatus() async {
-    if (_isFavorite != _initialFavoriteStatus) { // Only call modifyFavorite if the status has changed
+    if (_isFavorite != _initialFavoriteStatus) {
+      // Only call modifyFavorite if the status has changed
       try {
         final favoriteInput = FavoriteInput(
           activities: [],
@@ -86,7 +92,12 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                 gradient: LinearGradient(
                   colors: [
                     Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -149,11 +160,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         // Back button
         GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-            size: 28,
-          ),
+          child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
         ),
         const SizedBox(height: 20),
 
@@ -173,9 +180,12 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               ),
             ),
             GestureDetector(
-              onTap: _toggleFavoriteStatus, // Toggle the favorite status locally
+              onTap:
+                  _toggleFavoriteStatus, // Toggle the favorite status locally
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300), // Smooth transition for color change
+                duration: const Duration(
+                  milliseconds: 300,
+                ), // Smooth transition for color change
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -242,7 +252,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   Widget _buildDateInfo(String label, DateTime? date) {
     if (date == null) return const SizedBox.shrink();
 
-    final formattedDate = "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
+    final formattedDate =
+        "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -257,10 +268,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         const SizedBox(height: 4),
         Text(
           formattedDate,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-          ),
+          style: const TextStyle(fontSize: 14, color: Colors.white),
         ),
       ],
     );

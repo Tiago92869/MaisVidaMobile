@@ -5,6 +5,7 @@ import 'package:testtest/goals/goal_details_page.dart';
 import 'package:testtest/medicines/medicine_detail_page.dart';
 import 'package:testtest/menu/components/hcard.dart';
 import 'package:testtest/menu/components/vcard.dart';
+import 'package:testtest/menu/menu.dart';
 import 'package:testtest/menu/models/courses.dart';
 import 'package:testtest/menu/theme.dart';
 import 'package:testtest/activities/activities_page.dart';
@@ -25,7 +26,9 @@ import 'package:testtest/services/goal/goal_model.dart';
 import 'package:testtest/services/diary/diary_model.dart';
 
 class HomeTabView extends StatefulWidget {
-  const HomeTabView({Key? key}) : super(key: key);
+  final Function(int tabIndex) onTabChange; // Change callback to use tab index
+
+  const HomeTabView({Key? key, required this.onTabChange}) : super(key: key);
 
   @override
   State<HomeTabView> createState() => _HomeTabViewState();
@@ -53,6 +56,8 @@ class _HomeTabViewState extends State<HomeTabView> {
   bool _isLoadingGoals = true;
   bool _isLoadingDiaries = true;
 
+  bool _showFirstImage = true; // Track which image to display
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +66,20 @@ class _HomeTabViewState extends State<HomeTabView> {
     _fetchMedications();
     _fetchGoals();
     _fetchDiaries();
+
+    // Start alternating images
+    _startImageToggle();
+  }
+
+  void _startImageToggle() {
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showFirstImage = !_showFirstImage; // Toggle the image
+        });
+        _startImageToggle(); // Repeat the toggle
+      }
+    });
   }
 
   Future<void> _fetchActivities() async {
@@ -373,7 +392,7 @@ class _HomeTabViewState extends State<HomeTabView> {
     List<dynamic> items,
     bool isLoading,
     Widget Function(dynamic) itemBuilder,
-    VoidCallback onSeeMore,
+    int tabIndex, // Use tab index for navigation
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +407,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                 style: const TextStyle(fontSize: 34, fontFamily: "Poppins"),
               ),
               GestureDetector(
-                onTap: onSeeMore,
+                onTap: () {
+                  widget.onTabChange(tabIndex); // Pass the tab index
+                },
                 child: const Text(
                   "See More",
                   style: TextStyle(color: Colors.blue, fontSize: 16),
@@ -409,12 +430,7 @@ class _HomeTabViewState extends State<HomeTabView> {
               ),
             )
             : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(
-                10,
-                10,
-                10,
-                20,
-              ), // Added consistent padding
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               child: Column(children: items.map(itemBuilder).toList()),
             ),
         const SizedBox(height: 20),
@@ -426,7 +442,7 @@ class _HomeTabViewState extends State<HomeTabView> {
     String title,
     List<Activity> activities,
     bool isLoading,
-    VoidCallback onSeeMore,
+    int tabIndex, // Use tab index for navigation
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,10 +454,12 @@ class _HomeTabViewState extends State<HomeTabView> {
             children: [
               Text(
                 title,
-                style: TextStyle(fontSize: 34, fontFamily: "Poppins"),
+                style: const TextStyle(fontSize: 34, fontFamily: "Poppins"),
               ),
               GestureDetector(
-                onTap: onSeeMore,
+                onTap: () {
+                  widget.onTabChange(tabIndex); // Pass the tab index
+                },
                 child: const Text(
                   "See More",
                   style: TextStyle(color: Colors.blue, fontSize: 16),
@@ -487,8 +505,8 @@ class _HomeTabViewState extends State<HomeTabView> {
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: Container(
-                            width: 300, // Ensure a fixed width for each card
-                            height: 300, // Optional: Set a fixed height
+                            width: 300,
+                            height: 300,
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: backgroundColor,
@@ -574,316 +592,329 @@ class _HomeTabViewState extends State<HomeTabView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        clipBehavior: Clip.hardEdge,
-        decoration: BoxDecoration(
-          color: RiveAppTheme.background,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top + 60,
-            bottom: MediaQuery.of(context).padding.bottom,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildActivitiesSection(
-                "Activities",
-                _activities,
-                _isLoadingActivities,
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ActivitiesPage(),
+      body: Stack(
+        children: [
+          // Display the alternating images
+          if (_showFirstImage)
+            Positioned(
+              right: 80,
+              top: 320,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.7,
+                  child: Image.asset(
+                    'assets/images/starfish2.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-              _buildSection(
-                "Resources",
-                _resources,
-                _isLoadingResources,
-                (resource) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  ResourceDetailPage(resource: resource),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: _buildHCard(resource),
-                    ),
-                  );
-                },
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ResourcesPage(),
+            )
+          else
+            Positioned(
+              left: 100,
+              top: 250,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.5,
+                  child: Image.asset(
+                    'assets/images/starfish1.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-              _buildSection(
-                "Medication",
-                _medications,
-                _isLoadingMedications,
-                (medicine) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => MedicineDetailPage(
-                                medicine: medicine,
-                                isEditing: false,
-                              ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4A90E2).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            medicine.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF4A90E2),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            medicine.description,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                              Text(
-                                "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MedicinesPage(),
-                  ),
+            ),
+
+          // Main content of HomeTabView
+          SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 60,
+              bottom: MediaQuery.of(context).padding.bottom,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildActivitiesSection(
+                  "Activities",
+                  _activities,
+                  _isLoadingActivities,
+                  4, // Tab index for "Activities"
                 ),
-              ),
-              _buildSection(
-                "Goals",
-                _goals,
-                _isLoadingGoals,
-                (goal) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => GoalDetailPage(
-                                goal: goal,
-                                createResource: false,
-                              ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7B61FF).withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
+                _buildSection(
+                  "Resources",
+                  _resources,
+                  _isLoadingResources,
+                  (resource) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    ResourceDetailPage(resource: resource),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: _buildHCard(resource),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            goal.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF7B61FF),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            goal.description,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF7B61FF,
-                                  ).withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  StringCapitalization(
-                                    goal.subject.toString().split('.').last,
-                                  ).capitalizeFirstLetter(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF7B61FF),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    goal.completed
-                                        ? "Completed"
-                                        : "Not Completed",
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Switch(
-                                    value: goal.completed,
-                                    onChanged: null,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GoalsPage()),
+                    );
+                  },
+                  3, // Tab index for "Resources"
                 ),
-              ),
-              _buildSection(
-                "Diary",
-                _diaries,
-                _isLoadingDiaries,
-                (diary) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => DiaryDetailPage(
-                                diary: diary,
-                                createDiary: false,
-                              ),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      color: const Color(0xFFBBDEFB), // Lighter blue color
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        title: Text(
-                          diary.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                Colors.black, // Darker text for better contrast
+                _buildSection(
+                  "Medication",
+                  _medications,
+                  _isLoadingMedications,
+                  (medicine) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => MedicineDetailPage(
+                                  medicine: medicine,
+                                  isEditing: false,
+                                ),
                           ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4A90E2).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        subtitle: Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              diary.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              medicine.name,
                               style: const TextStyle(
-                                color: Colors.black87,
-                              ), // Subtle dark text
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4A90E2),
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Created: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
+                              medicine.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color:
-                                    Colors
-                                        .black54, // Subtle gray text for the date
+                                color: Colors.black54,
                               ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                Text(
+                                  "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        trailing: Icon(
-                          _getEmotionIcon(diary.emotion),
-                          color: const Color(
-                            0xFF64B5F6,
-                          ), // Light blue for the icon
-                          size: 32,
+                      ),
+                    );
+                  },
+                  2, // Tab index for "Medication"
+                ),
+                _buildSection(
+                  "Goals",
+                  _goals,
+                  _isLoadingGoals,
+                  (goal) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => GoalDetailPage(
+                                  goal: goal,
+                                  createResource: false,
+                                ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7B61FF).withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              goal.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF7B61FF),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              goal.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF7B61FF,
+                                    ).withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    goal.subject.toString().split('.').last,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF7B61FF),
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      goal.completed
+                                          ? "Completed"
+                                          : "Not Completed",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Switch(
+                                      value: goal.completed,
+                                      onChanged:
+                                          null, // Disable toggle in this view
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  );
-                },
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DiaryPage()),
+                    );
+                  },
+                  1, // Tab index for "Goals"
                 ),
-              ),
-            ],
+                _buildSection(
+                  "Diary",
+                  _diaries,
+                  _isLoadingDiaries,
+                  (diary) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => DiaryDetailPage(
+                                  diary: diary,
+                                  createDiary: false,
+                                ),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        color: const Color(0xFFBBDEFB), // Lighter blue color
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(16),
+                          title: Text(
+                            diary.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  Colors
+                                      .black, // Darker text for better contrast
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                diary.description,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                ), // Subtle dark text
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Created: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color:
+                                      Colors
+                                          .black54, // Subtle gray text for the date
+                                ),
+                              ),
+                            ],
+                          ),
+                          trailing: Icon(
+                            _getEmotionIcon(diary.emotion),
+                            color: const Color(
+                              0xFF64B5F6,
+                            ), // Light blue for the icon
+                            size: 32,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  0, // Tab index for "Diary"
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

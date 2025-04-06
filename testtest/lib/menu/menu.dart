@@ -58,7 +58,6 @@ Widget commonTabScene(String tabName) {
   );
 }
 
-
 class MenuScreen extends StatefulWidget {
   const MenuScreen({Key? key}) : super(key: key);
 
@@ -77,24 +76,83 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   late SMIBool _menuBtn;
 
   bool _showOnBoarding = false;
-  Widget _tabBody = Container(color: RiveAppTheme.background);
-  final List<Widget> _screens = [
-    const HomeTabView(),
-    commonTabScene("Diary"),
-    commonTabScene("Goals"),
-    commonTabScene("Medicine"),
-    commonTabScene("Resources"),
-    commonTabScene("Activities"),
-    commonTabScene("Notifications"),
-    commonTabScene("SOS"),
-    commonTabScene("Profile"),
-  ];
 
-  final springDesc = const SpringDescription(
-    mass: 0.1,
-    stiffness: 40,
-    damping: 5,
+  // Reference to HomeTabView
+  late HomeTabView _homeTabView;
+
+  // Initialize _tabBody with a fallback widget
+  Widget _tabBody = Container(
+    color: Colors.red, // Fallback color for debugging
+    alignment: Alignment.center,
+    child: const Text(
+      "Invalid Tab",
+      style: TextStyle(fontSize: 20, color: Colors.white),
+    ),
   );
+
+  // Screens list
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize HomeTabView
+    _homeTabView = HomeTabView(
+      onTabChange: (tabIndex) {
+        setState(() {
+          if (tabIndex >= 0 && tabIndex < _screens.length) {
+            _tabBody = _screens[tabIndex];
+          } else {
+            print('Invalid tab index: $tabIndex');
+          }
+        });
+      },
+    );
+
+    // Initialize _screens with HomeTabView as the first element
+    _screens = [
+      _homeTabView, // Add HomeTabView as the first screen
+      commonTabScene("Diary"),
+      commonTabScene("Goals"),
+      commonTabScene("Medicine"),
+      commonTabScene("Resources"),
+      commonTabScene("Activities"),
+      commonTabScene("Notifications"),
+      commonTabScene("SOS"),
+      commonTabScene("Profile"),
+    ];
+
+    // Set the initial tab body
+    _tabBody = _screens.first;
+
+    // Initialize animations
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      upperBound: 1,
+      vsync: this,
+    );
+    _onBoardingAnimController = AnimationController(
+      duration: const Duration(milliseconds: 350),
+      upperBound: 1,
+      vsync: this,
+    );
+
+    _sidebarAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController!, curve: Curves.linear),
+    );
+
+    _onBoardingAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _onBoardingAnimController!, curve: Curves.linear),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    _onBoardingAnimController?.dispose();
+    super.dispose();
+  }
 
   void _onMenuIconInit(Artboard artboard) {
     final controller = StateMachineController.fromArtboard(
@@ -108,7 +166,12 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   void onMenuPress() {
     if (_menuBtn.value) {
-      final springAnim = SpringSimulation(springDesc, 0, 1, 0);
+      final springAnim = SpringSimulation(
+        const SpringDescription(mass: 0.1, stiffness: 40, damping: 5),
+        0,
+        1,
+        0,
+      );
       _animationController?.animateWith(springAnim);
     } else {
       _animationController?.reverse();
@@ -129,13 +192,15 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     }
 
     // Search in menuItems
-    int index = MenuItemModel.menuItems
-        .indexWhere((menuItem) => menuItem.title == menuTitle);
+    int index = MenuItemModel.menuItems.indexWhere(
+      (menuItem) => menuItem.title == menuTitle,
+    );
 
     if (index == -1) {
       // If not found in menuItems, search in menuItems2
-      index = MenuItemModel.menuItems2
-          .indexWhere((menuItem) => menuItem.title == menuTitle);
+      index = MenuItemModel.menuItems2.indexWhere(
+        (menuItem) => menuItem.title == menuTitle,
+      );
 
       if (index != -1) {
         // Adjust the index to match the position in _screens
@@ -149,40 +214,18 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         _tabBody = _screens[index];
       });
     } else {
-      print('Error: Menu title "$menuTitle" not found in menuItems or menuItems2'); // Debugging print
+      print('Error: Invalid menu title or index');
+      setState(() {
+        _tabBody = Container(
+          color: Colors.red,
+          alignment: Alignment.center,
+          child: const Text(
+            "Invalid Tab",
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        );
+      });
     }
-  }
-
-  @override
-  void initState() {
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      upperBound: 1,
-      vsync: this,
-    );
-    _onBoardingAnimController = AnimationController(
-      duration: const Duration(milliseconds: 350),
-      upperBound: 1,
-      vsync: this,
-    );
-
-    _sidebarAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController!, curve: Curves.linear),
-    );
-
-    _onBoardingAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _onBoardingAnimController!, curve: Curves.linear),
-    );
-
-    _tabBody = _screens.first;
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _animationController?.dispose();
-    _onBoardingAnimController?.dispose();
-    super.dispose();
   }
 
   @override
@@ -222,7 +265,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               builder: (context, child) {
                 return Transform.scale(
                   scale:
-                      1 - (_showOnBoarding
+                      1 -
+                      (_showOnBoarding
                           ? _onBoardingAnim.value * 0.08
                           : _sidebarAnim.value * 0.1),
                   child: Transform.translate(
@@ -303,9 +347,10 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                         colors: [
                           RiveAppTheme.background.withOpacity(0),
                           RiveAppTheme.background.withOpacity(
-                            1 - (!_showOnBoarding
-                                ? _sidebarAnim.value
-                                : _onBoardingAnim.value),
+                            1 -
+                                (!_showOnBoarding
+                                    ? _sidebarAnim.value
+                                    : _onBoardingAnim.value),
                           ),
                         ],
                         begin: Alignment.topCenter,
@@ -319,46 +364,50 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
           ),
         ],
       ),
-      bottomNavigationBar: RepaintBoundary(
-        child: AnimatedBuilder(
-          animation: !_showOnBoarding ? _sidebarAnim : _onBoardingAnim,
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(
-                0,
-                !_showOnBoarding
-                    ? _sidebarAnim.value * 300
-                    : _onBoardingAnim.value * 200,
-              ),
-              child: child,
-            );
-          },
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CustomTabBar(
-                onTabChange: (tabIndex) {
-                  setState(() {
-                    if(tabIndex == 0){
-                      _tabBody = _screens.first;
-                    }
-                    if(tabIndex == 1){
-                      _tabBody = _screens[1];
-                    }
-                    if(tabIndex == 2){
-                      _tabBody = _screens[4];
-                    }
-                    if(tabIndex == 3){
-                      _tabBody = _screens[2];
-                    }
-                    if(tabIndex == 4){
-                      _tabBody = _screens[8];
-                    }
-                  });
-                },
-              ),
-            ],
-          ),
+      bottomNavigationBar: bottomNavigationBar(),
+    );
+  }
+
+  Widget bottomNavigationBar() {
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: !_showOnBoarding ? _sidebarAnim : _onBoardingAnim,
+        builder: (context, child) {
+          return Transform.translate(
+            offset: Offset(
+              0,
+              !_showOnBoarding
+                  ? _sidebarAnim.value * 300
+                  : _onBoardingAnim.value * 200,
+            ),
+            child: child,
+          );
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomTabBar(
+              onTabChange: (tabIndex) {
+                setState(() {
+                  if (tabIndex == 0) {
+                    _tabBody = _screens.first;
+                  }
+                  if (tabIndex == 1) {
+                    _tabBody = _screens[1];
+                  }
+                  if (tabIndex == 2) {
+                    _tabBody = _screens[4];
+                  }
+                  if (tabIndex == 3) {
+                    _tabBody = _screens[2];
+                  }
+                  if (tabIndex == 4) {
+                    _tabBody = _screens[8];
+                  }
+                });
+              },
+            ),
+          ],
         ),
       ),
     );
