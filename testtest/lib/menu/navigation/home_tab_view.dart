@@ -56,8 +56,6 @@ class _HomeTabViewState extends State<HomeTabView> {
   bool _isLoadingGoals = true;
   bool _isLoadingDiaries = true;
 
-  bool _showFirstImage = true; // Track which image to display
-
   @override
   void initState() {
     super.initState();
@@ -66,20 +64,6 @@ class _HomeTabViewState extends State<HomeTabView> {
     _fetchMedications();
     _fetchGoals();
     _fetchDiaries();
-
-    // Start alternating images
-    _startImageToggle();
-  }
-
-  void _startImageToggle() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _showFirstImage = !_showFirstImage; // Toggle the image
-        });
-        _startImageToggle(); // Repeat the toggle
-      }
-    });
   }
 
   Future<void> _fetchActivities() async {
@@ -404,7 +388,11 @@ class _HomeTabViewState extends State<HomeTabView> {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 34, fontFamily: "Poppins"),
+                style: const TextStyle(
+                  fontSize: 34,
+                  fontFamily: "Poppins",
+                  color: Colors.white, // Set title text color to white
+                ),
               ),
               GestureDetector(
                 onTap: () {
@@ -454,7 +442,11 @@ class _HomeTabViewState extends State<HomeTabView> {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 34, fontFamily: "Poppins"),
+                style: const TextStyle(
+                  fontSize: 34,
+                  fontFamily: "Poppins",
+                  color: Colors.white, // Set title text color to white
+                ),
               ),
               GestureDetector(
                 onTap: () {
@@ -591,44 +583,42 @@ class _HomeTabViewState extends State<HomeTabView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent, // Set background to white
       body: Stack(
         children: [
-          // Display the alternating images
-          if (_showFirstImage)
-            Positioned(
-              right: 80,
-              top: 320,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.7,
-                  child: Image.asset(
-                    'assets/images/starfish2.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            )
-          else
-            Positioned(
-              left: 100,
-              top: 250,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.5,
-                  child: Image.asset(
-                    'assets/images/starfish1.png',
-                    fit: BoxFit.contain,
-                  ),
+          // Add both images
+          Positioned(
+            right: 80,
+            top: -80,
+            width: 400,
+            height: 400,
+            child: Opacity(
+              opacity: 0.1,
+              child: Transform.rotate(
+                angle: 0.7,
+                child: Image.asset(
+                  'assets/images/starfish2.png',
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
+          ),
+          Positioned(
+            left: 100,
+            top: 450,
+            width: 400,
+            height: 400,
+            child: Opacity(
+              opacity: 0.1,
+              child: Transform.rotate(
+                angle: 0.5,
+                child: Image.asset(
+                  'assets/images/starfish1.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
 
           // Main content of HomeTabView
           SingleChildScrollView(
@@ -691,7 +681,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4A90E2).withOpacity(0.15),
+                          color: const Color(
+                            0xFFB3E5FC,
+                          ).withOpacity(0.3), // Lighter blue
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
@@ -702,7 +694,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4A90E2),
+                                color: Colors.white, // White text
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -712,7 +704,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.black54,
+                                color: Colors.white70, // Subtle white text
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -723,14 +715,14 @@ class _HomeTabViewState extends State<HomeTabView> {
                                   "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    color: Colors.black54,
+                                    color: Colors.white70, // Subtle white text
                                   ),
                                 ),
                                 Text(
                                   "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    color: Colors.black54,
+                                    color: Colors.white70, // Subtle white text
                                   ),
                                 ),
                               ],
@@ -764,7 +756,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF7B61FF).withOpacity(0.15),
+                          color: const Color(
+                            0xFFCE93D8,
+                          ).withOpacity(0.3), // Lighter purple
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Column(
@@ -775,7 +769,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF7B61FF),
+                                color: Colors.white, // White text
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -785,7 +779,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.black54,
+                                color: Colors.white70, // Subtle white text
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -799,8 +793,8 @@ class _HomeTabViewState extends State<HomeTabView> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: const Color(
-                                      0xFF7B61FF,
-                                    ).withOpacity(0.2),
+                                      0xFFCE93D8,
+                                    ).withOpacity(0.2), // Lighter purple
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -808,7 +802,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF7B61FF),
+                                      color: Colors.white, // White text
                                     ),
                                   ),
                                 ),
@@ -821,7 +815,8 @@ class _HomeTabViewState extends State<HomeTabView> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black54,
+                                        color:
+                                            Colors.white70, // Subtle white text
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -859,52 +854,61 @@ class _HomeTabViewState extends State<HomeTabView> {
                           ),
                         );
                       },
-                      child: Card(
-                        elevation: 4,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        color: const Color(0xFFBBDEFB), // Lighter blue color
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          title: Text(
-                            diary.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  Colors
-                                      .black, // Darker text for better contrast
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: const Color(
+                            0xFF64B5F6,
+                          ).withOpacity(0.3), // Transparent blue
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Left side: Diary information
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    diary.title,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white, // White text
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    diary.description,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Colors.white70, // Subtle white text
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Created: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color:
+                                          Colors.white70, // Subtle white text
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                diary.description,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                ), // Subtle dark text
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Created: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color:
-                                      Colors
-                                          .black54, // Subtle gray text for the date
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: Icon(
-                            _getEmotionIcon(diary.emotion),
-                            color: const Color(
-                              0xFF64B5F6,
-                            ), // Light blue for the icon
-                            size: 32,
-                          ),
+                            // Right side: Emotion icon
+                            Icon(
+                              _getEmotionIcon(diary.emotion),
+                              color: Colors.white, // White icon
+                              size: 48, // Larger size for better visibility
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -920,8 +924,7 @@ class _HomeTabViewState extends State<HomeTabView> {
   }
 
   Widget _buildHCard(Resource resource) {
-    const int maxDescriptionLength =
-        30; // Maximum length for the description (fits around two lines)
+    const int maxDescriptionLength = 30; // Maximum length for the description
 
     String truncatedDescription =
         resource.description.length > maxDescriptionLength
@@ -932,7 +935,7 @@ class _HomeTabViewState extends State<HomeTabView> {
       constraints: const BoxConstraints(maxHeight: 110),
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.blueAccent, // Replace with a dynamic color if needed
+        color: Colors.blueAccent.withOpacity(0.3), // Transparent blue
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -946,8 +949,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                   resource.title,
                   style: const TextStyle(
                     fontSize: 18,
+                    fontWeight: FontWeight.bold, // Make the title bold
                     fontFamily: "Poppins",
-                    color: Colors.white,
+                    color: Colors.white, // White text
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -956,7 +960,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontFamily: "Inter",
-                    color: Colors.white,
+                    color: Colors.white70, // Subtle white text
                   ),
                   maxLines: 2, // Ensure it doesn't exceed two lines
                   overflow:
