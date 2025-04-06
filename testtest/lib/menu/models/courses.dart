@@ -1,18 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:testtest/menu/assets.dart' as app_assets;
-
-enum ResourceType {
-  ARTICLE,
-  VIDEO,
-  PODCAST,
-  PHRASE,
-  CARE,
-  EXERCISE,
-  RECIPE,
-  MUSIC,
-  SOS,
-  OTHER,
-}
+import 'package:testtest/services/resource/resource_model.dart';
 
 class CourseModel {
   CourseModel({
