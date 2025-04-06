@@ -67,9 +67,10 @@ class _HomeTabViewState extends State<HomeTabView> {
     try {
       final activities = await _activityService.fetchActivities(0, 3, "");
       setState(() {
-        _activities = activities.content.isNotEmpty
-            ? activities.content
-            : _getMockedActivities();
+        _activities =
+            activities.content.isNotEmpty
+                ? activities.content
+                : _getMockedActivities();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch activities.");
@@ -87,9 +88,10 @@ class _HomeTabViewState extends State<HomeTabView> {
     try {
       final resources = await _resourceService.fetchResources([], 0, 4, "");
       setState(() {
-        _resources = resources.content.isNotEmpty
-            ? resources.content
-            : _getMockedResources();
+        _resources =
+            resources.content.isNotEmpty
+                ? resources.content
+                : _getMockedResources();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch resources.");
@@ -105,11 +107,16 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   Future<void> _fetchMedications() async {
     try {
-      final medications = await _medicineService.fetchMedicines(false, DateTime.now(), DateTime.now());
+      final medications = await _medicineService.fetchMedicines(
+        false,
+        DateTime.now(),
+        DateTime.now(),
+      );
       setState(() {
-        _medications = medications.isNotEmpty
-            ? medications[0].medicines.take(3).toList()
-            : _getMockedMedications();
+        _medications =
+            medications.isNotEmpty
+                ? medications[0].medicines.take(3).toList()
+                : _getMockedMedications();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch medications.");
@@ -125,11 +132,17 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   Future<void> _fetchGoals() async {
     try {
-      final goals = await _goalService.fetchGoals(false, DateTime.now(), DateTime.now(), []);
+      final goals = await _goalService.fetchGoals(
+        false,
+        DateTime.now(),
+        DateTime.now(),
+        [],
+      );
       setState(() {
-        _goals = goals.isNotEmpty
-            ? goals[0].goals.take(3).toList()
-            : _getMockedGoals();
+        _goals =
+            goals.isNotEmpty
+                ? goals[0].goals.take(3).toList()
+                : _getMockedGoals();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch goals.");
@@ -145,11 +158,16 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   Future<void> _fetchDiaries() async {
     try {
-      final diaries = await _diaryService.fetchDiaries([], DateTime.now(), DateTime.now());
+      final diaries = await _diaryService.fetchDiaries(
+        [],
+        DateTime.now(),
+        DateTime.now(),
+      );
       setState(() {
-        _diaries = diaries.isNotEmpty
-            ? diaries[0].diaries.take(3).toList()
-            : _getMockedDiaries();
+        _diaries =
+            diaries.isNotEmpty
+                ? diaries[0].diaries.take(3).toList()
+                : _getMockedDiaries();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch diaries.");
@@ -165,10 +183,7 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
@@ -353,44 +368,207 @@ class _HomeTabViewState extends State<HomeTabView> {
     ];
   }
 
-  Widget _buildSection(String title, List<dynamic> items, bool isLoading, Widget Function(dynamic) itemBuilder, VoidCallback onSeeMore) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontFamily: "Poppins",
+  Widget _buildSection(
+    String title,
+    List<dynamic> items,
+    bool isLoading,
+    Widget Function(dynamic) itemBuilder,
+    VoidCallback onSeeMore,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontSize: 34, fontFamily: "Poppins"),
               ),
-            ),
-            GestureDetector(
-              onTap: onSeeMore,
-              child: const Text(
-                "See More",
-                style: TextStyle(color: Colors.blue, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 10),
-      isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : items.isEmpty
-              ? const Text("No data available", style: TextStyle(color: Colors.grey))
-              : Column(
-                  children: items.map(itemBuilder).toList(),
+              GestureDetector(
+                onTap: onSeeMore,
+                child: const Text(
+                  "See More",
+                  style: TextStyle(color: Colors.blue, fontSize: 16),
                 ),
-      const SizedBox(height: 20),
-    ],
-  );
-}
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : items.isEmpty
+            ? const Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 20),
+              child: Text(
+                "No data available",
+                style: TextStyle(color: Colors.grey),
+              ),
+            )
+            : SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                10,
+                10,
+                10,
+                20,
+              ), // Added consistent padding
+              child: Column(children: items.map(itemBuilder).toList()),
+            ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildActivitiesSection(
+    String title,
+    List<Activity> activities,
+    bool isLoading,
+    VoidCallback onSeeMore,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 34, fontFamily: "Poppins"),
+              ),
+              GestureDetector(
+                onTap: onSeeMore,
+                child: const Text(
+                  "See More",
+                  style: TextStyle(color: Colors.blue, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : activities.isEmpty
+            ? const Text(
+              "No activities available",
+              style: TextStyle(color: Colors.grey),
+            )
+            : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+              child: Row(
+                children:
+                    activities.map((activity) {
+                      final backgroundColor =
+                          const [
+                            Color(0xFF9CC5FF),
+                            Color(0xFF6E6AE8),
+                            Color(0xFF005FE7),
+                            Color(0xFFBBA6FF),
+                          ][activities.indexOf(activity) %
+                              4]; // Cycle through colors
+
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      ActivityDetailsPage(activity: activity),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Container(
+                            width: 300, // Ensure a fixed width for each card
+                            height: 300, // Optional: Set a fixed height
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: backgroundColor,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: backgroundColor.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 12),
+                                ),
+                                BoxShadow(
+                                  color: backgroundColor.withOpacity(0.3),
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  activity.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  activity.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => ActivityDetailsPage(
+                                                activity: activity,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: backgroundColor,
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Start",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
+            ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -410,152 +588,15 @@ class _HomeTabViewState extends State<HomeTabView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Courses",
-                  style: TextStyle(fontSize: 34, fontFamily: "Poppins"),
-                ),
-              ),
-              SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _courses
-                      .map(
-                        (course) => Padding(
-                          key: course.id,
-                          padding: const EdgeInsets.all(10),
-                          child: VCard(course: course),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-              _buildSection(
+              _buildActivitiesSection(
                 "Activities",
                 _activities,
                 _isLoadingActivities,
-                (activity) {
-                  final backgroundColor = const [
-                    Color(0xFF9CC5FF),
-                    Color(0xFF6E6AE8),
-                    Color(0xFF005FE7),
-                    Color(0xFFBBA6FF),
-                  ][_activities.indexOf(activity) % 4]; // Cycle through colors
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ActivityDetailsPage(activity: activity),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: backgroundColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: backgroundColor.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 12),
-                            ),
-                            BoxShadow(
-                              color: backgroundColor.withOpacity(0.3),
-                              blurRadius: 2,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Title
-                            Text(
-                              activity.title,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontFamily: "Poppins",
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Description
-                            Text(
-                              activity.description,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Created At
-                            Text(
-                              "Created At: ${activity.createdAt?.toLocal().toString().split(' ')[0]}",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontFamily: "Inter",
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Resources Count
-                            Text(
-                              "Resources: ${activity.resources?.length}",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontFamily: "Inter",
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Spacer(),
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ActivityDetailsPage(activity: activity),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: backgroundColor,
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "Start",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
                 () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ActivitiesPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const ActivitiesPage(),
+                  ),
                 ),
               ),
               _buildSection(
@@ -568,7 +609,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ResourceDetailPage(resource: resource),
+                          builder:
+                              (context) =>
+                                  ResourceDetailPage(resource: resource),
                         ),
                       );
                     },
@@ -580,7 +623,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                 },
                 () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ResourcesPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const ResourcesPage(),
+                  ),
                 ),
               ),
               _buildSection(
@@ -593,10 +638,11 @@ class _HomeTabViewState extends State<HomeTabView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MedicineDetailPage(
-                            medicine: medicine,
-                            isEditing: false,
-                          ),
+                          builder:
+                              (context) => MedicineDetailPage(
+                                medicine: medicine,
+                                isEditing: false,
+                              ),
                         ),
                       );
                     },
@@ -604,36 +650,31 @@ class _HomeTabViewState extends State<HomeTabView> {
                       margin: const EdgeInsets.only(bottom: 20),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: const Color(0xFF4A90E2).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Medicine Name
                           Text(
                             medicine.name,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Color(0xFF4A90E2),
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Medicine Description (limited to 2 lines)
                           Text(
                             medicine.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: Colors.black54,
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Start and End Dates
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -641,14 +682,14 @@ class _HomeTabViewState extends State<HomeTabView> {
                                 "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: Colors.white70,
+                                  color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: Colors.white70,
+                                  color: Colors.black54,
                                 ),
                               ),
                             ],
@@ -660,7 +701,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                 },
                 () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MedicinesPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const MedicinesPage(),
+                  ),
                 ),
               ),
               _buildSection(
@@ -673,10 +716,11 @@ class _HomeTabViewState extends State<HomeTabView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GoalDetailPage(
-                            goal: goal,
-                            createResource: false,
-                          ),
+                          builder:
+                              (context) => GoalDetailPage(
+                                goal: goal,
+                                createResource: false,
+                              ),
                         ),
                       );
                     },
@@ -684,71 +728,72 @@ class _HomeTabViewState extends State<HomeTabView> {
                       margin: const EdgeInsets.only(bottom: 20),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: const Color(0xFF7B61FF).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Goal Title
                           Text(
                             goal.title,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Color(0xFF7B61FF),
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Goal Description (limited to 2 lines)
                           Text(
                             goal.description,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: Colors.black54,
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Subject and Completed Toggle
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // Subject
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: const Color(
+                                    0xFF7B61FF,
+                                  ).withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  StringCapitalization(goal.subject.toString().split('.').last).capitalizeFirstLetter(),
+                                  StringCapitalization(
+                                    goal.subject.toString().split('.').last,
+                                  ).capitalizeFirstLetter(),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: Color(0xFF7B61FF),
                                   ),
                                 ),
                               ),
-
-                              // Status Toggle
                               Row(
                                 children: [
                                   Text(
-                                    goal.completed ? "Completed" : "Not Completed",
+                                    goal.completed
+                                        ? "Completed"
+                                        : "Not Completed",
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white70,
+                                      color: Colors.black54,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Switch(
                                     value: goal.completed,
-                                    onChanged: null, // Disable toggle in this view
+                                    onChanged: null,
                                   ),
                                 ],
                               ),
@@ -765,55 +810,77 @@ class _HomeTabViewState extends State<HomeTabView> {
                 ),
               ),
               _buildSection(
-  "Diary",
-  _diaries,
-  _isLoadingDiaries,
-  (diary) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DiaryDetailPage(
-              diary: diary,
-              createDiary: false,
-            ),
-          ),
-        );
-      },
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          title: Text(
-            diary.title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          subtitle: Text(
-            diary.description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.black54),
-          ),
-          trailing: Icon(
-            _getEmotionIcon(diary.emotion),
-            color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
-            size: 32,
-          ),
-        ),
-      ),
-    );
-  },
-  () => Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const DiaryPage()),
-  ),
-),
-
+                "Diary",
+                _diaries,
+                _isLoadingDiaries,
+                (diary) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => DiaryDetailPage(
+                                diary: diary,
+                                createDiary: false,
+                              ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      color: const Color(0xFFBBDEFB), // Lighter blue color
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        title: Text(
+                          diary.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Colors.black, // Darker text for better contrast
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              diary.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black87,
+                              ), // Subtle dark text
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Created: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color:
+                                    Colors
+                                        .black54, // Subtle gray text for the date
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: Icon(
+                          _getEmotionIcon(diary.emotion),
+                          color: const Color(
+                            0xFF64B5F6,
+                          ), // Light blue for the icon
+                          size: 32,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DiaryPage()),
+                ),
+              ),
             ],
           ),
         ),
@@ -822,84 +889,87 @@ class _HomeTabViewState extends State<HomeTabView> {
   }
 
   Widget _buildHCard(Resource resource) {
-  const int maxDescriptionLength = 30; // Maximum length for the description (fits around two lines)
+    const int maxDescriptionLength =
+        30; // Maximum length for the description (fits around two lines)
 
-  String truncatedDescription = resource.description.length > maxDescriptionLength
-      ? '${resource.description.substring(0, maxDescriptionLength)}...'
-      : resource.description;
+    String truncatedDescription =
+        resource.description.length > maxDescriptionLength
+            ? '${resource.description.substring(0, maxDescriptionLength)}...'
+            : resource.description;
 
-  return Container(
-    constraints: const BoxConstraints(maxHeight: 110),
-    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-    decoration: BoxDecoration(
-      color: Colors.blueAccent, // Replace with a dynamic color if needed
-      borderRadius: BorderRadius.circular(30),
-    ),
-    child: Row(
-      children: [
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                resource.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: "Poppins",
-                  color: Colors.white,
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 110),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.blueAccent, // Replace with a dynamic color if needed
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  resource.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontFamily: "Poppins",
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                truncatedDescription,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: "Inter",
-                  color: Colors.white,
+                const SizedBox(height: 4),
+                Text(
+                  truncatedDescription,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontFamily: "Inter",
+                    color: Colors.white,
+                  ),
+                  maxLines: 2, // Ensure it doesn't exceed two lines
+                  overflow:
+                      TextOverflow.ellipsis, // Add ellipsis if it overflows
                 ),
-                maxLines: 2, // Ensure it doesn't exceed two lines
-                overflow: TextOverflow.ellipsis, // Add ellipsis if it overflows
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(20),
-          child: VerticalDivider(thickness: 0.8, width: 0),
-        ),
-        Opacity(
-          opacity: 0.9,
-          child: Image.asset(
-            _getImageForResourceType(resource.type),
-            width: 48, // Set the width to 48
-            height: 48, // Set the height to 48
-            fit: BoxFit.contain, // Ensure the image fits within the bounds
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: VerticalDivider(thickness: 0.8, width: 0),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-String _getImageForResourceType(ResourceType type) {
-  switch (type) {
-    case ResourceType.ARTICLE:
-      return 'assets/images/resources/newspaper.png';
-    case ResourceType.VIDEO:
-      return 'assets/images/resources/video.png';
-    case ResourceType.PODCAST:
-      return 'assets/images/resources/recording.png';
-    case ResourceType.EXERCISE:
-      return 'assets/images/resources/physical-wellbeing.png';
-    case ResourceType.RECIPE:
-      return 'assets/images/resources/recipe.png';
-    case ResourceType.SOS:
-      return 'assets/images/resources/sos.png';
-    default:
-      return 'assets/images/resources/other.png';
+          Opacity(
+            opacity: 0.9,
+            child: Image.asset(
+              _getImageForResourceType(resource.type),
+              width: 48, // Set the width to 48
+              height: 48, // Set the height to 48
+              fit: BoxFit.contain, // Ensure the image fits within the bounds
+            ),
+          ),
+        ],
+      ),
+    );
   }
-}
+
+  String _getImageForResourceType(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return 'assets/images/resources/newspaper.png';
+      case ResourceType.VIDEO:
+        return 'assets/images/resources/video.png';
+      case ResourceType.PODCAST:
+        return 'assets/images/resources/recording.png';
+      case ResourceType.EXERCISE:
+        return 'assets/images/resources/physical-wellbeing.png';
+      case ResourceType.RECIPE:
+        return 'assets/images/resources/recipe.png';
+      case ResourceType.SOS:
+        return 'assets/images/resources/sos.png';
+      default:
+        return 'assets/images/resources/other.png';
+    }
+  }
 }
 
 // Extension to capitalize the first letter of a string
