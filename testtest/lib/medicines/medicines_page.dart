@@ -30,30 +30,58 @@ class _MedicinesPageState extends State<MedicinesPage> {
     // Add mocked data
     _medicines.addAll([
       Medicine(
-      id: "1",
-      name: "Paracetamol",
-      description: "Used to treat fever and mild pain.",
-      archived: false,
-      startedAt: DateTime.now().subtract(const Duration(days: 2)),
-      endedAt: DateTime.now().add(const Duration(days: 5)),
-      hasNotifications: true,
-      plans: WeekDay.values.map((day) {
-        return Plan(
-          id: UniqueKey().toString(),
-          weekDay: day,
-          dosages: [], // Empty dosages for now
-        );
-      }).toList(),
-    ),
+        id: "1",
+        name: "Paracetamol",
+        description: "Used to treat fever and mild pain.",
+        archived: false,
+        startedAt: DateTime.now().subtract(const Duration(days: 2)),
+        endedAt: DateTime.now().add(const Duration(days: 5)),
+        hasNotifications: true,
+        plans:
+            WeekDay.values.map((day) {
+              return Plan(
+                id: UniqueKey().toString(),
+                weekDay: day,
+                dosages: [
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(hour: 8, minute: 0), // Morning dosage
+                    dosage: 1, // 1 tablet
+                  ),
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(
+                      hour: 20,
+                      minute: 0,
+                    ), // Evening dosage
+                    dosage: 1, // 1 tablet
+                  ),
+                ],
+              );
+            }).toList(),
+      ),
       Medicine(
         id: "2",
         name: "Ibuprofen",
-        description: "Anti-inflammatory medicine for pain inflammatory medicine for pain reliefinflammatory medicine for pain reliefinflammatory medicine for pain reliefrelief.",
+        description: "Anti-inflammatory medicine for pain relief.",
         archived: false,
         startedAt: DateTime.now().subtract(const Duration(days: 1)),
         endedAt: DateTime.now().add(const Duration(days: 10)),
         hasNotifications: false,
-        plans: [],
+        plans:
+            WeekDay.values.map((day) {
+              return Plan(
+                id: UniqueKey().toString(),
+                weekDay: day,
+                dosages: [
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(hour: 12, minute: 0), // Noon dosage
+                    dosage: 2, // 2 tablets
+                  ),
+                ],
+              );
+            }).toList(),
       ),
       Medicine(
         id: "3",
@@ -63,7 +91,82 @@ class _MedicinesPageState extends State<MedicinesPage> {
         startedAt: DateTime.now().subtract(const Duration(days: 7)),
         endedAt: DateTime.now().subtract(const Duration(days: 1)),
         hasNotifications: true,
-        plans: [],
+        plans:
+            WeekDay.values.map((day) {
+              return Plan(
+                id: UniqueKey().toString(),
+                weekDay: day,
+                dosages: [
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(hour: 9, minute: 0), // Morning dosage
+                    dosage: 1, // 1 capsule
+                  ),
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(hour: 21, minute: 0), // Night dosage
+                    dosage: 1, // 1 capsule
+                  ),
+                ],
+              );
+            }).toList(),
+      ),
+      Medicine(
+        id: "4",
+        name: "Vitamin C",
+        description: "Boosts immunity and prevents scurvy.",
+        archived: false,
+        startedAt: DateTime.now().subtract(const Duration(days: 3)),
+        endedAt: DateTime.now().add(const Duration(days: 15)),
+        hasNotifications: true,
+        plans:
+            WeekDay.values.map((day) {
+              return Plan(
+                id: UniqueKey().toString(),
+                weekDay: day,
+                dosages: [
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(
+                      hour: 7,
+                      minute: 30,
+                    ), // Morning dosage
+                    dosage: 1, // 1 tablet
+                  ),
+                ],
+              );
+            }).toList(),
+      ),
+      Medicine(
+        id: "5",
+        name: "Metformin",
+        description: "Used to control blood sugar levels in diabetes.",
+        archived: false,
+        startedAt: DateTime.now().subtract(const Duration(days: 5)),
+        endedAt: DateTime.now().add(const Duration(days: 20)),
+        hasNotifications: true,
+        plans:
+            WeekDay.values.map((day) {
+              return Plan(
+                id: UniqueKey().toString(),
+                weekDay: day,
+                dosages: [
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(hour: 8, minute: 0), // Morning dosage
+                    dosage: 1, // 1 tablet
+                  ),
+                  Dosage(
+                    id: UniqueKey().toString(),
+                    time: const TimeOfDay(
+                      hour: 18,
+                      minute: 0,
+                    ), // Evening dosage
+                    dosage: 1, // 1 tablet
+                  ),
+                ],
+              );
+            }).toList(),
       ),
     ]);
   }
@@ -88,7 +191,11 @@ class _MedicinesPageState extends State<MedicinesPage> {
       }
 
       // Fetch medicines from the repository
-      final medicineDays = await _medicineRepository.getMedicines(_showArchived, startDate, endDate);
+      final medicineDays = await _medicineRepository.getMedicines(
+        _showArchived,
+        startDate,
+        endDate,
+      );
 
       // Update the _medicines list with the fetched data
       setState(() {
@@ -168,8 +275,18 @@ class _MedicinesPageState extends State<MedicinesPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(102, 122, 236, 1), // Start color (darker blue)
-                    Color.fromRGBO(255, 255, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      102,
+                      122,
+                      236,
+                      1,
+                    ), // Start color (darker blue)
+                    Color.fromRGBO(
+                      255,
+                      255,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -184,7 +301,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
               ignoring: _isFilterPanelVisible,
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -208,7 +328,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
                           // Left Arrow
                           IconButton(
                             onPressed: () => _moveWeek(-1),
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
                             iconSize: 30, // Arrow size
                           ),
                           // Week Days
@@ -216,69 +339,91 @@ class _MedicinesPageState extends State<MedicinesPage> {
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
                               transitionBuilder: (child, animation) {
-                                return FadeTransition(opacity: animation, child: child);
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
                               },
                               child: Row(
                                 key: ValueKey(_currentWeekStart),
-                                mainAxisAlignment: MainAxisAlignment.spaceAround, // Adjust spacing
-                                children: weekDays.map((day) {
-                                  final isSelected = _selectedDay?.day == day.day &&
-                                      _selectedDay?.month == day.month &&
-                                      _selectedDay?.year == day.year;
+                                mainAxisAlignment:
+                                    MainAxisAlignment
+                                        .spaceAround, // Adjust spacing
+                                children:
+                                    weekDays.map((day) {
+                                      final isSelected =
+                                          _selectedDay?.day == day.day &&
+                                          _selectedDay?.month == day.month &&
+                                          _selectedDay?.year == day.year;
 
-                                  return GestureDetector(
-                                    onTap: () => _onDaySelected(day),
-                                    child: Column(
-                                      children: [
-                                        // Day of the week
-                                        Text(
-                                          "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-
-                                        // Date with conditional purple container
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced horizontal padding
-                                          decoration: isSelected
-                                              ? BoxDecoration(
-                                                  color: const Color.fromRGBO(85, 123, 233, 1), // Purple background
-                                                  borderRadius: BorderRadius.circular(12),
-                                                )
-                                              : null, // No decoration if not selected
-                                          child: Text(
-                                            day.day.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                      return GestureDetector(
+                                        onTap: () => _onDaySelected(day),
+                                        child: Column(
+                                          children: [
+                                            // Day of the week
+                                            Text(
+                                              "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
+                                            const SizedBox(height: 4),
 
-                                        // Month abbreviation
-                                        Text(
-                                          "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                          ),
+                                            // Date with conditional purple container
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 6,
+                                              ), // Reduced horizontal padding
+                                              decoration:
+                                                  isSelected
+                                                      ? BoxDecoration(
+                                                        color: const Color.fromRGBO(
+                                                          85,
+                                                          123,
+                                                          233,
+                                                          1,
+                                                        ), // Purple background
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
+                                                            ),
+                                                      )
+                                                      : null, // No decoration if not selected
+                                              child: Text(
+                                                day.day.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+
+                                            // Month abbreviation
+                                            Text(
+                                              "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
+                                      );
+                                    }).toList(),
                               ),
                             ),
                           ),
                           // Right Arrow
                           IconButton(
                             onPressed: () => _moveWeek(1),
-                            icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                            ),
                             iconSize: 30, // Arrow size
                           ),
                         ],
@@ -286,104 +431,117 @@ class _MedicinesPageState extends State<MedicinesPage> {
                       const SizedBox(height: 20),
                       // Medicines Container
                       Expanded(
-                        child: _isLoading
-                            ? const Center(
-                                child: CircularProgressIndicator(), // Show loading indicator
-                              )
-                            : _medicines.isEmpty
+                        child:
+                            _isLoading
                                 ? const Center(
-                                    child: Text(
-                                      "No Medicines Found",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    padding: const EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(72, 85, 204, 1),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: ListView.builder(
-                                      itemCount: _medicines.length,
-                                      itemBuilder: (context, index) {
-                                        final medicine = _medicines[index];
-                                        return GestureDetector(
-                                          onTap: () {
-                                            // Navigate to MedicineDetailPage for visualizing the medicine
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => MedicineDetailPage(
-                                                  medicine: medicine,
-                                                  isEditing: false,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            margin: const EdgeInsets.only(bottom: 20),
-                                            padding: const EdgeInsets.all(20),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                // Medicine Name
-                                                Text(
-                                                  medicine.name,
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8),
-
-                                                // Medicine Description (limited to 2 lines)
-                                                Text(
-                                                  medicine.description,
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.white70,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8),
-
-                                                // Start and End Dates
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white70,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white70,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                  child:
+                                      CircularProgressIndicator(), // Show loading indicator
+                                )
+                                : _medicines.isEmpty
+                                ? const Center(
+                                  child: Text(
+                                    "No Medicines Found",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70,
                                     ),
                                   ),
+                                )
+                                : Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromRGBO(72, 85, 204, 1),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: ListView.builder(
+                                    itemCount: _medicines.length,
+                                    itemBuilder: (context, index) {
+                                      final medicine = _medicines[index];
+                                      return GestureDetector(
+                                        onTap: () {
+                                          // Navigate to MedicineDetailPage for visualizing the medicine
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      MedicineDetailPage(
+                                                        medicine: medicine,
+                                                        isEditing: false,
+                                                      ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          margin: const EdgeInsets.only(
+                                            bottom: 20,
+                                          ),
+                                          padding: const EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(
+                                              0.2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Medicine Name
+                                              Text(
+                                                medicine.name,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+
+                                              // Medicine Description (limited to 2 lines)
+                                              Text(
+                                                medicine.description,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+
+                                              // Start and End Dates
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white70,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white70,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
                       ),
                     ],
                   ),
@@ -393,38 +551,45 @@ class _MedicinesPageState extends State<MedicinesPage> {
           ),
           // Open Medicines Icon
           Positioned(
-  top: 58,
-  right: 30,
-  child: GestureDetector(
-    onTap: () {
-      setState(() {
-        _showArchived = !_showArchived; // Toggle between archived and open medicines
-      });
-      _fetchMedicines(); // Refresh the medicines list
-    },
-    child: CircleAvatar(
-      backgroundColor: Colors.white,
-      child: Icon(
-        _showArchived ? Icons.folder_open : Icons.archive, // Switch icon based on _showArchived
-        color: const Color.fromRGBO(72, 85, 204, 1),
-      ),
-    ),
-  ),
-),
+            top: 58,
+            right: 30,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _showArchived =
+                      !_showArchived; // Toggle between archived and open medicines
+                });
+                _fetchMedicines(); // Refresh the medicines list
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(
+                  _showArchived
+                      ? Icons.folder_open
+                      : Icons.archive, // Switch icon based on _showArchived
+                  color: const Color.fromRGBO(72, 85, 204, 1),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90.0, right: 20), // Move the button 40 pixels upwards
+        padding: const EdgeInsets.only(
+          bottom: 90.0,
+          right: 20,
+        ), // Move the button 40 pixels upwards
         child: FloatingActionButton(
           onPressed: () {
             // Navigate to MedicineDetailPage for creating a new medicine
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const MedicineDetailPage(
-                  medicine: null,
-                  isEditing: true,
-                ),
+                builder:
+                    (context) => const MedicineDetailPage(
+                      medicine: null,
+                      isEditing: true,
+                    ),
               ),
             );
           },
