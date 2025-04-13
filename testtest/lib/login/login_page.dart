@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Show the loading overlay
     });
 
     try {
@@ -44,7 +44,10 @@ class _LoginPageState extends State<LoginPage> {
 
       print('Access token and user ID saved successfully.');
 
-      // Navigate to the MenuScreen on successful login
+      // Simulate a delay for loading (e.g., fetching user data)
+      await Future.delayed(const Duration(seconds: 4));
+
+      // Navigate to the MenuScreen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MenuScreen()),
@@ -62,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } finally {
       setState(() {
-        _isLoading = false;
+        _isLoading = false; // Hide the loading overlay
       });
     }
   }
@@ -303,7 +306,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
-          // Loading Indicator
+          // Loading Overlay
           if (_isLoading)
             Positioned.fill(
               child: Container(
