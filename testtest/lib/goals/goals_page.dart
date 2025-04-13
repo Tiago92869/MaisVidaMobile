@@ -284,171 +284,168 @@ class _GoalsPageState extends State<GoalsPage> {
                       const SizedBox(height: 20),
                       // Goals Container
                       Expanded(
-                        child: RefreshIndicator(
-                          onRefresh:
-                              _fetchGoalsForWeek, // Refresh goals when pulled down
-                          child: Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(72, 85, 204, 1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Stack(
-                              children: [
-                                // List of goals
-                                ListView.builder(
-                                  itemCount: _goals.length,
-                                  itemBuilder: (context, index) {
-                                    final goal = _goals[index];
-                                    return GestureDetector(
-                                      onTap: () {
-                                        // Navigate to GoalDetailPage for visualizing the goal
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => GoalDetailPage(
-                                                  goal: goal,
-                                                  createResource: false,
-                                                ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                          bottom: 20,
-                                        ),
-                                        padding: const EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Goal Title
-                                            Text(
-                                              goal.title,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                        child:
+                            _isLoading
+                                ? const Center(
+                                  child:
+                                      CircularProgressIndicator(), // Show loading indicator
+                                )
+                                : _goals.isEmpty
+                                ? const Center(
+                                  child: Text(
+                                    "No Goals Found",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                )
+                                : RefreshIndicator(
+                                  onRefresh:
+                                      _fetchGoalsForWeek, // Refresh goals when pulled down
+                                  child: Container(
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromRGBO(
+                                        72,
+                                        85,
+                                        204,
+                                        1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: ListView.builder(
+                                      itemCount: _goals.length,
+                                      itemBuilder: (context, index) {
+                                        final goal = _goals[index];
+                                        return GestureDetector(
+                                          onTap: () {
+                                            // Navigate to GoalDetailPage for visualizing the goal
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (context) => GoalDetailPage(
+                                                      goal: goal,
+                                                      createResource: false,
+                                                    ),
                                               ),
+                                            );
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                              bottom: 20,
                                             ),
-                                            const SizedBox(height: 8),
-
-                                            // Goal Description (limited to 2 lines)
-                                            Text(
-                                              goal.description,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white70,
+                                            padding: const EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.2,
                                               ),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
-                                            const SizedBox(height: 8),
-
-                                            // Subject and Completed Toggle
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                // Subject
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white
-                                                        .withOpacity(0.2),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                  ),
-                                                  child: Text(
-                                                    StringCapitalization(
-                                                      goal.subject
-                                                          .toString()
-                                                          .split('.')
-                                                          .last,
-                                                    ).capitalizeFirstLetter(),
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
+                                                // Goal Title
+                                                Text(
+                                                  goal.title,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
                                                   ),
                                                 ),
+                                                const SizedBox(height: 8),
 
-                                                // Status Toggle
+                                                // Goal Description (limited to 2 lines)
+                                                Text(
+                                                  goal.description,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.white70,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+
+                                                // Subject and Completed Toggle
                                                 Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
-                                                    Text(
-                                                      goal.completed
-                                                          ? "Completed"
-                                                          : "Not Completed",
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white70,
+                                                    // Subject
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                            vertical: 6,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white
+                                                            .withOpacity(0.2),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                      ),
+                                                      child: Text(
+                                                        StringCapitalization(
+                                                          goal.subject
+                                                              .toString()
+                                                              .split('.')
+                                                              .last,
+                                                        ).capitalizeFirstLetter(),
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white,
+                                                        ),
                                                       ),
                                                     ),
-                                                    const SizedBox(width: 8),
-                                                    Switch(
-                                                      value:
-                                                          goal.completed ??
-                                                          false,
-                                                      onChanged: null,
+
+                                                    // Status Toggle
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          goal.completed
+                                                              ? "Completed"
+                                                              : "Not Completed",
+                                                          style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Colors.white70,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        Switch(
+                                                          value:
+                                                              goal.completed ??
+                                                              false,
+                                                          onChanged: null,
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                // Button in the bottom-right corner
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: FloatingActionButton(
-                                    onPressed: () {
-                                      // Navigate to GoalDetailPage for creating a new goal
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => const GoalDetailPage(
-                                                goal: null,
-                                                createResource: true,
-                                              ), // No goal passed
-                                        ),
-                                      );
-                                    },
-                                    backgroundColor: Colors.white,
-                                    child: const Icon(
-                                      Icons.add,
-                                      color: Color.fromRGBO(72, 85, 204, 1),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -654,6 +651,33 @@ class _GoalsPageState extends State<GoalsPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 90.0,
+          right: 20,
+        ), // Move the button 40 pixels upwards
+        child: FloatingActionButton(
+          onPressed: () {
+            // Navigate to GoalDetailPage for creating a new goal
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => GoalDetailPage(
+                      createResource:
+                          true, // Indicate that a new goal is being created
+                    ),
+              ),
+            ).then((value) {
+              if (value == true) {
+                _fetchGoalsForWeek(); // Refresh the goals list after returning
+              }
+            });
+          },
+          backgroundColor: Colors.white,
+          child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+        ),
       ),
     );
   }
