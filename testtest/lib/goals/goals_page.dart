@@ -49,6 +49,25 @@ class _GoalsPageState extends State<GoalsPage> {
     }
   }
 
+  Future<void> _fetchGoalsForDay(DateTime day) async {
+    setState(() => _isLoading = true);
+    try {
+      final goalDays = await _goalService.fetchGoals(
+        null,
+        day,
+        day,
+        _selectedSubjects.toList(),
+      );
+      setState(() {
+        _goals = goalDays.expand((goalDay) => goalDay.goals).toList();
+      });
+    } catch (e) {
+      _showErrorSnackbar("Failed to fetch goals. Please try again.");
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   void _moveWeek(int direction) {
     setState(() {
       _currentWeekStart = _currentWeekStart.add(Duration(days: 7 * direction));
@@ -186,7 +205,17 @@ class _GoalsPageState extends State<GoalsPage> {
 
     return GestureDetector(
       onTap: () {
-        setState(() => _selectedDay = isSelected ? null : day);
+        setState(() {
+          if (isSelected) {
+            // Deselect the day and fetch goals for the entire week
+            _selectedDay = null;
+            _fetchGoalsForWeek();
+          } else {
+            // Select the day and fetch goals for that specific day
+            _selectedDay = day;
+            _fetchGoalsForDay(day);
+          }
+        });
       },
       child: Column(
         children: [
@@ -242,13 +271,20 @@ class _GoalsPageState extends State<GoalsPage> {
     }
 
     if (_goals.isEmpty) {
-      return const Center(
-        child: Text(
-          "No Goals Found",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
+      return Expanded(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text(
+                "No Goals Found",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
           ),
         ),
       );
