@@ -696,7 +696,7 @@ class _GoalsPageState extends State<GoalsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            "Goals Completed",
+                            "Show Completed",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -709,7 +709,13 @@ class _GoalsPageState extends State<GoalsPage> {
                               setState(() {
                                 _isCompleted = value;
                               });
-                              _fetchGoalsForWeek(); // Refresh goals based on the new filter
+                              if (_selectedDay != null) {
+                                _fetchGoalsForDay(
+                                  _selectedDay!,
+                                ); // Fetch goals for the selected day
+                              } else {
+                                _fetchGoalsForWeek(); // Fetch goals for the entire week
+                              }
                             },
                             activeColor: const Color.fromARGB(
                               255,
