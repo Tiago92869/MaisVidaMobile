@@ -287,6 +287,44 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                                     initialDate: recordedAt,
                                     firstDate: DateTime(2000),
                                     lastDate: DateTime.now(),
+                                    builder: (
+                                      BuildContext context,
+                                      Widget? child,
+                                    ) {
+                                      return Theme(
+                                        data: ThemeData.light().copyWith(
+                                          primaryColor: const Color.fromRGBO(
+                                            72,
+                                            85,
+                                            204,
+                                            1,
+                                          ), // Header background color
+                                          hintColor: const Color.fromRGBO(
+                                            123,
+                                            144,
+                                            255,
+                                            1,
+                                          ), // Selected date color
+                                          colorScheme: const ColorScheme.light(
+                                            primary: Color.fromRGBO(
+                                              72,
+                                              85,
+                                              204,
+                                              1,
+                                            ), // Header text color
+                                            onPrimary:
+                                                Colors
+                                                    .white, // Header text color
+                                            onSurface:
+                                                Colors.black, // Body text color
+                                          ),
+                                          dialogBackgroundColor:
+                                              Colors
+                                                  .white, // Background color of the calendar
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
                                   );
                                   if (pickedDate != null) {
                                     setState(() {

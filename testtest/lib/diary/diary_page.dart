@@ -382,6 +382,38 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ),
 
+          // Filter Button
+          Positioned(
+            top: 58,
+            right: 20,
+            child: GestureDetector(
+              onTap: _toggleFilterPanel,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 5,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.filter_alt,
+                    color: Colors.blue,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // Sliding filter panel
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
@@ -535,38 +567,6 @@ class _DiaryPageState extends State<DiaryPage> {
                   ),
                   const SizedBox(height: 30),
                 ],
-              ),
-            ),
-          ),
-
-          // Filter Button
-          Positioned(
-            top: 58,
-            right: 20,
-            child: GestureDetector(
-              onTap: _toggleFilterPanel,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.filter_alt,
-                    color: Colors.blue,
-                    size: 28,
-                  ),
-                ),
               ),
             ),
           ),
