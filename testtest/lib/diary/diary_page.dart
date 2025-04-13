@@ -15,6 +15,8 @@ class _DiaryPageState extends State<DiaryPage> {
   final DiaryService _diaryService = DiaryService(); // Initialize DiaryService
   bool _isLoading = false; // Tracks if data is being fetched
   bool _hasError = false; // Tracks if there was an error during fetch
+  bool _hasMoreData = true; // Tracks if there is more data to fetch
+  int _currentPage = 0; // Tracks the current page for pagination
 
   DateTime _selectedDate = DateTime.now();
 
@@ -72,26 +74,22 @@ class _DiaryPageState extends State<DiaryPage> {
 
   // Function to fetch diaries for the selected date
   Future<void> _fetchDiariesForSelectedDate({bool isScrolling = false}) async {
+    if (isScrolling && !_hasMoreData) {
+      // If there is no more data to fetch, stop further requests
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _hasError = false;
 
-      // Reset _diaryEntries only if not scrolling
+      // Reset _diaryEntries and _currentPage only if not scrolling
       if (!isScrolling) {
         _diaryEntries = [];
+        _currentPage = 0;
+        _hasMoreData = true; // Reset hasMoreData when fetching new data
       }
     });
-
-    // Show loading dialog only if not scrolling
-    if (!isScrolling) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return const Center(child: CircularProgressIndicator());
-        },
-      );
-    }
 
     try {
       // Fetch diaries from the DiaryService
@@ -99,6 +97,8 @@ class _DiaryPageState extends State<DiaryPage> {
         _selectedEmotions.toList(), // Pass selected emotions
         _selectedDate, // Start date
         _selectedDate, // End date (same as start date for a single day)
+        page: _currentPage, // Current page
+        size: 10, // Fetch 10 diaries per page
       );
 
       setState(() {
@@ -107,6 +107,9 @@ class _DiaryPageState extends State<DiaryPage> {
           for (var diaryDay in diaries) {
             _diaryEntries.addAll(diaryDay.diaries);
           }
+          _currentPage++; // Increment the page number
+        } else {
+          _hasMoreData = false; // No more data to fetch
         }
       });
     } catch (e) {
@@ -123,11 +126,6 @@ class _DiaryPageState extends State<DiaryPage> {
         ),
       );
     } finally {
-      // Close the loading dialog only if not scrolling
-      if (!isScrolling) {
-        Navigator.pop(context);
-      }
-
       setState(() {
         _isLoading = false;
       });
@@ -278,14 +276,16 @@ class _DiaryPageState extends State<DiaryPage> {
                         if (!_isLoading &&
                             scrollInfo.metrics.pixels ==
                                 scrollInfo.metrics.maxScrollExtent) {
-                          // User has scrolled to the bottom, refresh the page
+                          // User has scrolled to the bottom, fetch the next page
                           _fetchDiariesForSelectedDate(isScrolling: true);
                         }
                         return false;
                       },
                       child: RefreshIndicator(
                         onRefresh:
-                            _fetchDiariesForSelectedDate, // Refresh when pulled down
+                            () => _fetchDiariesForSelectedDate(
+                              isScrolling: false,
+                            ), // Reset on refresh
                         child:
                             _hasError
                                 ? const Center(
@@ -297,7 +297,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                     ),
                                   ),
                                 )
-                                : entriesForSelectedDate.isEmpty
+                                : _diaryEntries.isEmpty
                                 ? const Center(
                                   child: Text(
                                     "No entries for this day.",
@@ -308,12 +308,10 @@ class _DiaryPageState extends State<DiaryPage> {
                                   ),
                                 )
                                 : ListView.builder(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 60,
-                                  ), // Add padding to the bottom
-                                  itemCount: entriesForSelectedDate.length,
+                                  padding: const EdgeInsets.only(bottom: 60),
+                                  itemCount: _diaryEntries.length,
                                   itemBuilder: (context, index) {
-                                    final entry = entriesForSelectedDate[index];
+                                    final entry = _diaryEntries[index];
                                     return Card(
                                       elevation: 4,
                                       margin: const EdgeInsets.symmetric(
@@ -323,11 +321,8 @@ class _DiaryPageState extends State<DiaryPage> {
                                         title: Text(entry.title),
                                         subtitle: Text(
                                           entry.description,
-                                          maxLines:
-                                              2, // Show only 2 lines of the description
-                                          overflow:
-                                              TextOverflow
-                                                  .ellipsis, // Add ellipsis if the text overflows
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             color: Colors.black54,
                                           ),
@@ -339,8 +334,8 @@ class _DiaryPageState extends State<DiaryPage> {
                                             50,
                                             250,
                                             0.8,
-                                          ), // Purplish color
-                                          size: 32, // Increased size
+                                          ),
+                                          size: 32,
                                         ),
                                         onTap: () {
                                           Navigator.push(

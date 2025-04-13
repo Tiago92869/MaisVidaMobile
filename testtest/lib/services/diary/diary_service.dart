@@ -35,21 +35,23 @@ class DiaryService {
   Future<List<DiaryDay>> fetchDiaries(
     List<DiaryType> emotions,
     DateTime startDate,
-    DateTime endDate,
-  ) async {
+    DateTime endDate, {
+    int page = 0, // Default page is 0
+    int size = 10, // Default size is 10
+  }) async {
     await _loadStoredCredentials();
 
     // Format the emotions as a query parameter
     final String emotionsQuery = emotions
         .map(
           (emotion) =>
-              'emotion=${emotion.toString().split('.').last.toUpperCase()}',
+              'Diary%20Emotion=${emotion.toString().split('.').last.toUpperCase()}',
         )
         .join('&');
 
     // Construct the URL with the query parameters
     final String url =
-        '$_baseUrl?userId=$_userId&$emotionsQuery&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}';
+        '$_baseUrl?userId=$_userId&$emotionsQuery&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}&page=$page&size=$size';
     print('Request URL for fetchDiaries: $url'); // Log the request URL
 
     try {
