@@ -590,7 +590,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           if (!widget.createResource) // Show only when editing an existing goal
             Positioned(
               bottom: 20,
-              left: 20,
+              right: 20, // Move the button to the right side
               child: GestureDetector(
                 onTap: () async {
                   final shouldDelete = await _showDeleteConfirmationDialog();
@@ -599,8 +599,13 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   }
                 },
                 child: CircleAvatar(
+                  radius: 30, // Increase the size of the button
                   backgroundColor: Colors.red,
-                  child: const Icon(Icons.delete, color: Colors.white),
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                    size: 28, // Increase the size of the icon
+                  ),
                 ),
               ),
             ),

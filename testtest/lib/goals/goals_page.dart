@@ -23,6 +23,7 @@ class _GoalsPageState extends State<GoalsPage> {
   List<GoalInfoCard> _goals = [];
   bool _isLoading = false;
   bool _isFetchingMore = false; // To track if more data is being fetched
+  bool _isCompleted = false; // To track if more data is being fetched
   int _currentPage = 0; // Current page
   int _totalPages = 1; // Total pages (default to 1)
 
@@ -54,7 +55,7 @@ class _GoalsPageState extends State<GoalsPage> {
       final startDate = _currentWeekStart;
       final endDate = _currentWeekStart.add(const Duration(days: 6));
       final pagezGoals = await _goalService.fetchGoals(
-        null,
+        _isCompleted,
         startDate,
         endDate,
         _selectedSubjects.toList(),
@@ -81,7 +82,7 @@ class _GoalsPageState extends State<GoalsPage> {
     setState(() => _isLoading = true);
     try {
       final pagezGoals = await _goalService.fetchGoals(
-        null,
+        _isCompleted,
         day,
         day,
         _selectedSubjects.toList(),
@@ -106,7 +107,7 @@ class _GoalsPageState extends State<GoalsPage> {
       final startDate = _currentWeekStart;
       final endDate = _currentWeekStart.add(const Duration(days: 6));
       final pagezGoals = await _goalService.fetchGoals(
-        null,
+        _isCompleted,
         startDate,
         endDate,
         _selectedSubjects.toList(),
@@ -620,74 +621,106 @@ class _GoalsPageState extends State<GoalsPage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    children:
-                        GoalSubject.values.map((subject) {
-                          final isSelected = _selectedSubjects.contains(
-                            subject,
-                          );
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (isSelected) {
-                                  _selectedSubjects.remove(subject);
-                                } else {
-                                  _selectedSubjects.add(subject);
-                                }
-                              });
-                              _updateFilters(_selectedSubjects);
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                border: Border.all(
+                    children: [
+                      // Subject Filters
+                      ...GoalSubject.values.map((subject) {
+                        final isSelected = _selectedSubjects.contains(subject);
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                _selectedSubjects.remove(subject);
+                              } else {
+                                _selectedSubjects.add(subject);
+                              }
+                            });
+                            _updateFilters(_selectedSubjects);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color:
+                                    isSelected
+                                        ? Colors.white
+                                        : Colors.transparent,
+                                width: 1.5,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              color:
+                                  isSelected
+                                      ? const Color.fromRGBO(85, 123, 233, 1)
+                                      : Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 15,
+                            ),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: Center(
+                              child: Text(
+                                StringCapitalization(
+                                  subject.toString().split('.').last,
+                                ).capitalizeFirstLetter(),
+                                style: TextStyle(
                                   color:
                                       isSelected
                                           ? Colors.white
-                                          : Colors.transparent,
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                color:
-                                    isSelected
-                                        ? const Color.fromRGBO(85, 123, 233, 1)
-                                        : Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 15,
-                              ),
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: Center(
-                                child: Text(
-                                  StringCapitalization(
-                                    subject.toString().split('.').last,
-                                  ).capitalizeFirstLetter(),
-                                  style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.white
-                                            : const Color.fromRGBO(
-                                              72,
-                                              85,
-                                              204,
-                                              1,
-                                            ),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                          : const Color.fromRGBO(
+                                            72,
+                                            85,
+                                            204,
+                                            1,
+                                          ),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
+                          ),
+                        );
+                      }).toList(),
+
+                      const SizedBox(height: 20),
+
+                      // Completed Filter Switch
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Goals Completed",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Switch(
+                            value: _isCompleted,
+                            onChanged: (value) {
+                              setState(() {
+                                _isCompleted = value;
+                              });
+                              _fetchGoalsForWeek(); // Refresh goals based on the new filter
+                            },
+                            activeColor: const Color.fromARGB(
+                              255,
+                              255,
+                              255,
+                              255,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
