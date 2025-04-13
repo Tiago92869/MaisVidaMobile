@@ -110,12 +110,12 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         // Call createDiary if this is a new diary
         final createdDiary = await _diaryService.createDiary(diary);
         Navigator.pop(context); // Close the loading dialog
-        Navigator.pop(context, createdDiary); // Return the created diary
+        Navigator.pop(context, true); // Return true to indicate success
       } else {
         // Call updateDiary if editing an existing diary
         final updatedDiary = await _diaryService.updateDiary(diary.id, diary);
         Navigator.pop(context); // Close the loading dialog
-        Navigator.pop(context, updatedDiary); // Return the updated diary
+        Navigator.pop(context, true); // Return true to indicate success
       }
     } catch (e) {
       Navigator.pop(context); // Close the loading dialog
@@ -266,18 +266,20 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   const SizedBox(height: 20),
 
                   // Recorded At Date
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Recorded At: ",
+                        "Recorded At",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
                         ),
                       ),
-                      TextButton(
-                        onPressed:
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap:
                             editMode
                                 ? () async {
                                   final pickedDate = await showDatePicker(
@@ -293,11 +295,21 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                                   }
                                 }
                                 : null,
-                        child: Text(
-                          "${recordedAt.month}/${recordedAt.day}/${recordedAt.year}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            "${recordedAt.day.toString().padLeft(2, '0')}-${recordedAt.month.toString().padLeft(2, '0')}-${recordedAt.year}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

@@ -337,8 +337,8 @@ class _DiaryPageState extends State<DiaryPage> {
                                           ),
                                           size: 32,
                                         ),
-                                        onTap: () {
-                                          Navigator.push(
+                                        onTap: () async {
+                                          final result = await Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder:
@@ -348,6 +348,13 @@ class _DiaryPageState extends State<DiaryPage> {
                                                   ),
                                             ),
                                           );
+
+                                          if (result == true) {
+                                            // Refresh the search with the previously set parameters
+                                            _fetchDiariesForSelectedDate(
+                                              isScrolling: false,
+                                            );
+                                          }
                                         },
                                       ),
                                     );
@@ -578,8 +585,8 @@ class _DiaryPageState extends State<DiaryPage> {
                       ? 0.0
                       : 1.0, // Hide the FAB when the filter panel is open
               child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder:
@@ -589,6 +596,11 @@ class _DiaryPageState extends State<DiaryPage> {
                           ),
                     ),
                   );
+
+                  if (result == true) {
+                    // Refresh the search with the previously set parameters
+                    _fetchDiariesForSelectedDate(isScrolling: false);
+                  }
                 },
                 backgroundColor: Colors.white,
                 child: const Icon(
