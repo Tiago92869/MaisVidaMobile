@@ -17,8 +17,6 @@ class GoalRepository {
       startDate,
       endDate,
       goalSubjects,
-      page,
-      size,
     );
   }
 

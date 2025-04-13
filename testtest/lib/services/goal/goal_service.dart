@@ -38,11 +38,7 @@ class GoalService {
     DateTime startDate,
     DateTime endDate,
     List<GoalSubject> goalSubjects,
-    int currentPage,
-    int pageSize, {
-    int page = 0, // Add page parameter
-    int size = 5, // Add size parameter
-  }) async {
+  ) async {
     await _loadStoredCredentials();
     try {
       print('Fetching goals...');
@@ -56,8 +52,7 @@ class GoalService {
           isCompleted != null ? '&isCompleted=$isCompleted' : '';
       final String url =
           '$_baseUrl?&userId=$_userId$isCompletedQuery&$subjectsQuery'
-          '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}'
-          '&page=$page&size=$size'; // Add page and size to the query
+          '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}'; // Add page and size to the query
 
       print('Request URL for fetchGoals: $url'); // Log the request URL
 
