@@ -71,20 +71,27 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 
   // Function to fetch diaries for the selected date
-  Future<void> _fetchDiariesForSelectedDate() async {
+  Future<void> _fetchDiariesForSelectedDate({bool isScrolling = false}) async {
     setState(() {
       _isLoading = true;
       _hasError = false;
+
+      // Reset _diaryEntries only if not scrolling
+      if (!isScrolling) {
+        _diaryEntries = [];
+      }
     });
 
-    // Show loading dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
+    // Show loading dialog only if not scrolling
+    if (!isScrolling) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+    }
 
     try {
       // Fetch diaries from the DiaryService
@@ -116,7 +123,11 @@ class _DiaryPageState extends State<DiaryPage> {
         ),
       );
     } finally {
-      Navigator.pop(context); // Close the loading dialog
+      // Close the loading dialog only if not scrolling
+      if (!isScrolling) {
+        Navigator.pop(context);
+      }
+
       setState(() {
         _isLoading = false;
       });
@@ -268,7 +279,7 @@ class _DiaryPageState extends State<DiaryPage> {
                             scrollInfo.metrics.pixels ==
                                 scrollInfo.metrics.maxScrollExtent) {
                           // User has scrolled to the bottom, refresh the page
-                          _fetchDiariesForSelectedDate();
+                          _fetchDiariesForSelectedDate(isScrolling: true);
                         }
                         return false;
                       },
