@@ -134,6 +134,74 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     }
   }
 
+  Future<bool> _showDeleteConfirmationDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Delete Diary",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Text(
+                "Are you sure you want to delete this diary? This action cannot be undone.",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    "Delete",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  Future<void> _deleteDiary() async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+
+    try {
+      await _diaryService.deleteDiary(widget.diary!.id);
+      Navigator.pop(context); // Close the loading dialog
+      Navigator.pop(context, true); // Return true to indicate success
+    } catch (e) {
+      Navigator.pop(context); // Close the loading dialog
+      // Handle errors (e.g., show a snackbar)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to delete diary. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void toggleEditMode() {
     setState(() {
       editMode = !editMode;
@@ -439,6 +507,30 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               ),
             ),
           ),
+
+          // Delete Button
+          if (!widget.createDiary) // Show only when editing an existing diary
+            Positioned(
+              bottom: 20,
+              right: 20, // Move the button to the right side
+              child: GestureDetector(
+                onTap: () async {
+                  final shouldDelete = await _showDeleteConfirmationDialog();
+                  if (shouldDelete) {
+                    await _deleteDiary();
+                  }
+                },
+                child: CircleAvatar(
+                  radius: 30, // Increase the size of the button
+                  backgroundColor: Colors.red,
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                    size: 28, // Increase the size of the icon
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
