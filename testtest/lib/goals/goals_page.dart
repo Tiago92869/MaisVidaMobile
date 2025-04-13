@@ -688,12 +688,26 @@ class _GoalsPageState extends State<GoalsPage> {
               builder:
                   (context) => GoalDetailPage(
                     createResource: true,
-                    onSave: _fetchGoalsForWeek,
+                    onSave: () {
+                      if (_selectedDay != null) {
+                        _fetchGoalsForDay(
+                          _selectedDay!,
+                        ); // Fetch goals for the selected day
+                      } else {
+                        _fetchGoalsForWeek(); // Fetch goals for the entire week
+                      }
+                    },
                   ),
             ),
           ).then((value) {
             if (value == true) {
-              _fetchGoalsForWeek();
+              if (_selectedDay != null) {
+                _fetchGoalsForDay(
+                  _selectedDay!,
+                ); // Fetch goals for the selected day
+              } else {
+                _fetchGoalsForWeek(); // Fetch goals for the entire week
+              }
             }
           });
         },
