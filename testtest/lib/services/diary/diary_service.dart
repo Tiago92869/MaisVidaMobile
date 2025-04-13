@@ -16,10 +16,8 @@ class DiaryService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -43,7 +41,10 @@ class DiaryService {
 
     // Format the emotions as a query parameter
     final String emotionsQuery = emotions
-        .map((emotion) => 'emotion=${emotion.toString().split('.').last.toUpperCase()}')
+        .map(
+          (emotion) =>
+              'emotion=${emotion.toString().split('.').last.toUpperCase()}',
+        )
         .join('&');
 
     // Construct the URL with the query parameters
@@ -52,20 +53,23 @@ class DiaryService {
     print('Request URL for fetchDiaries: $url'); // Log the request URL
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -92,21 +96,24 @@ class DiaryService {
     print('Request Body for createDiary: $requestBody'); // Log the request body
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+            body: requestBody,
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -134,21 +141,22 @@ class DiaryService {
     try {
       final response = await http
           .patch(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(diary.toJson()),
-      )
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+            body: json.encode(diary.toJson()),
+          )
           .timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('updateDiary request timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+            _timeoutDuration,
+            onTimeout: () {
+              print('updateDiary request timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('updateDiary response status code: ${response.statusCode}');
 
@@ -157,7 +165,8 @@ class DiaryService {
         return Diary.fromJson(json.decode(response.body));
       } else {
         print(
-            'Failed to update diary with status code: ${response.statusCode}');
+          'Failed to update diary with status code: ${response.statusCode}',
+        );
         throw Exception('Failed to update diary');
       }
     } catch (e) {
@@ -172,19 +181,20 @@ class DiaryService {
     print('Request URL for deleteDiary: $url'); // Log the request URL
 
     try {
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .delete(
+            Uri.parse(url),
+            headers: {'Authorization': 'Bearer $_accessToken'},
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {

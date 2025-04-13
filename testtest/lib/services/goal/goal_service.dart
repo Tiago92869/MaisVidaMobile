@@ -17,10 +17,8 @@ class GoalService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -45,8 +43,10 @@ class GoalService {
     try {
       print('Fetching goals...');
       final String subjectsQuery = goalSubjects
-          .map((subject) =>
-              'goalSubjects=${subject.toString().split('.').last.toUpperCase()}')
+          .map(
+            (subject) =>
+                'goalSubjects=${subject.toString().split('.').last.toUpperCase()}',
+          )
           .join('&');
       final String url =
           '$_baseUrl?&userId=$_userId&isCompleted=$isCompleted&$subjectsQuery'
@@ -54,20 +54,23 @@ class GoalService {
 
       print('Request URL for fetchGoals: $url'); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -92,22 +95,27 @@ class GoalService {
     await _loadStoredCredentials();
     try {
       final requestBody = jsonEncode(goal.toJson());
-      print('Request Body for createGoal: $requestBody'); // Log the request body
+      print(
+        'Request Body for createGoal: $requestBody',
+      ); // Log the request body
 
-      final response = await http.post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .post(
+            Uri.parse(_baseUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+            body: requestBody,
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -131,22 +139,27 @@ class GoalService {
       final requestBody = jsonEncode(goal.toJson());
       final String requestUrl = '$_baseUrl/$id';
       print('Request URL for updateGoal: $requestUrl'); // Log the request URL
-      print('Request Body for updateGoal: $requestBody'); // Log the request body
+      print(
+        'Request Body for updateGoal: $requestBody',
+      ); // Log the request body
 
-      final response = await http.patch(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .patch(
+            Uri.parse(requestUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+            body: requestBody,
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -170,18 +183,19 @@ class GoalService {
       final String requestUrl = '$_baseUrl/$id';
       print('Request URL for deleteGoal: $requestUrl'); // Log the request URL
 
-      final response = await http.delete(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .delete(
+            Uri.parse(requestUrl),
+            headers: {'Authorization': 'Bearer $_accessToken'},
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {

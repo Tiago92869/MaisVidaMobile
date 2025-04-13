@@ -18,10 +18,8 @@ class NotificationService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -30,32 +28,40 @@ class NotificationService {
     }
 
     if (_userId != null) {
-      print('User ID loaded: $_userId'); 
+      print('User ID loaded: $_userId');
     } else {
       print('No User ID found');
     }
   }
 
-  Future<List<NotificationModel>> fetchNotifications({int page = 0, int size = 10}) async {
+  Future<List<NotificationModel>> fetchNotifications({
+    int page = 0,
+    int size = 10,
+  }) async {
     await _loadStoredCredentials();
     try {
       final requestUrl = '$_baseUrl?userId=$_userId&page=$page&size=$size';
-      print('Request URL for fetchNotifications: $requestUrl'); // Log the request URL
+      print(
+        'Request URL for fetchNotifications: $requestUrl',
+      ); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $requestUrl timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(requestUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $requestUrl timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response status code: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -75,7 +81,9 @@ class NotificationService {
           throw Exception('Unexpected response format');
         }
       } else {
-        print('Failed to load notifications. Status Code: ${response.statusCode}');
+        print(
+          'Failed to load notifications. Status Code: ${response.statusCode}',
+        );
         throw Exception('Failed to load notifications');
       }
     } catch (e) {
@@ -88,28 +96,35 @@ class NotificationService {
     await _loadStoredCredentials();
     try {
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for deleteNotification: $requestUrl'); // Log the request URL
+      print(
+        'Request URL for deleteNotification: $requestUrl',
+      ); // Log the request URL
 
-      final response = await http.delete(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $requestUrl timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .delete(
+            Uri.parse(requestUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $requestUrl timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
         print('Notification deleted successfully.');
       } else {
-        print('Failed to delete notification. Status Code: ${response.statusCode}');
+        print(
+          'Failed to delete notification. Status Code: ${response.statusCode}',
+        );
         throw Exception('Failed to delete notification');
       }
     } catch (e) {

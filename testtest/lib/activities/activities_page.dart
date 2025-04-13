@@ -70,74 +70,13 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   @override
   void initState() {
     super.initState();
-
-    // Add mock activities for testing
-    _activities = [
-      Activity(
-        id: "1",
-        title: "Morning Yoga",
-        description: "Start your day with a refreshing yoga session.",
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-        resources: [
-          Resource(
-            id: "r1",
-            title: "Yoga Basics",
-            description: "Learn the basics of yoga.",
-            type: ResourceType.VIDEO,
-            createdAt: DateTime.now().subtract(const Duration(days: 10)),
-            updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-          ),
-          Resource(
-            id: "r2",
-            title: "Breathing Techniques",
-            description: "Master breathing techniques for relaxation.",
-            type: ResourceType.ARTICLE,
-            createdAt: DateTime.now().subtract(const Duration(days: 8)),
-            updatedAt: DateTime.now().subtract(const Duration(days: 4)),
-          ),
-        ],
-      ),
-      Activity(
-        id: "2",
-        title: "Healthy Cooking",
-        description: "Learn to cook healthy and delicious meals.",
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 7)),
-        resources: [
-          Resource(
-            id: "r3",
-            title: "Quick Recipes",
-            description: "Prepare quick and healthy recipes.",
-            type: ResourceType.RECIPE,
-            createdAt: DateTime.now().subtract(const Duration(days: 15)),
-            updatedAt: DateTime.now().subtract(const Duration(days: 10)),
-          ),
-        ],
-      ),
-      Activity(
-        id: "3",
-        title: "Meditation for Beginners",
-        description: "A guide to help you start meditating.",
-        createdAt: DateTime.now().subtract(const Duration(days: 20)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 15)),
-        resources: [
-          Resource(
-            id: "r4",
-            title: "Meditation Basics",
-            description: "Learn the basics of meditation.",
-            type: ResourceType.PODCAST,
-            createdAt: DateTime.now().subtract(const Duration(days: 25)),
-            updatedAt: DateTime.now().subtract(const Duration(days: 20)),
-          ),
-        ],
-      ),
-    ];
+    _fetchActivities();
   }
 
   // Function to fetch activities
   Future<void> _fetchActivities() async {
-    if (_isLoading || _isLastPage) return; // Prevent duplicate or unnecessary requests
+    if (_isLoading || _isLastPage)
+      return; // Prevent duplicate or unnecessary requests
 
     setState(() {
       _isLoading = true;
@@ -151,7 +90,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       );
 
       setState(() {
-        _activities.addAll(activityPage.content); // Append new activities to the list
+        _activities.addAll(
+          activityPage.content,
+        ); // Append new activities to the list
         _isLastPage = activityPage.last; // Check if this is the last page
         _currentPage++; // Increment the page number for the next fetch
       });
@@ -183,7 +124,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
   // Function to detect when the user scrolls to the bottom
   void _onScroll(ScrollController controller) {
-    if (controller.position.pixels >= controller.position.maxScrollExtent - 200) {
+    if (controller.position.pixels >=
+        controller.position.maxScrollExtent - 200) {
       _fetchActivities(); // Fetch the next page when near the bottom
     }
   }
@@ -200,13 +142,20 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           GestureDetector(
             onTap: _closeFilterPanel,
             child: IgnorePointer(
-              ignoring: _isFilterPanelVisible, // Disable interactions when the filter is open
+              ignoring:
+                  _isFilterPanelVisible, // Disable interactions when the filter is open
               child: Stack(
                 children: [
                   Container(
-                    color: Colors.transparent, // Detect taps anywhere on the screen
+                    color:
+                        Colors
+                            .transparent, // Detect taps anywhere on the screen
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 40,
+                      ),
                       child: RefreshIndicator(
                         onRefresh: () async {
                           setState(() {
@@ -217,12 +166,17 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                           await _fetchActivities(); // Fetch activities again
                         },
                         child: SingleChildScrollView(
-                          controller: _scrollController, // Attach the scroll controller
-                          physics: const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
+                          controller:
+                              _scrollController, // Attach the scroll controller
+                          physics:
+                              const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center, // Center the cards
+                            crossAxisAlignment:
+                                CrossAxisAlignment.center, // Center the cards
                             children: [
-                              const SizedBox(height: 60), // Add spacing between the top of the screen and the title
+                              const SizedBox(
+                                height: 60,
+                              ), // Add spacing between the top of the screen and the title
                               // Title (Activities) centered at the top
                               const Center(
                                 child: Text(
@@ -238,134 +192,164 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               const SizedBox(height: 40),
                               // Input TextField with Search icon
                               TextField(
-                                onChanged: _onSearch, // Trigger search on input change
+                                onChanged:
+                                    _onSearch, // Trigger search on input change
                                 decoration: InputDecoration(
                                   labelText: "Search Activities",
-                                  labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                                  prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20),
+                                  labelStyle: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.search,
+                                    color: Colors.grey,
+                                    size: 20,
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    borderSide: const BorderSide(color: Colors.grey),
+                                    borderSide: const BorderSide(
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                    vertical: 10,
+                                  ),
                                 ),
                                 style: const TextStyle(fontSize: 14),
                               ),
                               const SizedBox(height: 20),
                               // Display the activities as cards
                               Column(
-                                children: _activities
-                                    .asMap()
-                                    .entries
-                                    .map(
-                                      (entry) {
-                                        final index = entry.key;
-                                        final activity = entry.value;
-                                        final backgroundColor = _activityColors[index % _activityColors.length];
+                                children:
+                                    _activities.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final activity = entry.value;
+                                      final backgroundColor =
+                                          _activityColors[index %
+                                              _activityColors.length];
 
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 15),
-                                          child: Container(
-                                            constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
-                                            padding: const EdgeInsets.all(20),
-                                            decoration: BoxDecoration(
-                                              color: backgroundColor,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: backgroundColor.withOpacity(0.3),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 12),
-                                                ),
-                                                BoxShadow(
-                                                  color: backgroundColor.withOpacity(0.3),
-                                                  blurRadius: 2,
-                                                  offset: const Offset(0, 1),
-                                                ),
-                                              ],
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                // Title
-                                                Text(
-                                                  activity.title,
-                                                  style: const TextStyle(
-                                                    fontSize: 24,
-                                                    fontFamily: "Poppins",
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                // Description
-                                                Text(
-                                                  activity.description,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 2,
-                                                  style: TextStyle(
-                                                    color: Colors.white.withOpacity(0.7),
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                // Created At
-                                                Text(
-                                                  "Created At: ${activity.createdAt?.toLocal().toString().split(' ')[0]}",
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontFamily: "Inter",
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                // Resources Count
-                                                Text(
-                                                  "Resources: ${activity.resources?.length}",
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontFamily: "Inter",
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                const Spacer(),
-                                                Center(
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) => ActivityDetailsPage(
-                                                            activity: activity,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      foregroundColor: backgroundColor,
-                                                      backgroundColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                    ),
-                                                    child: const Text(
-                                                      "Start",
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 15,
+                                        ),
+                                        child: Container(
+                                          constraints: const BoxConstraints(
+                                            maxWidth: 350,
+                                            maxHeight: 350,
+                                          ),
+                                          padding: const EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            color: backgroundColor,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: backgroundColor
+                                                    .withOpacity(0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 12),
+                                              ),
+                                              BoxShadow(
+                                                color: backgroundColor
+                                                    .withOpacity(0.3),
+                                                blurRadius: 2,
+                                                offset: const Offset(0, 1),
+                                              ),
+                                            ],
+                                            borderRadius: BorderRadius.circular(
+                                              20,
                                             ),
                                           ),
-                                        );
-                                      },
-                                    )
-                                    .toList(),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Title
+                                              Text(
+                                                activity.title,
+                                                style: const TextStyle(
+                                                  fontSize: 24,
+                                                  fontFamily: "Poppins",
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              // Description
+                                              Text(
+                                                activity.description,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                  color: Colors.white
+                                                      .withOpacity(0.7),
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              // Created At
+                                              Text(
+                                                "Created At: ${activity.createdAt?.toLocal().toString().split(' ')[0]}",
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: "Inter",
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              // Resources Count
+                                              Text(
+                                                "Resources: ${activity.resources?.length}",
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: "Inter",
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              Center(
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder:
+                                                            (context) =>
+                                                                ActivityDetailsPage(
+                                                                  activity:
+                                                                      activity,
+                                                                ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    foregroundColor:
+                                                        backgroundColor,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    "Start",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
                               ),
                               if (_isLoading)
                                 const Padding(
@@ -406,9 +390,14 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: _isStarGlowing
-                                ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
-                                : Colors.black.withOpacity(0.2), // Default shadow when not pressed
+                            color:
+                                _isStarGlowing
+                                    ? Colors.blue.withOpacity(
+                                      0.8,
+                                    ) // Glowing shadow when pressed
+                                    : Colors.black.withOpacity(
+                                      0.2,
+                                    ), // Default shadow when not pressed
                             blurRadius: _isStarGlowing ? 15 : 5,
                             spreadRadius: _isStarGlowing ? 5 : 0,
                             offset: const Offset(0, 5),
@@ -466,7 +455,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 gradient: const LinearGradient(
                   colors: [
                     Color.fromRGBO(50, 75, 200, 1), // Start color (darker blue)
-                    Color.fromRGBO(100, 130, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      100,
+                      130,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -481,7 +475,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 40), // Space between the arrow and text
+                  const SizedBox(
+                    height: 40,
+                  ), // Space between the arrow and text
                   Padding(
                     padding: const EdgeInsets.only(top: 20, left: 15),
                     child: Row(
@@ -513,56 +509,80 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: _filterTypes.map((filterType) {
-                            bool isSelected = _selectedFilterTypes.contains(filterType);
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    _selectedFilterTypes.remove(filterType);
-                                  } else {
-                                    _selectedFilterTypes.add(filterType);
-                                  }
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: isSelected ? Colors.white : Colors.transparent,
-                                    width: 1.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: isSelected
-                                      ? const Color.fromRGBO(70, 100, 200, 1) // Selected button color (blueish)
-                                      : Colors.white, // Default button color
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
+                          children:
+                              _filterTypes.map((filterType) {
+                                bool isSelected = _selectedFilterTypes.contains(
+                                  filterType,
+                                );
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isSelected) {
+                                        _selectedFilterTypes.remove(filterType);
+                                      } else {
+                                        _selectedFilterTypes.add(filterType);
+                                      }
+                                    });
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color:
+                                          isSelected
+                                              ? const Color.fromRGBO(
+                                                70,
+                                                100,
+                                                200,
+                                                1,
+                                              ) // Selected button color (blueish)
+                                              : Colors
+                                                  .white, // Default button color
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: Center(
-                                  child: Text(
-                                    filterType.toString().split('.').last,
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? Colors.white
-                                          : const Color.fromRGBO(50, 75, 200, 1), // Text color for unselected buttons
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Poppins",
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 15,
+                                    ),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        filterType.toString().split('.').last,
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : const Color.fromRGBO(
+                                                    50,
+                                                    75,
+                                                    200,
+                                                    1,
+                                                  ), // Text color for unselected buttons
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Poppins",
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }).toList(),
                         ),
                       ),
                     ),

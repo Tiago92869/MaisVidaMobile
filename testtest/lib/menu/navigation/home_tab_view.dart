@@ -3,17 +3,7 @@ import 'package:testtest/activities/activity_details_page.dart';
 import 'package:testtest/diary/diary_detail_page.dart';
 import 'package:testtest/goals/goal_details_page.dart';
 import 'package:testtest/medicines/medicine_detail_page.dart';
-import 'package:testtest/menu/components/hcard.dart';
-import 'package:testtest/menu/components/vcard.dart';
-import 'package:testtest/menu/menu.dart';
-import 'package:testtest/menu/models/courses.dart';
-import 'package:testtest/menu/theme.dart';
-import 'package:testtest/activities/activities_page.dart';
 import 'package:testtest/resources/resource_detail_page.dart';
-import 'package:testtest/resources/resources_page.dart';
-import 'package:testtest/medicines/medicines_page.dart';
-import 'package:testtest/goals/goals_page.dart';
-import 'package:testtest/diary/diary_page.dart';
 import 'package:testtest/services/activity/activity_service.dart';
 import 'package:testtest/services/resource/resource_service.dart';
 import 'package:testtest/services/medicine/medicine_service.dart';
@@ -35,9 +25,6 @@ class HomeTabView extends StatefulWidget {
 }
 
 class _HomeTabViewState extends State<HomeTabView> {
-  final List<CourseModel> _courses = CourseModel.courses;
-  final List<CourseModel> _courseSections = CourseModel.courseSections;
-
   final ActivityService _activityService = ActivityService();
   final ResourceService _resourceService = ResourceService();
   final MedicineService _medicineService = MedicineService();
@@ -70,16 +57,10 @@ class _HomeTabViewState extends State<HomeTabView> {
     try {
       final activities = await _activityService.fetchActivities(0, 3, "");
       setState(() {
-        _activities =
-            activities.content.isNotEmpty
-                ? activities.content
-                : _getMockedActivities();
+        _activities = activities.content;
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch activities.");
-      setState(() {
-        _activities = _getMockedActivities();
-      });
     } finally {
       setState(() {
         _isLoadingActivities = false;
@@ -91,16 +72,10 @@ class _HomeTabViewState extends State<HomeTabView> {
     try {
       final resources = await _resourceService.fetchResources([], 0, 4, "");
       setState(() {
-        _resources =
-            resources.content.isNotEmpty
-                ? resources.content
-                : _getMockedResources();
+        _resources = resources.content;
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch resources.");
-      setState(() {
-        _resources = _getMockedResources();
-      });
     } finally {
       setState(() {
         _isLoadingResources = false;
@@ -116,16 +91,10 @@ class _HomeTabViewState extends State<HomeTabView> {
         DateTime.now(),
       );
       setState(() {
-        _medications =
-            medications.isNotEmpty
-                ? medications[0].medicines.take(3).toList()
-                : _getMockedMedications();
+        _medications = medications[0].medicines.take(3).toList();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch medications.");
-      setState(() {
-        _medications = _getMockedMedications();
-      });
     } finally {
       setState(() {
         _isLoadingMedications = false;
@@ -142,16 +111,10 @@ class _HomeTabViewState extends State<HomeTabView> {
         [],
       );
       setState(() {
-        _goals =
-            goals.isNotEmpty
-                ? goals[0].goals.take(3).toList()
-                : _getMockedGoals();
+        _goals = goals[0].goals.take(3).toList();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch goals.");
-      setState(() {
-        _goals = _getMockedGoals();
-      });
     } finally {
       setState(() {
         _isLoadingGoals = false;
@@ -167,16 +130,10 @@ class _HomeTabViewState extends State<HomeTabView> {
         DateTime.now(),
       );
       setState(() {
-        _diaries =
-            diaries.isNotEmpty
-                ? diaries[0].diaries.take(3).toList()
-                : _getMockedDiaries();
+        _diaries = diaries[0].diaries.take(3).toList();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch diaries.");
-      setState(() {
-        _diaries = _getMockedDiaries();
-      });
     } finally {
       setState(() {
         _isLoadingDiaries = false;
@@ -188,187 +145,6 @@ class _HomeTabViewState extends State<HomeTabView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
-  }
-
-  // Mocked data for each section
-  List<Activity> _getMockedActivities() {
-    return [
-      Activity(
-        id: "1",
-        title: "Mocked Activity 1",
-        description: "Description for activity 1",
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        resources: [],
-      ),
-      Activity(
-        id: "2",
-        title: "Mocked Activity 2",
-        description: "Description for activity 2",
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        resources: [],
-      ),
-      Activity(
-        id: "3",
-        title: "Mocked Activity 3",
-        description: "Description for activity 3",
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        resources: [],
-      ),
-    ];
-  }
-
-  List<Resource> _getMockedResources() {
-    return [
-      Resource(
-        id: "1",
-        title: "Mocked Resource 1",
-        description: "Description for resource 1",
-        type: ResourceType.ARTICLE,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Resource(
-        id: "2",
-        title: "Mocked Resource 2",
-        description: "Description for resource 2",
-        type: ResourceType.VIDEO,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Resource(
-        id: "3",
-        title: "Mocked Resource 3",
-        description: "Description for resource 3",
-        type: ResourceType.PODCAST,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Resource(
-        id: "4",
-        title: "Mocked Resource 4",
-        description: "Description for resource 4",
-        type: ResourceType.EXERCISE,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    ];
-  }
-
-  List<Medicine> _getMockedMedications() {
-    return [
-      Medicine(
-        id: "1",
-        name: "Mocked Medicine 1",
-        description: "Description for medicine 1",
-        archived: false,
-        startedAt: DateTime.now().subtract(const Duration(days: 10)),
-        endedAt: DateTime.now().add(const Duration(days: 10)),
-        hasNotifications: true,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        plans: [],
-      ),
-      Medicine(
-        id: "2",
-        name: "Mocked Medicine 2",
-        description: "Description for medicine 2",
-        archived: false,
-        startedAt: DateTime.now().subtract(const Duration(days: 5)),
-        endedAt: DateTime.now().add(const Duration(days: 15)),
-        hasNotifications: false,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        plans: [],
-      ),
-      Medicine(
-        id: "3",
-        name: "Mocked Medicine 3",
-        description: "Description for medicine 3",
-        archived: true,
-        startedAt: DateTime.now().subtract(const Duration(days: 20)),
-        endedAt: DateTime.now().add(const Duration(days: 5)),
-        hasNotifications: true,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        plans: [],
-      ),
-    ];
-  }
-
-  List<GoalInfoCard> _getMockedGoals() {
-    return [
-      GoalInfoCard(
-        id: "1",
-        title: "Mocked Goal 1",
-        description: "Description for goal 1",
-        goalDate: DateTime.now().add(const Duration(days: 7)),
-        completedDate: null,
-        completed: false,
-        hasNotifications: true,
-        subject: GoalSubject.Personal,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      GoalInfoCard(
-        id: "2",
-        title: "Mocked Goal 2",
-        description: "Description for goal 2",
-        goalDate: DateTime.now().add(const Duration(days: 14)),
-        completedDate: null,
-        completed: false,
-        hasNotifications: false,
-        subject: GoalSubject.Work,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      GoalInfoCard(
-        id: "3",
-        title: "Mocked Goal 3",
-        description: "Description for goal 3",
-        goalDate: DateTime.now().add(const Duration(days: 21)),
-        completedDate: null,
-        completed: true,
-        hasNotifications: true,
-        subject: GoalSubject.Studies,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    ];
-  }
-
-  List<Diary> _getMockedDiaries() {
-    return [
-      Diary(
-        id: "1",
-        title: "Mocked Diary 1",
-        description: "Description for diary 1",
-        recordedAt: DateTime.now(),
-        emotion: DiaryType.Happy,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Diary(
-        id: "2",
-        title: "Mocked Diary 2",
-        description: "Description for diary 2",
-        recordedAt: DateTime.now(),
-        emotion: DiaryType.Neutral,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Diary(
-        id: "3",
-        title: "Mocked Diary 3",
-        description: "Description for diary 3",
-        recordedAt: DateTime.now(),
-        emotion: DiaryType.Sad,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    ];
   }
 
   Widget _buildSection(

@@ -42,57 +42,13 @@ class _ResourcesPageState extends State<ResourcesPage> {
   @override
   void initState() {
     super.initState();
-
-    // Add mock resources for testing
-    _resources = [
-      Resource(
-        id: "1",
-        title: "How to Stay Healthy",
-        description: "Learn the best practices for maintaining a healthy lifestyle.",
-        type: ResourceType.ARTICLE,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      Resource(
-        id: "2",
-        title: "10-Minute Workout",
-        description: "A quick and effective workout routine for busy people.",
-        type: ResourceType.EXERCISE,
-        createdAt: DateTime.now().subtract(const Duration(days: 20)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 15)),
-      ),
-      Resource(
-        id: "3",
-        title: "Meditation for Beginners",
-        description: "A guide to help you start meditating and reduce stress.",
-        type: ResourceType.PODCAST,
-        createdAt: DateTime.now().subtract(const Duration(days: 30)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 25)),
-      ),
-      Resource(
-        id: "4",
-        title: "Healthy Recipes",
-        description: "Delicious and nutritious recipes for a balanced diet.",
-        type: ResourceType.RECIPE,
-        createdAt: DateTime.now().subtract(const Duration(days: 40)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 35)),
-      ),
-      Resource(
-        id: "5",
-        title: "Emergency Contacts",
-        description: "Important contacts to call in case of an emergency.",
-        type: ResourceType.SOS,
-        createdAt: DateTime.now().subtract(const Duration(days: 50)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 45)),
-      ),
-    ];
-
     _fetchResources(); // Fetch the first page of resources when the page opens
   }
 
   // Function to fetch resources
   Future<void> _fetchResources() async {
-    if (_isLoading || _isLastPage) return; // Prevent duplicate or unnecessary requests
+    if (_isLoading || _isLastPage)
+      return; // Prevent duplicate or unnecessary requests
 
     setState(() {
       _isLoading = true;
@@ -107,7 +63,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
       );
 
       setState(() {
-        _resources.addAll(resourcePage.content); // Append new resources to the list
+        _resources.addAll(
+          resourcePage.content,
+        ); // Append new resources to the list
         _isLastPage = resourcePage.last; // Check if this is the last page
         _currentPage++; // Increment the page number for the next fetch
       });
@@ -202,7 +160,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
 
   // Function to detect when the user scrolls to the bottom
   void _onScroll(ScrollController controller) {
-    if (controller.position.pixels >= controller.position.maxScrollExtent - 200) {
+    if (controller.position.pixels >=
+        controller.position.maxScrollExtent - 200) {
       _fetchResources(); // Fetch the next page when near the bottom
     }
   }
@@ -219,7 +178,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
           GestureDetector(
             onTap: _closeFilterPanel,
             child: IgnorePointer(
-              ignoring: _isFilterPanelVisible, // Disable interactions when the filter is open
+              ignoring:
+                  _isFilterPanelVisible, // Disable interactions when the filter is open
               child: Stack(
                 children: [
                   RefreshIndicator(
@@ -232,15 +192,25 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       await _fetchResources(); // Fetch resources again
                     },
                     child: SingleChildScrollView(
-                      controller: _scrollController, // Attach the scroll controller
-                      physics: const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
+                      controller:
+                          _scrollController, // Attach the scroll controller
+                      physics:
+                          const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
                       child: Container(
-                        color: Colors.transparent, // Detect taps anywhere on the screen
-                        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 40),
+                        color:
+                            Colors
+                                .transparent, // Detect taps anywhere on the screen
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          right: 20,
+                          bottom: 40,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 60), // Add spacing between the top of the screen and the title
+                            const SizedBox(
+                              height: 60,
+                            ), // Add spacing between the top of the screen and the title
                             // Title (Resources) centered at the top
                             const Center(
                               child: Text(
@@ -256,40 +226,60 @@ class _ResourcesPageState extends State<ResourcesPage> {
                             const SizedBox(height: 40),
                             // Input TextField with Search icon
                             TextField(
-                              onChanged: _onSearch, // Trigger search on input change
+                              onChanged:
+                                  _onSearch, // Trigger search on input change
                               decoration: InputDecoration(
                                 labelText: "Search Resources",
-                                labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                                prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20),
+                                labelStyle: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                                prefixIcon: const Icon(
+                                  Icons.search,
+                                  color: Colors.grey,
+                                  size: 20,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20),
-                                  borderSide: const BorderSide(color: Colors.grey),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 10,
+                                ),
                               ),
                               style: const TextStyle(fontSize: 14),
                             ),
                             const SizedBox(height: 20),
                             // Display the resources as HCards
                             Column(
-                              children: _resources
-                                  .map(
-                                    (resource) => Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => ResourceDetailPage(resource: resource),
-                                            ),
-                                          );
-                                        },
-                                        child: _buildHCard(resource),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
+                              children:
+                                  _resources
+                                      .map(
+                                        (resource) => Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (context) =>
+                                                          ResourceDetailPage(
+                                                            resource: resource,
+                                                          ),
+                                                ),
+                                              );
+                                            },
+                                            child: _buildHCard(resource),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
                             ),
                             if (_isLoading)
                               const Padding(
@@ -305,9 +295,14 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   // Apply blur effect when filter panel is visible
                   if (_isFilterPanelVisible)
                     BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust blur intensity
+                      filter: ImageFilter.blur(
+                        sigmaX: 5.0,
+                        sigmaY: 5.0,
+                      ), // Adjust blur intensity
                       child: Container(
-                        color: Colors.black.withOpacity(0.2), // Optional: Add a semi-transparent overlay
+                        color: Colors.black.withOpacity(
+                          0.2,
+                        ), // Optional: Add a semi-transparent overlay
                       ),
                     ),
                 ],
@@ -333,9 +328,14 @@ class _ResourcesPageState extends State<ResourcesPage> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: _isStarGlowing
-                                ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
-                                : Colors.black.withOpacity(0.2), // Default shadow when not pressed
+                            color:
+                                _isStarGlowing
+                                    ? Colors.blue.withOpacity(
+                                      0.8,
+                                    ) // Glowing shadow when pressed
+                                    : Colors.black.withOpacity(
+                                      0.2,
+                                    ), // Default shadow when not pressed
                             blurRadius: _isStarGlowing ? 15 : 5,
                             spreadRadius: _isStarGlowing ? 5 : 0,
                             offset: const Offset(0, 5),
@@ -393,7 +393,12 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 gradient: const LinearGradient(
                   colors: [
                     Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -408,7 +413,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 40), // Space between the arrow and text
+                  const SizedBox(
+                    height: 40,
+                  ), // Space between the arrow and text
                   Padding(
                     padding: const EdgeInsets.only(top: 20, left: 15),
                     child: Row(
@@ -440,46 +447,77 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: _resourceTypes.map((resourceType) {
-                            bool isSelected = _selectedResourceTypes.contains(resourceType);
-                            return GestureDetector(
-                              onTap: () => _toggleResourceType(resourceType),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: isSelected ? Colors.white : Colors.transparent,
-                                    width: 1.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: isSelected
-                                      ? const Color.fromRGBO(85, 123, 233, 1) // Selected button color
-                                      : Colors.white, // Default button color
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
+                          children:
+                              _resourceTypes.map((resourceType) {
+                                bool isSelected = _selectedResourceTypes
+                                    .contains(resourceType);
+                                return GestureDetector(
+                                  onTap:
+                                      () => _toggleResourceType(resourceType),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color:
+                                          isSelected
+                                              ? const Color.fromRGBO(
+                                                85,
+                                                123,
+                                                233,
+                                                1,
+                                              ) // Selected button color
+                                              : Colors
+                                                  .white, // Default button color
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: Center(
-                                  child: Text(
-                                    StringCapitalization(resourceType.toString().split('.').last).capitalizeFirstLetter(),
-                                    style: TextStyle(
-                                      color: isSelected ? Colors.white : const Color.fromRGBO(72, 85, 204, 1),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Poppins",
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 15,
+                                    ),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        StringCapitalization(
+                                          resourceType
+                                              .toString()
+                                              .split('.')
+                                              .last,
+                                        ).capitalizeFirstLetter(),
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : const Color.fromRGBO(
+                                                    72,
+                                                    85,
+                                                    204,
+                                                    1,
+                                                  ),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Poppins",
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }).toList(),
                         ),
                       ),
                     ),
@@ -495,11 +533,13 @@ class _ResourcesPageState extends State<ResourcesPage> {
   }
 
   Widget _buildHCard(Resource resource) {
-    const int maxDescriptionLength = 30; // Maximum length for the description (fits around two lines)
+    const int maxDescriptionLength =
+        30; // Maximum length for the description (fits around two lines)
 
-    String truncatedDescription = resource.description.length > maxDescriptionLength
-        ? '${resource.description.substring(0, maxDescriptionLength)}...'
-        : resource.description;
+    String truncatedDescription =
+        resource.description.length > maxDescriptionLength
+            ? '${resource.description.substring(0, maxDescriptionLength)}...'
+            : resource.description;
 
     return Container(
       constraints: const BoxConstraints(maxHeight: 110),
@@ -532,7 +572,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
                     color: Colors.white,
                   ),
                   maxLines: 2, // Ensure it doesn't exceed two lines
-                  overflow: TextOverflow.ellipsis, // Add ellipsis if it overflows
+                  overflow:
+                      TextOverflow.ellipsis, // Add ellipsis if it overflows
                 ),
               ],
             ),

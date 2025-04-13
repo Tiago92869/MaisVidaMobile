@@ -1,6 +1,8 @@
 // login_page.dart
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart'; // Import the jwt_decoder package
 import 'create_account_page.dart';
 import 'reset_password_page.dart';
 import 'package:testtest/menu/menu.dart';
@@ -15,6 +17,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final UserService _userService = UserService();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -25,21 +28,21 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      //FIXME REMOVE WHEN CODE IS READY
-      // Check if the email is "tt" and the password is empty
-      if (_emailController.text.trim().isEmpty && _passwordController.text.trim().isEmpty) {
-        // Redirect to the MenuScreen without calling the login method
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MenuScreen()),
-        );
-        return; // Exit the method early
-      }
       // Call the login method from UserService
-      await _userService.login(
+      final token = await _userService.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+
+      // Decode the accessToken to extract the userId
+      final decodedToken = JwtDecoder.decode(token.accessToken);
+      final String userId = decodedToken['sub']; // Extract the 'sub' field
+
+      // Save the accessToken and userId securely
+      await _storage.write(key: 'accessToken', value: token.accessToken);
+      await _storage.write(key: 'userId', value: userId);
+
+      print('Access token and user ID saved successfully.');
 
       // Navigate to the MenuScreen on successful login
       Navigator.pushReplacement(
@@ -95,7 +98,9 @@ class _LoginPageState extends State<LoginPage> {
                             child: Container(
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
-                                  image: AssetImage('assets/images/starfish1.png'),
+                                  image: AssetImage(
+                                    'assets/images/starfish1.png',
+                                  ),
                                 ),
                               ),
                             ),
@@ -114,7 +119,9 @@ class _LoginPageState extends State<LoginPage> {
                             child: Container(
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
-                                  image: AssetImage('assets/images/starfish2.png'),
+                                  image: AssetImage(
+                                    'assets/images/starfish2.png',
+                                  ),
                                 ),
                               ),
                             ),
@@ -143,7 +150,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
+                  padding: const EdgeInsets.only(
+                    top: 10,
+                    bottom: 10,
+                    left: 30,
+                    right: 30,
+                  ),
                   child: Column(
                     children: <Widget>[
                       FadeInUp(
@@ -168,7 +180,9 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: const EdgeInsets.all(8.0),
                                 decoration: const BoxDecoration(
                                   border: Border(
-                                    bottom: BorderSide(color: Color(0xFF557BE9)),
+                                    bottom: BorderSide(
+                                      color: Color(0xFF557BE9),
+                                    ),
                                   ),
                                 ),
                                 child: TextField(
@@ -176,7 +190,9 @@ class _LoginPageState extends State<LoginPage> {
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Email or Phone number",
-                                    hintStyle: TextStyle(color: Colors.grey[700]),
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[700],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -188,7 +204,9 @@ class _LoginPageState extends State<LoginPage> {
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Password",
-                                    hintStyle: TextStyle(color: Colors.grey[700]),
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[700],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -272,7 +290,9 @@ class _LoginPageState extends State<LoginPage> {
                             "Forgot Password?",
                             style: TextStyle(
                               color: Color(0xFF557BE9),
-                              decoration: TextDecoration.underline, // Underline to show it's clickable
+                              decoration:
+                                  TextDecoration
+                                      .underline, // Underline to show it's clickable
                             ),
                           ),
                         ),
@@ -289,9 +309,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Container(
                 color: Colors.black.withOpacity(0.5),
                 child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
+                  child: CircularProgressIndicator(color: Colors.white),
                 ),
               ),
             ),

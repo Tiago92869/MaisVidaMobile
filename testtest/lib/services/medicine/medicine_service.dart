@@ -16,10 +16,9 @@ class MedicineService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -45,19 +44,23 @@ class MedicineService {
           '$_baseUrl?archived=$archived&startDate=${startDate.toIso8601String()}&endDate=${endDate.toIso8601String()}';
       print('Request URL for fetchMedicines: $url'); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException('The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -82,19 +85,23 @@ class MedicineService {
       final String url = '$_baseUrl/$id';
       print('Request URL for fetchMedicineById: $url'); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException('The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -116,21 +123,27 @@ class MedicineService {
     await _loadStoredCredentials();
     try {
       final requestBody = jsonEncode(medicine.toJson());
-      print('Request Body for createMedicine: $requestBody'); // Log the request body
+      print(
+        'Request Body for createMedicine: $requestBody',
+      ); // Log the request body
 
-      final response = await http.post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException('The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .post(
+            Uri.parse(_baseUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+            body: requestBody,
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -153,22 +166,30 @@ class MedicineService {
     try {
       final requestBody = jsonEncode(medicine.toJson());
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for modifyMedicine: $requestUrl'); // Log the request URL
-      print('Request Body for modifyMedicine: $requestBody'); // Log the request body
+      print(
+        'Request URL for modifyMedicine: $requestUrl',
+      ); // Log the request URL
+      print(
+        'Request Body for modifyMedicine: $requestBody',
+      ); // Log the request body
 
-      final response = await http.patch(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException('The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .patch(
+            Uri.parse(requestUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+            body: requestBody,
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -190,19 +211,23 @@ class MedicineService {
     await _loadStoredCredentials();
     try {
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for deleteMedicine: $requestUrl'); // Log the request URL
+      print(
+        'Request URL for deleteMedicine: $requestUrl',
+      ); // Log the request URL
 
-      final response = await http.delete(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException('The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .delete(
+            Uri.parse(requestUrl),
+            headers: {'Authorization': 'Bearer $_accessToken'},
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {

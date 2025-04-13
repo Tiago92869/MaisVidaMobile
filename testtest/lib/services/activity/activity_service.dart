@@ -17,10 +17,8 @@ class ActivityService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -35,26 +33,33 @@ class ActivityService {
     }
   }
 
-  Future<ActivityPage> fetchActivities(int page, int size, String searchQuery) async {
+  Future<ActivityPage> fetchActivities(
+    int page,
+    int size,
+    String searchQuery,
+  ) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl?page=$page&size=$size&search=$searchQuery';
     print('Request URL for fetchActivities: $url'); // Log the request URL
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -62,7 +67,9 @@ class ActivityService {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final activityPage = ActivityPage.fromJson(jsonResponse);
-        print('Successfully fetched ${activityPage.content.length} activities.');
+        print(
+          'Successfully fetched ${activityPage.content.length} activities.',
+        );
         return activityPage;
       } else {
         print('Failed to load activities. Status Code: ${response.statusCode}');
@@ -80,20 +87,23 @@ class ActivityService {
     print('Request URL for fetchActivityById: $url'); // Log the request URL
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');

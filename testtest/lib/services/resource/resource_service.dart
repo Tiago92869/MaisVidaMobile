@@ -17,10 +17,8 @@ class ResourceService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -36,34 +34,42 @@ class ResourceService {
   }
 
   Future<ResourcePage> fetchResources(
-      List<ResourceType> resourceTypes, int page, int size, String search) async {
+    List<ResourceType> resourceTypes,
+    int page,
+    int size,
+    String search,
+  ) async {
     await _loadStoredCredentials();
     try {
       print('Fetching resources...');
 
       // Convert resourceTypes to a comma-separated string
-      final String resourceTypesParam =
-          resourceTypes.map((type) => type.toString().split('.').last).join(',');
+      final String resourceTypesParam = resourceTypes
+          .map((type) => type.toString().split('.').last)
+          .join(',');
 
       // Build the URL with query parameters
       final String url =
           '$_baseUrl?userId=$_userId&page=$page&size=$size&search=$search&resourceType=$resourceTypesParam';
       print('Request URL for fetchResources: $url'); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $url timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $url timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -86,22 +92,27 @@ class ResourceService {
     try {
       print('Fetching resource with ID: $id');
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for fetchResourceById: $requestUrl'); // Log the request URL
+      print(
+        'Request URL for fetchResourceById: $requestUrl',
+      ); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(requestUrl),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          print('Request to $requestUrl timed out.');
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(requestUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $requestUrl timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');

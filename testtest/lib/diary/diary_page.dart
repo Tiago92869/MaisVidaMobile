@@ -25,54 +25,12 @@ class _DiaryPageState extends State<DiaryPage> {
   final TextEditingController _descriptionController = TextEditingController();
   DiaryType? _selectedEmotion;
 
-  List<Diary> _diaryEntries = []; // Initialize _diaryEntries as an empty list of Diary
+  List<Diary> _diaryEntries =
+      []; // Initialize _diaryEntries as an empty list of Diary
 
   @override
   void initState() {
     super.initState();
-
-    // Add mock data directly to _diaryEntries
-    _diaryEntries = [
-      // Mock data for the current day
-      Diary(
-        id: "1",
-        title: "Morning Exercise",
-        description: "Did a 30-minute yoga session to start the day.",
-        recordedAt: DateTime.now(),
-        emotion: DiaryType.Happy,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      Diary(
-        id: "2",
-        title: "Team Meeting",
-        description: "Discussed project updates and next steps with the team.",
-        recordedAt: DateTime.now(),
-        emotion: DiaryType.Neutral,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      // Mock data for previous days
-      Diary(
-        id: "3",
-        title: "Dinner with Friends",
-        description: "Had a great time catching up with old friends.",
-        recordedAt: DateTime.now().subtract(const Duration(days: 1)),
-        emotion: DiaryType.Love,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Diary(
-        id: "4",
-        title: "Feeling Unwell",
-        description: "Stayed in bed all day due to a headache.",
-        recordedAt: DateTime.now().subtract(const Duration(days: 2)),
-        emotion: DiaryType.Sick,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-    ];
-    
     _fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
   }
 
@@ -100,11 +58,15 @@ class _DiaryPageState extends State<DiaryPage> {
   // Function to filter diary entries by the selected date and emotions
   List<Diary> _getEntriesForSelectedDate() {
     return _diaryEntries
-        .where((entry) =>
-            entry.recordedAt.toLocal().year == _selectedDate.toLocal().year &&
-            entry.recordedAt.toLocal().month == _selectedDate.toLocal().month &&
-            entry.recordedAt.toLocal().day == _selectedDate.toLocal().day &&
-            (_selectedEmotions.isEmpty || _selectedEmotions.contains(entry.emotion)))
+        .where(
+          (entry) =>
+              entry.recordedAt.toLocal().year == _selectedDate.toLocal().year &&
+              entry.recordedAt.toLocal().month ==
+                  _selectedDate.toLocal().month &&
+              entry.recordedAt.toLocal().day == _selectedDate.toLocal().day &&
+              (_selectedEmotions.isEmpty ||
+                  _selectedEmotions.contains(entry.emotion)),
+        )
         .toList();
   }
 
@@ -120,9 +82,7 @@ class _DiaryPageState extends State<DiaryPage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const Center(child: CircularProgressIndicator());
       },
     );
 
@@ -189,14 +149,25 @@ class _DiaryPageState extends State<DiaryPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color.fromRGBO(72, 85, 204, 1), // Header background color
-            hintColor: const Color.fromRGBO(123, 144, 255, 1), // Selected date color
+            primaryColor: const Color.fromRGBO(
+              72,
+              85,
+              204,
+              1,
+            ), // Header background color
+            hintColor: const Color.fromRGBO(
+              123,
+              144,
+              255,
+              1,
+            ), // Selected date color
             colorScheme: const ColorScheme.light(
               primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black, // Body text color
             ),
-            dialogBackgroundColor: Colors.white, // Background color of the calendar
+            dialogBackgroundColor:
+                Colors.white, // Background color of the calendar
           ),
           child: child!,
         );
@@ -225,7 +196,12 @@ class _DiaryPageState extends State<DiaryPage> {
                 gradient: LinearGradient(
                   colors: [
                     Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -262,7 +238,8 @@ class _DiaryPageState extends State<DiaryPage> {
                         onPressed: _goToPreviousDay,
                       ),
                       GestureDetector(
-                        onTap: _selectDate, // Show calendar when the date is tapped
+                        onTap:
+                            _selectDate, // Show calendar when the date is tapped
                         child: Text(
                           "${_selectedDate.toLocal().month}/${_selectedDate.toLocal().day}/${_selectedDate.toLocal().year}",
                           style: const TextStyle(
@@ -273,7 +250,10 @@ class _DiaryPageState extends State<DiaryPage> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                        icon: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
                         onPressed: _goToNextDay,
                       ),
                     ],
@@ -284,64 +264,89 @@ class _DiaryPageState extends State<DiaryPage> {
                   Expanded(
                     child: NotificationListener<ScrollNotification>(
                       onNotification: (ScrollNotification scrollInfo) {
-                        if (!_isLoading && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                        if (!_isLoading &&
+                            scrollInfo.metrics.pixels ==
+                                scrollInfo.metrics.maxScrollExtent) {
                           // User has scrolled to the bottom, refresh the page
                           _fetchDiariesForSelectedDate();
                         }
                         return false;
                       },
                       child: RefreshIndicator(
-                        onRefresh: _fetchDiariesForSelectedDate, // Refresh when pulled down
-                        child: _hasError
-                            ? const Center(
-                                child: Text(
-                                  "Failed to load entries. Please try again.",
-                                  style: TextStyle(fontSize: 16, color: Colors.white70),
-                                ),
-                              )
-                            : entriesForSelectedDate.isEmpty
+                        onRefresh:
+                            _fetchDiariesForSelectedDate, // Refresh when pulled down
+                        child:
+                            _hasError
                                 ? const Center(
-                                    child: Text(
-                                      "No entries for this day.",
-                                      style: TextStyle(fontSize: 16, color: Colors.white70),
+                                  child: Text(
+                                    "Failed to load entries. Please try again.",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white70,
                                     ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.only(bottom: 60), // Add padding to the bottom
-                                    itemCount: entriesForSelectedDate.length,
-                                    itemBuilder: (context, index) {
-                                      final entry = entriesForSelectedDate[index];
-                                      return Card(
-                                        elevation: 4,
-                                        margin: const EdgeInsets.symmetric(vertical: 8),
-                                        child: ListTile(
-                                          title: Text(entry.title),
-                                          subtitle: Text(
-                                            entry.description,
-                                            maxLines: 2, // Show only 2 lines of the description
-                                            overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
-                                            style: const TextStyle(color: Colors.black54),
-                                          ),
-                                          trailing: Icon(
-                                            _getEmotionIcon(entry.emotion),
-                                            color: const Color.fromRGBO(123, 50, 250, 0.8), // Purplish color
-                                            size: 32, // Increased size
-                                          ),
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => DiaryDetailPage(
-                                                  diary: entry,
-                                                  createDiary: false,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
                                   ),
+                                )
+                                : entriesForSelectedDate.isEmpty
+                                ? const Center(
+                                  child: Text(
+                                    "No entries for this day.",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                )
+                                : ListView.builder(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 60,
+                                  ), // Add padding to the bottom
+                                  itemCount: entriesForSelectedDate.length,
+                                  itemBuilder: (context, index) {
+                                    final entry = entriesForSelectedDate[index];
+                                    return Card(
+                                      elevation: 4,
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ),
+                                      child: ListTile(
+                                        title: Text(entry.title),
+                                        subtitle: Text(
+                                          entry.description,
+                                          maxLines:
+                                              2, // Show only 2 lines of the description
+                                          overflow:
+                                              TextOverflow
+                                                  .ellipsis, // Add ellipsis if the text overflows
+                                          style: const TextStyle(
+                                            color: Colors.black54,
+                                          ),
+                                        ),
+                                        trailing: Icon(
+                                          _getEmotionIcon(entry.emotion),
+                                          color: const Color.fromRGBO(
+                                            123,
+                                            50,
+                                            250,
+                                            0.8,
+                                          ), // Purplish color
+                                          size: 32, // Increased size
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => DiaryDetailPage(
+                                                    diary: entry,
+                                                    createDiary: false,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
                       ),
                     ),
                   ),
@@ -353,9 +358,14 @@ class _DiaryPageState extends State<DiaryPage> {
           // Apply blur effect when filter panel is visible
           if (_isFilterPanelVisible)
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust blur intensity
+              filter: ImageFilter.blur(
+                sigmaX: 5.0,
+                sigmaY: 5.0,
+              ), // Adjust blur intensity
               child: Container(
-                color: Colors.black.withOpacity(0.2), // Optional: Add a semi-transparent overlay
+                color: Colors.black.withOpacity(
+                  0.2,
+                ), // Optional: Add a semi-transparent overlay
               ),
             ),
 
@@ -371,7 +381,12 @@ class _DiaryPageState extends State<DiaryPage> {
                 gradient: const LinearGradient(
                   colors: [
                     Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -386,7 +401,9 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 40), // Space between the arrow and text
+                  const SizedBox(
+                    height: 40,
+                  ), // Space between the arrow and text
                   Padding(
                     padding: const EdgeInsets.only(top: 20, left: 15),
                     child: Row(
@@ -418,56 +435,87 @@ class _DiaryPageState extends State<DiaryPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: DiaryType.values.map((emotion) {
-                            final isSelected = _selectedEmotions.contains(emotion);
-                            return GestureDetector(
-                              onTap: () {
-                                _toggleEmotion(emotion);
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: isSelected ? Colors.white : Colors.transparent,
-                                    width: 1.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: isSelected
-                                      ? const Color.fromRGBO(85, 123, 233, 1) // Selected button color
-                                      : Colors.white, // Default button color
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      _getEmotionIcon(emotion),
-                                      color: const Color.fromRGBO(123, 50, 250, 1), // Purplish color
-                                      size: 28, // Increased size
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      emotion.name,
-                                      style: TextStyle(
-                                        color: isSelected ? Colors.white : const Color.fromRGBO(72, 85, 204, 1),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: "Poppins",
+                          children:
+                              DiaryType.values.map((emotion) {
+                                final isSelected = _selectedEmotions.contains(
+                                  emotion,
+                                );
+                                return GestureDetector(
+                                  onTap: () {
+                                    _toggleEmotion(emotion);
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                        width: 1.5,
                                       ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color:
+                                          isSelected
+                                              ? const Color.fromRGBO(
+                                                85,
+                                                123,
+                                                233,
+                                                1,
+                                              ) // Selected button color
+                                              : Colors
+                                                  .white, // Default button color
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 15,
+                                    ),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          _getEmotionIcon(emotion),
+                                          color: const Color.fromRGBO(
+                                            123,
+                                            50,
+                                            250,
+                                            1,
+                                          ), // Purplish color
+                                          size: 28, // Increased size
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          emotion.name,
+                                          style: TextStyle(
+                                            color:
+                                                isSelected
+                                                    ? Colors.white
+                                                    : const Color.fromRGBO(
+                                                      72,
+                                                      85,
+                                                      204,
+                                                      1,
+                                                    ),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Poppins",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                         ),
                       ),
                     ),
@@ -513,24 +561,34 @@ class _DiaryPageState extends State<DiaryPage> {
           // Floating Action Button Positioned Upwards
           Positioned(
             bottom: 100, // Adjust the vertical position of the FAB
-            right: _isFilterPanelVisible ? -80 : 20, // Slide the FAB out when the filter panel is open
+            right:
+                _isFilterPanelVisible
+                    ? -80
+                    : 20, // Slide the FAB out when the filter panel is open
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
-              opacity: _isFilterPanelVisible ? 0.0 : 1.0, // Hide the FAB when the filter panel is open
+              opacity:
+                  _isFilterPanelVisible
+                      ? 0.0
+                      : 1.0, // Hide the FAB when the filter panel is open
               child: FloatingActionButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DiaryDetailPage(
-                        diary: null, // Pass null for creating a new entry
-                        createDiary: true,
-                      ),
+                      builder:
+                          (context) => DiaryDetailPage(
+                            diary: null, // Pass null for creating a new entry
+                            createDiary: true,
+                          ),
                     ),
                   );
                 },
                 backgroundColor: Colors.white,
-                child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+                child: const Icon(
+                  Icons.add,
+                  color: Color.fromRGBO(72, 85, 204, 1),
+                ),
               ),
             ),
           ),

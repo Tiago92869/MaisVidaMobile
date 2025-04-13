@@ -18,10 +18,8 @@ class UserService {
 
   Future<void> _loadStoredCredentials() async {
     print('Loading stored credentials...');
-    // _accessToken = await _storage.read(key: 'accessToken');
-    // _userId = await _storage.read(key: 'userId');
-    _accessToken = "testeste";
-    _userId = "asdasd";
+    _accessToken = await _storage.read(key: 'accessToken');
+    _userId = await _storage.read(key: 'userId');
 
     if (_accessToken != null) {
       print('Access token loaded: $_accessToken');
@@ -46,19 +44,22 @@ class UserService {
       final requestUrl = '$_baseUrl/mine';
       print('Request URL for getUserById: $requestUrl'); // Log the request URL
 
-      final response = await http.get(
-        Uri.parse(requestUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $_accessToken',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(requestUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $_accessToken',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response status code: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -78,23 +79,22 @@ class UserService {
     print('Attempting login with username: $username');
     final queryParameters = {'username': username, 'password': password};
 
-    final uri =
-        Uri.parse('$_tokenUrl').replace(queryParameters: queryParameters);
+    final uri = Uri.parse(
+      '$_tokenUrl',
+    ).replace(queryParameters: queryParameters);
     print('Request URL for login: $uri'); // Log the request URL
 
     try {
-      final response = await http.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      ).timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+      final response = await http
+          .post(uri, headers: {'Content-Type': 'application/json'})
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response status code: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -139,24 +139,27 @@ class UserService {
       final requestBody = json.encode(user.toJson());
       final requestUrl = '$_baseUrl/$_userId';
       print('Request URL for updateUser: $requestUrl'); // Log the request URL
-      print('Request body for updateUser: $requestBody'); // Log the request body
+      print(
+        'Request body for updateUser: $requestBody',
+      ); // Log the request body
 
       final response = await http
           .patch(
-        Uri.parse(requestUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $_accessToken',
-        },
-        body: requestBody,
-      )
+            Uri.parse(requestUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $_accessToken',
+            },
+            body: requestBody,
+          )
           .timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response status code: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -178,23 +181,24 @@ class UserService {
       final requestBody = json.encode(user.toJson());
       final requestUrl = '$_baseUrl/create';
       print('Request URL for createUser: $requestUrl'); // Log the request URL
-      print('Request body for createUser: $requestBody'); // Log the request body
+      print(
+        'Request body for createUser: $requestBody',
+      ); // Log the request body
 
       final response = await http
           .post(
-        Uri.parse(requestUrl),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      )
+            Uri.parse(requestUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: requestBody,
+          )
           .timeout(
-        _timeoutDuration,
-        onTimeout: () {
-          throw TimeoutException(
-              'The connection has timed out, please try again later.');
-        },
-      );
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
 
       print('Response status code: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -211,13 +215,14 @@ class UserService {
   }
 
   // Method to update the user's password
-  Future<void> updateUserPassword(String userId, PasswordUpdateDTO passwordUpdateDTO) async {
+  Future<void> updateUserPassword(
+    String userId,
+    PasswordUpdateDTO passwordUpdateDTO,
+  ) async {
     final url = Uri.parse('$_baseUrl/users/$userId/password');
     final response = await http.patch(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode(passwordUpdateDTO.toJson()),
     );
 

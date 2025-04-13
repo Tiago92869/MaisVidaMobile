@@ -29,59 +29,6 @@ class _GoalsPageState extends State<GoalsPage> {
   void initState() {
     super.initState();
     _selectedDay = null; // Do not select any day when the page opens
-
-    // Add mock goals for testing
-    _goals = [
-      GoalInfoCard(
-        id: "1",
-        title: "Learn Flutter",
-        description: "Complete the Flutter tutorial and build a sample app.",
-        goalDate: DateTime.now().add(const Duration(days: 1)),
-        completedDate: null,
-        completed: false,
-        hasNotifications: true,
-        subject: GoalSubject.Studies,
-        createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      GoalInfoCard(
-        id: "2",
-        title: "Workout",
-        description: "Do a 30-minute workout session.",
-        goalDate: DateTime.now().add(const Duration(days: 2)),
-        completedDate: null,
-        completed: false,
-        hasNotifications: false,
-        subject: GoalSubject.Personal,
-        createdAt: DateTime.now().subtract(const Duration(days: 15)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 10)),
-      ),
-      GoalInfoCard(
-        id: "3",
-        title: "Team Meeting",
-        description: "Attend the weekly team meeting and discuss project updates.",
-        goalDate: DateTime.now().add(const Duration(days: 3)),
-        completedDate: null,
-        completed: false,
-        hasNotifications: true,
-        subject: GoalSubject.Work,
-        createdAt: DateTime.now().subtract(const Duration(days: 20)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 15)),
-      ),
-      GoalInfoCard(
-        id: "4",
-        title: "Family Dinner",
-        description: "Have dinner with family and spend quality time together.",
-        goalDate: DateTime.now().add(const Duration(days: 4)),
-        completedDate: null,
-        completed: false,
-        hasNotifications: false,
-        subject: GoalSubject.Family,
-        createdAt: DateTime.now().subtract(const Duration(days: 25)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 20)),
-      ),
-    ];
-
     _fetchGoalsForWeek(); // Fetch goals for the initial week
   }
 
@@ -171,8 +118,18 @@ class _GoalsPageState extends State<GoalsPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(102, 122, 236, 1), // Start color (darker blue)
-                    Color.fromRGBO(255, 255, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      102,
+                      122,
+                      236,
+                      1,
+                    ), // Start color (darker blue)
+                    Color.fromRGBO(
+                      255,
+                      255,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -187,7 +144,10 @@ class _GoalsPageState extends State<GoalsPage> {
               ignoring: _isFilterPanelVisible,
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -211,7 +171,10 @@ class _GoalsPageState extends State<GoalsPage> {
                           // Left Arrow
                           IconButton(
                             onPressed: () => _moveWeek(-1),
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            ),
                             iconSize: 30, // Arrow size
                           ),
                           // Week Days
@@ -219,79 +182,101 @@ class _GoalsPageState extends State<GoalsPage> {
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
                               transitionBuilder: (child, animation) {
-                                return FadeTransition(opacity: animation, child: child);
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
                               },
                               child: Row(
                                 key: ValueKey(_currentWeekStart),
-                                mainAxisAlignment: MainAxisAlignment.spaceAround, // Adjust spacing
-                                children: weekDays.map((day) {
-                                  final isSelected = _selectedDay?.day == day.day &&
-                                      _selectedDay?.month == day.month &&
-                                      _selectedDay?.year == day.year;
+                                mainAxisAlignment:
+                                    MainAxisAlignment
+                                        .spaceAround, // Adjust spacing
+                                children:
+                                    weekDays.map((day) {
+                                      final isSelected =
+                                          _selectedDay?.day == day.day &&
+                                          _selectedDay?.month == day.month &&
+                                          _selectedDay?.year == day.year;
 
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        if (isSelected) {
-                                          // Deselect the date if it's already selected
-                                          _selectedDay = null;
-                                        } else {
-                                          // Select the new date
-                                          _selectedDay = day;
-                                        }
-                                      });
-                                    },
-                                    child: Column(
-                                      children: [
-                                        // Day of the week
-                                        Text(
-                                          "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-
-                                        // Date with conditional purple container
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Reduced horizontal padding
-                                          decoration: isSelected
-                                              ? BoxDecoration(
-                                                  color: const Color.fromRGBO(85, 123, 233, 1), // Purple background
-                                                  borderRadius: BorderRadius.circular(12),
-                                                )
-                                              : null, // No decoration if not selected
-                                          child: Text(
-                                            day.day.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            if (isSelected) {
+                                              // Deselect the date if it's already selected
+                                              _selectedDay = null;
+                                            } else {
+                                              // Select the new date
+                                              _selectedDay = day;
+                                            }
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            // Day of the week
+                                            Text(
+                                              "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
+                                            const SizedBox(height: 4),
 
-                                        // Month abbreviation
-                                        Text(
-                                          "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                          ),
+                                            // Date with conditional purple container
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 6,
+                                              ), // Reduced horizontal padding
+                                              decoration:
+                                                  isSelected
+                                                      ? BoxDecoration(
+                                                        color: const Color.fromRGBO(
+                                                          85,
+                                                          123,
+                                                          233,
+                                                          1,
+                                                        ), // Purple background
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
+                                                            ),
+                                                      )
+                                                      : null, // No decoration if not selected
+                                              child: Text(
+                                                day.day.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+
+                                            // Month abbreviation
+                                            Text(
+                                              "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
+                                      );
+                                    }).toList(),
                               ),
                             ),
                           ),
                           // Right Arrow
                           IconButton(
                             onPressed: () => _moveWeek(1),
-                            icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                            ),
                             iconSize: 30, // Arrow size
                           ),
                         ],
@@ -300,7 +285,8 @@ class _GoalsPageState extends State<GoalsPage> {
                       // Goals Container
                       Expanded(
                         child: RefreshIndicator(
-                          onRefresh: _fetchGoalsForWeek, // Refresh goals when pulled down
+                          onRefresh:
+                              _fetchGoalsForWeek, // Refresh goals when pulled down
                           child: Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
@@ -320,19 +306,28 @@ class _GoalsPageState extends State<GoalsPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => GoalDetailPage(goal: goal, createResource: false,),
+                                            builder:
+                                                (context) => GoalDetailPage(
+                                                  goal: goal,
+                                                  createResource: false,
+                                                ),
                                           ),
                                         );
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.only(bottom: 20),
+                                        margin: const EdgeInsets.only(
+                                          bottom: 20,
+                                        ),
                                         padding: const EdgeInsets.all(20),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             // Goal Title
                                             Text(
@@ -359,20 +354,36 @@ class _GoalsPageState extends State<GoalsPage> {
 
                                             // Subject and Completed Toggle
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 // Subject
                                                 Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6,
+                                                      ),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.white.withOpacity(0.2),
-                                                    borderRadius: BorderRadius.circular(20),
+                                                    color: Colors.white
+                                                        .withOpacity(0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
                                                   child: Text(
-                                                    StringCapitalization(goal.subject.toString().split('.').last).capitalizeFirstLetter(),
+                                                    StringCapitalization(
+                                                      goal.subject
+                                                          .toString()
+                                                          .split('.')
+                                                          .last,
+                                                    ).capitalizeFirstLetter(),
                                                     style: const TextStyle(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   ),
@@ -382,16 +393,21 @@ class _GoalsPageState extends State<GoalsPage> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      goal.completed ? "Completed" : "Not Completed",
+                                                      goal.completed
+                                                          ? "Completed"
+                                                          : "Not Completed",
                                                       style: const TextStyle(
                                                         fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         color: Colors.white70,
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
                                                     Switch(
-                                                      value: goal.completed ?? false,
+                                                      value:
+                                                          goal.completed ??
+                                                          false,
                                                       onChanged: null,
                                                     ),
                                                   ],
@@ -414,12 +430,19 @@ class _GoalsPageState extends State<GoalsPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const GoalDetailPage(goal: null, createResource: true,), // No goal passed
+                                          builder:
+                                              (context) => const GoalDetailPage(
+                                                goal: null,
+                                                createResource: true,
+                                              ), // No goal passed
                                         ),
                                       );
                                     },
                                     backgroundColor: Colors.white,
-                                    child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+                                    child: const Icon(
+                                      Icons.add,
+                                      color: Color.fromRGBO(72, 85, 204, 1),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -436,9 +459,14 @@ class _GoalsPageState extends State<GoalsPage> {
           // Apply blur effect when filter panel is visible
           if (_isFilterPanelVisible)
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust blur intensity
+              filter: ImageFilter.blur(
+                sigmaX: 5.0,
+                sigmaY: 5.0,
+              ), // Adjust blur intensity
               child: Container(
-                color: Colors.black.withOpacity(0.2), // Optional: Add a semi-transparent overlay
+                color: Colors.black.withOpacity(
+                  0.2,
+                ), // Optional: Add a semi-transparent overlay
               ),
             ),
           // Filter Icon Positioned
@@ -484,7 +512,12 @@ class _GoalsPageState extends State<GoalsPage> {
                 gradient: const LinearGradient(
                   colors: [
                     Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -499,7 +532,9 @@ class _GoalsPageState extends State<GoalsPage> {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 40), // Space between the arrow and text
+                  const SizedBox(
+                    height: 40,
+                  ), // Space between the arrow and text
                   Padding(
                     padding: const EdgeInsets.only(top: 20, left: 15),
                     child: Row(
@@ -531,57 +566,85 @@ class _GoalsPageState extends State<GoalsPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: GoalSubject.values.map((subject) {
-                            bool isSelected = _selectedSubjects.contains(subject);
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    _selectedSubjects.remove(subject);
-                                  } else {
-                                    _selectedSubjects.add(subject);
-                                  }
-                                });
-                                _updateFilters(_selectedSubjects); // Update filters and fetch goals
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: isSelected ? Colors.white : Colors.transparent,
-                                    width: 1.5,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: isSelected
-                                      ? const Color.fromRGBO(85, 123, 233, 1) // Selected button color
-                                      : Colors.white, // Default button color
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
+                          children:
+                              GoalSubject.values.map((subject) {
+                                bool isSelected = _selectedSubjects.contains(
+                                  subject,
+                                );
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isSelected) {
+                                        _selectedSubjects.remove(subject);
+                                      } else {
+                                        _selectedSubjects.add(subject);
+                                      }
+                                    });
+                                    _updateFilters(
+                                      _selectedSubjects,
+                                    ); // Update filters and fetch goals
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color:
+                                          isSelected
+                                              ? const Color.fromRGBO(
+                                                85,
+                                                123,
+                                                233,
+                                                1,
+                                              ) // Selected button color
+                                              : Colors
+                                                  .white, // Default button color
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: Center(
-                                  child: Text(
-                                    StringCapitalization(subject.toString().split('.').last).capitalizeFirstLetter(),
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? Colors.white
-                                          : const Color.fromRGBO(72, 85, 204, 1),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Poppins",
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 15,
+                                    ),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        StringCapitalization(
+                                          subject.toString().split('.').last,
+                                        ).capitalizeFirstLetter(),
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : const Color.fromRGBO(
+                                                    72,
+                                                    85,
+                                                    204,
+                                                    1,
+                                                  ),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Poppins",
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }).toList(),
                         ),
                       ),
                     ),
