@@ -13,6 +13,7 @@ class GoalsPage extends StatefulWidget {
 
 class _GoalsPageState extends State<GoalsPage> {
   final GoalService _goalService = GoalService();
+  final ScrollController _scrollController = ScrollController();
 
   DateTime _currentWeekStart = DateTime.now();
   DateTime? _selectedDay;
@@ -21,11 +22,30 @@ class _GoalsPageState extends State<GoalsPage> {
 
   List<GoalInfoCard> _goals = [];
   bool _isLoading = false;
+  bool _isFetchingMore = false; // To track if more data is being fetched
+  int _currentPage = 0; // Current page
+  int _totalPages = 1; // Total pages (default to 1)
 
   @override
   void initState() {
     super.initState();
     _fetchGoalsForWeek();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        !_isFetchingMore &&
+        _currentPage < _totalPages - 1) {
+      _fetchMoreGoals();
+    }
   }
 
   Future<void> _fetchGoalsForWeek({int page = 0, int size = 10}) async {
@@ -43,6 +63,8 @@ class _GoalsPageState extends State<GoalsPage> {
       );
       setState(() {
         _goals = pagezGoals.goals;
+        _currentPage = pagezGoals.pageNumber;
+        _totalPages = pagezGoals.totalPages;
       });
     } catch (e) {
       _showErrorSnackbar("Failed to fetch goals. Please try again.");
@@ -68,11 +90,38 @@ class _GoalsPageState extends State<GoalsPage> {
       );
       setState(() {
         _goals = pagezGoals.goals;
+        _currentPage = pagezGoals.pageNumber;
+        _totalPages = pagezGoals.totalPages;
       });
     } catch (e) {
       _showErrorSnackbar("Failed to fetch goals. Please try again.");
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _fetchMoreGoals() async {
+    setState(() => _isFetchingMore = true);
+    try {
+      final startDate = _currentWeekStart;
+      final endDate = _currentWeekStart.add(const Duration(days: 6));
+      final pagezGoals = await _goalService.fetchGoals(
+        null,
+        startDate,
+        endDate,
+        _selectedSubjects.toList(),
+        page: _currentPage + 1,
+        size: 10,
+      );
+      setState(() {
+        _goals.addAll(pagezGoals.goals); // Append new goals to the list
+        _currentPage = pagezGoals.pageNumber;
+        _totalPages = pagezGoals.totalPages;
+      });
+    } catch (e) {
+      _showErrorSnackbar("Failed to fetch more goals. Please try again.");
+    } finally {
+      setState(() => _isFetchingMore = false);
     }
   }
 
@@ -300,9 +349,18 @@ class _GoalsPageState extends State<GoalsPage> {
 
     return Expanded(
       child: ListView.builder(
+        controller: _scrollController, // Attach the ScrollController
         padding: const EdgeInsets.all(20),
-        itemCount: _goals.length,
+        itemCount: _goals.length + (_isFetchingMore ? 1 : 0),
         itemBuilder: (context, index) {
+          if (index == _goals.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
           final goal = _goals[index];
           return _buildGoalCard(goal);
         },

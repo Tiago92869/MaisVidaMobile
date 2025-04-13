@@ -83,11 +83,8 @@ class GoalService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> json = jsonDecode(response.body);
 
-        // Extract the content field from the response
-        final Map<String, dynamic> content = json['content'];
-
-        // Parse the content into a PagezGoalsDTO
-        return PagezGoalsDTO.fromJson(content);
+        // Parse the JSON into a PagezGoalsDTO
+        return PagezGoalsDTO.fromJson(json);
       } else {
         print('Failed to load goals. Status Code: ${response.statusCode}');
         throw Exception('Failed to load goals');

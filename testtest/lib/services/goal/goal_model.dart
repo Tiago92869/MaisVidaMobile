@@ -88,24 +88,39 @@ class PagezGoalsDTO {
   final int totalPages;
   final int totalElements;
   final int pageNumber;
+  final int pageSize;
+  final int numberOfElements;
+  final bool isFirst;
+  final bool isLast;
+  final bool isEmpty;
   final List<GoalInfoCard> goals;
 
   PagezGoalsDTO({
     required this.totalPages,
     required this.totalElements,
     required this.pageNumber,
+    required this.pageSize,
+    required this.numberOfElements,
+    required this.isFirst,
+    required this.isLast,
+    required this.isEmpty,
     required this.goals,
   });
 
   factory PagezGoalsDTO.fromJson(Map<String, dynamic> json) {
-    var goalsJson = json['goals'] as List;
+    var contentJson = json['content'] as List;
     List<GoalInfoCard> goalsList =
-        goalsJson.map((goal) => GoalInfoCard.fromJson(goal)).toList();
+        contentJson.map((goal) => GoalInfoCard.fromJson(goal)).toList();
 
     return PagezGoalsDTO(
       totalPages: json['totalPages'],
       totalElements: json['totalElements'],
-      pageNumber: json['pageNumber'],
+      pageNumber: json['number'],
+      pageSize: json['size'],
+      numberOfElements: json['numberOfElements'],
+      isFirst: json['first'],
+      isLast: json['last'],
+      isEmpty: json['empty'],
       goals: goalsList,
     );
   }
