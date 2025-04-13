@@ -387,7 +387,15 @@ class _GoalsPageState extends State<GoalsPage> {
                 (context) => GoalDetailPage(
                   goal: goal,
                   createResource: false,
-                  onSave: _fetchGoalsForWeek,
+                  onSave: () {
+                    if (_selectedDay != null) {
+                      _fetchGoalsForDay(
+                        _selectedDay!,
+                      ); // Fetch goals for the selected day
+                    } else {
+                      _fetchGoalsForWeek(); // Fetch goals for the entire week
+                    }
+                  },
                 ),
           ),
         ).then((value) {
@@ -699,17 +707,7 @@ class _GoalsPageState extends State<GoalsPage> {
                     },
                   ),
             ),
-          ).then((value) {
-            if (value == true) {
-              if (_selectedDay != null) {
-                _fetchGoalsForDay(
-                  _selectedDay!,
-                ); // Fetch goals for the selected day
-              } else {
-                _fetchGoalsForWeek(); // Fetch goals for the entire week
-              }
-            }
-          });
+          );
         },
         backgroundColor: Colors.white,
         child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
