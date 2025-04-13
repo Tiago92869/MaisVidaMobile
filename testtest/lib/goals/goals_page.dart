@@ -354,7 +354,13 @@ class _GoalsPageState extends State<GoalsPage> {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: () async {
-          await _fetchGoalsForWeek(); // Call the fetch method on refresh
+          if (_selectedDay != null) {
+            await _fetchGoalsForDay(
+              _selectedDay!,
+            ); // Fetch goals for the selected day
+          } else {
+            await _fetchGoalsForWeek(); // Fetch goals for the entire week
+          }
         },
         child: ListView.builder(
           controller: _scrollController, // Attach the ScrollController
@@ -398,9 +404,16 @@ class _GoalsPageState extends State<GoalsPage> {
                   },
                 ),
           ),
-        ).then((value) {
-          if (value == true) {
-            _fetchGoalsForWeek();
+        ).then((result) {
+          if (result == true) {
+            // Check if a day is selected and fetch accordingly
+            if (_selectedDay != null) {
+              _fetchGoalsForDay(
+                _selectedDay!,
+              ); // Fetch goals for the selected day
+            } else {
+              _fetchGoalsForWeek(); // Fetch goals for the entire week
+            }
           }
         });
       },

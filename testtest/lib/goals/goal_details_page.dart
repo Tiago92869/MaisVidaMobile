@@ -140,6 +140,80 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     }
   }
 
+  Future<void> _deleteGoal() async {
+    if (widget.goal == null || widget.goal!.id.isEmpty) return;
+
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+
+    try {
+      await _goalService.deleteGoal(widget.goal!.id);
+      print('Goal deleted successfully.');
+
+      if (widget.onSave != null) {
+        widget.onSave!(); // Trigger the callback to refresh goals
+      }
+
+      // Navigate back and pass a flag to indicate deletion
+      Navigator.pop(context, true);
+    } catch (e) {
+      print('Error deleting goal: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to delete goal. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading indicator
+      });
+    }
+  }
+
+  Future<bool> _showDeleteConfirmationDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Delete Goal",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Text(
+                "Are you sure you want to delete this goal? This action cannot be undone.",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    "Delete",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Return false if the dialog is dismissed
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -512,6 +586,24 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ),
             ),
           ),
+          // Delete Button
+          if (!widget.createResource) // Show only when editing an existing goal
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: GestureDetector(
+                onTap: () async {
+                  final shouldDelete = await _showDeleteConfirmationDialog();
+                  if (shouldDelete) {
+                    await _deleteGoal();
+                  }
+                },
+                child: CircleAvatar(
+                  backgroundColor: Colors.red,
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+              ),
+            ),
         ],
       ),
     );
