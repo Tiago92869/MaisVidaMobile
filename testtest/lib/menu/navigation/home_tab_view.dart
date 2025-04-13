@@ -104,14 +104,16 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   Future<void> _fetchGoals() async {
     try {
-      final goals = await _goalService.fetchGoals(
+      final pagezGoals = await _goalService.fetchGoals(
         false,
         DateTime.now(),
         DateTime.now(),
         [],
+        page: 0,
+        size: 3, // Fetch only the first 3 goals
       );
       setState(() {
-        _goals = goals[0].goals.take(3).toList();
+        _goals = pagezGoals.goals; // Extract goals from the PagezGoalsDTO
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch goals.");

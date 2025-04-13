@@ -28,19 +28,21 @@ class _GoalsPageState extends State<GoalsPage> {
     _fetchGoalsForWeek();
   }
 
-  Future<void> _fetchGoalsForWeek() async {
+  Future<void> _fetchGoalsForWeek({int page = 0, int size = 10}) async {
     setState(() => _isLoading = true);
     try {
       final startDate = _currentWeekStart;
       final endDate = _currentWeekStart.add(const Duration(days: 6));
-      final goalDays = await _goalService.fetchGoals(
+      final pagezGoals = await _goalService.fetchGoals(
         null,
         startDate,
         endDate,
         _selectedSubjects.toList(),
+        page: page,
+        size: size,
       );
       setState(() {
-        _goals = goalDays.expand((goalDay) => goalDay.goals).toList();
+        _goals = pagezGoals.goals;
       });
     } catch (e) {
       _showErrorSnackbar("Failed to fetch goals. Please try again.");
@@ -49,17 +51,23 @@ class _GoalsPageState extends State<GoalsPage> {
     }
   }
 
-  Future<void> _fetchGoalsForDay(DateTime day) async {
+  Future<void> _fetchGoalsForDay(
+    DateTime day, {
+    int page = 0,
+    int size = 10,
+  }) async {
     setState(() => _isLoading = true);
     try {
-      final goalDays = await _goalService.fetchGoals(
+      final pagezGoals = await _goalService.fetchGoals(
         null,
         day,
         day,
         _selectedSubjects.toList(),
+        page: page,
+        size: size,
       );
       setState(() {
-        _goals = goalDays.expand((goalDay) => goalDay.goals).toList();
+        _goals = pagezGoals.goals;
       });
     } catch (e) {
       _showErrorSnackbar("Failed to fetch goals. Please try again.");

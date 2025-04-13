@@ -84,4 +84,31 @@ class GoalDay {
   }
 }
 
+class PagezGoalsDTO {
+  final int totalPages;
+  final int totalElements;
+  final int pageNumber;
+  final List<GoalInfoCard> goals;
+
+  PagezGoalsDTO({
+    required this.totalPages,
+    required this.totalElements,
+    required this.pageNumber,
+    required this.goals,
+  });
+
+  factory PagezGoalsDTO.fromJson(Map<String, dynamic> json) {
+    var goalsJson = json['goals'] as List;
+    List<GoalInfoCard> goalsList =
+        goalsJson.map((goal) => GoalInfoCard.fromJson(goal)).toList();
+
+    return PagezGoalsDTO(
+      totalPages: json['totalPages'],
+      totalElements: json['totalElements'],
+      pageNumber: json['pageNumber'],
+      goals: goalsList,
+    );
+  }
+}
+
 DateTime? parseDate(String? date) => date != null ? DateTime.parse(date) : null;

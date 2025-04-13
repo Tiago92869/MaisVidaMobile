@@ -33,12 +33,14 @@ class GoalService {
     }
   }
 
-  Future<List<GoalDay>> fetchGoals(
+  Future<PagezGoalsDTO> fetchGoals(
     bool? isCompleted,
     DateTime startDate,
     DateTime endDate,
-    List<GoalSubject> goalSubjects,
-  ) async {
+    List<GoalSubject> goalSubjects, {
+    int page = 0,
+    int size = 10,
+  }) async {
     await _loadStoredCredentials();
     try {
       print('Fetching goals...');
@@ -52,7 +54,8 @@ class GoalService {
           isCompleted != null ? '&isCompleted=$isCompleted' : '';
       final String url =
           '$_baseUrl?&userId=$_userId$isCompletedQuery&$subjectsQuery'
-          '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}'; // Add page and size to the query
+          '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}'
+          '&page=$page&size=$size'; // Added pagination parameters
 
       print('Request URL for fetchGoals: $url'); // Log the request URL
 
@@ -78,11 +81,13 @@ class GoalService {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonList = jsonDecode(response.body);
-        final List<GoalDay> goalDays =
-            jsonList.map((json) => GoalDay.fromJson(json)).toList();
-        print('Goals fetched successfully. Total goals: ${goalDays.length}');
-        return goalDays;
+        final Map<String, dynamic> json = jsonDecode(response.body);
+
+        // Extract the content field from the response
+        final Map<String, dynamic> content = json['content'];
+
+        // Parse the content into a PagezGoalsDTO
+        return PagezGoalsDTO.fromJson(content);
       } else {
         print('Failed to load goals. Status Code: ${response.statusCode}');
         throw Exception('Failed to load goals');
