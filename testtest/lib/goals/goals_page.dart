@@ -324,7 +324,11 @@ class _GoalsPageState extends State<GoalsPage> {
 
   Widget _buildGoalsList() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Expanded(
+        child: Center(
+          child: CircularProgressIndicator(), // Center the loading indicator
+        ),
+      );
     }
 
     if (_goals.isEmpty) {
@@ -348,22 +352,27 @@ class _GoalsPageState extends State<GoalsPage> {
     }
 
     return Expanded(
-      child: ListView.builder(
-        controller: _scrollController, // Attach the ScrollController
-        padding: const EdgeInsets.all(20),
-        itemCount: _goals.length + (_isFetchingMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == _goals.length) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-          final goal = _goals[index];
-          return _buildGoalCard(goal);
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await _fetchGoalsForWeek(); // Call the fetch method on refresh
         },
+        child: ListView.builder(
+          controller: _scrollController, // Attach the ScrollController
+          padding: const EdgeInsets.all(20),
+          itemCount: _goals.length + (_isFetchingMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == _goals.length) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            final goal = _goals[index];
+            return _buildGoalCard(goal);
+          },
+        ),
       ),
     );
   }
@@ -480,6 +489,9 @@ class _GoalsPageState extends State<GoalsPage> {
   }
 
   Widget _buildFilterIcon() {
+    final bool hasFilters =
+        _selectedSubjects.isNotEmpty; // Check if filters are selected
+
     return Positioned(
       top: 58,
       right: 20,
@@ -487,21 +499,42 @@ class _GoalsPageState extends State<GoalsPage> {
         onTap: _toggleFilterPanel,
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 5,
-                  offset: const Offset(0, 5),
+          child: Stack(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 5,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: const Icon(Icons.filter_alt, color: Colors.blue, size: 28),
+                child: const Icon(
+                  Icons.filter_alt,
+                  color: Colors.blue,
+                  size: 28,
+                ),
+              ),
+              if (hasFilters) // Show the small circle only if filters are selected
+                Positioned(
+                  top: 3,
+                  right: 4,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue, // Red color for the indicator
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),

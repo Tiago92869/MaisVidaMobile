@@ -31,6 +31,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   bool completed = false; // Local variable for completed toggle
   late bool editMode; // Tracks if the user is editing
   bool _isLoading = false; // Tracks if a save operation is in progress
+  bool _showFirstStarfish = true; // Randomly show one of the starfish images
 
   @override
   void initState() {
@@ -52,9 +53,36 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      firstDate: DateTime(2000), // Earliest selectable date
+      lastDate: DateTime(2100), // Latest selectable date
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color.fromRGBO(
+              72,
+              85,
+              204,
+              1,
+            ), // Header background color
+            hintColor: const Color.fromRGBO(
+              123,
+              144,
+              255,
+              1,
+            ), // Selected date color
+            colorScheme: const ColorScheme.light(
+              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              onPrimary: Colors.white, // Header text color
+              onSurface: Colors.black, // Body text color
+            ),
+            dialogBackgroundColor:
+                Colors.white, // Background color of the calendar
+          ),
+          child: child!,
+        );
+      },
     );
+
     if (pickedDate != null && pickedDate != selectedDate) {
       setState(() {
         selectedDate = pickedDate;
@@ -142,6 +170,43 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ),
             ),
           ),
+
+          // Randomly show one of the starfish images
+          if (_showFirstStarfish)
+            Positioned(
+              right: 80,
+              top: 320,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.7,
+                  child: Image.asset(
+                    'assets/images/starfish2.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            )
+          else
+            Positioned(
+              left: 100,
+              top: 250,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.5,
+                  child: Image.asset(
+                    'assets/images/starfish1.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+
           // Content
           SafeArea(
             child: Padding(
