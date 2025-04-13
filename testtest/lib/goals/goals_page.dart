@@ -24,6 +24,10 @@ class _GoalsPageState extends State<GoalsPage> {
 
   List<GoalInfoCard> _goals = []; // List of goals to display
   bool _isLoading = false; // Loading state
+  bool _isFetchingMore = false; // Fetching more goals state
+  bool _hasMoreGoals = true; // Flag to indicate if there are more goals
+  int _currentPage = 0; // Current page for pagination
+  final int _pageSize = 10; // Number of goals per page
 
   @override
   void initState() {
@@ -33,9 +37,17 @@ class _GoalsPageState extends State<GoalsPage> {
   }
 
   // Function to fetch goals for the current week and selected subjects
-  Future<void> _fetchGoalsForWeek() async {
+  Future<void> _fetchGoalsForWeek({bool isLoadMore = false}) async {
+    if (isLoadMore && (_isFetchingMore || !_hasMoreGoals)) return;
+
     setState(() {
-      _isLoading = true;
+      if (isLoadMore) {
+        _isFetchingMore = true;
+      } else {
+        _isLoading = true;
+        _currentPage = 0; // Reset to the first page when not loading more
+        _hasMoreGoals = true; // Reset the flag for more goals
+      }
     });
 
     try {
@@ -47,13 +59,26 @@ class _GoalsPageState extends State<GoalsPage> {
         startDate,
         endDate,
         _selectedSubjects.toList(), // Selected subjects
+        _currentPage, // Pass the current page
+        _pageSize, // Pass the page size
       );
 
       // Flatten the list of goals from all days
       final fetchedGoals = goalDays.expand((goalDay) => goalDay.goals).toList();
 
       setState(() {
-        _goals = fetchedGoals; // Replace the goals list with the new data
+        if (isLoadMore) {
+          _goals.addAll(fetchedGoals); // Append new goals to the list
+          _isFetchingMore = false;
+        } else {
+          _goals = fetchedGoals; // Replace the goals list with the new data
+        }
+
+        // Check if there are more goals to fetch
+        _hasMoreGoals = fetchedGoals.length == _pageSize;
+        if (_hasMoreGoals) {
+          _currentPage++; // Increment the page for the next fetch
+        }
       });
     } catch (e) {
       print('Error fetching goals: $e');
@@ -66,6 +91,7 @@ class _GoalsPageState extends State<GoalsPage> {
     } finally {
       setState(() {
         _isLoading = false;
+        _isFetchingMore = false;
       });
     }
   }
@@ -145,7 +171,7 @@ class _GoalsPageState extends State<GoalsPage> {
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+                    horizontal: 10,
                     vertical: 20,
                   ),
                   child: Column(
@@ -227,7 +253,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(
                                                 horizontal: 8,
-                                                vertical: 6,
+                                                vertical: 8,
                                               ), // Reduced horizontal padding
                                               decoration:
                                                   isSelected
@@ -247,7 +273,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                               child: Text(
                                                 day.day.toString(),
                                                 style: const TextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,
                                                 ),
@@ -281,7 +307,7 @@ class _GoalsPageState extends State<GoalsPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       // Goals Container
                       Expanded(
                         child:
@@ -303,21 +329,42 @@ class _GoalsPageState extends State<GoalsPage> {
                                 )
                                 : RefreshIndicator(
                                   onRefresh:
-                                      _fetchGoalsForWeek, // Refresh goals when pulled down
-                                  child: Container(
-                                    padding: const EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                        72,
-                                        85,
-                                        204,
-                                        1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                      () =>
+                                          _fetchGoalsForWeek(), // Refresh goals when pulled down
+                                  child: NotificationListener<
+                                    ScrollNotification
+                                  >(
+                                    onNotification: (
+                                      ScrollNotification scrollInfo,
+                                    ) {
+                                      if (scrollInfo.metrics.pixels ==
+                                              scrollInfo
+                                                  .metrics
+                                                  .maxScrollExtent &&
+                                          !_isFetchingMore &&
+                                          _hasMoreGoals) {
+                                        _fetchGoalsForWeek(
+                                          isLoadMore: true,
+                                        ); // Fetch the next page
+                                      }
+                                      return false;
+                                    },
                                     child: ListView.builder(
-                                      itemCount: _goals.length,
+                                      padding: const EdgeInsets.all(20),
+                                      itemCount:
+                                          _goals.length +
+                                          (_isFetchingMore ? 1 : 0),
                                       itemBuilder: (context, index) {
+                                        if (index == _goals.length) {
+                                          return const Center(
+                                            child: Padding(
+                                              padding: EdgeInsets.all(16.0),
+                                              child:
+                                                  CircularProgressIndicator(), // Loading more indicator
+                                            ),
+                                          );
+                                        }
+
                                         final goal = _goals[index];
                                         return GestureDetector(
                                           onTap: () {
@@ -347,11 +394,30 @@ class _GoalsPageState extends State<GoalsPage> {
                                             ),
                                             padding: const EdgeInsets.all(20),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(
-                                                0.2,
-                                              ),
+                                              color: const Color.fromARGB(
+                                                255,
+                                                33,
+                                                70,
+                                                119,
+                                              ).withOpacity(
+                                                0.8,
+                                              ), // Darker background color
                                               borderRadius:
                                                   BorderRadius.circular(20),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: const Color.fromARGB(
+                                                    255,
+                                                    33,
+                                                    70,
+                                                    119,
+                                                  ).withOpacity(
+                                                    0.3,
+                                                  ), // Add a subtle shadow
+                                                  blurRadius: 5,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
                                             ),
                                             child: Column(
                                               crossAxisAlignment:
@@ -363,7 +429,9 @@ class _GoalsPageState extends State<GoalsPage> {
                                                   style: const TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
+                                                    color:
+                                                        Colors
+                                                            .white, // White text for better contrast
                                                   ),
                                                 ),
                                                 const SizedBox(height: 8),
@@ -376,7 +444,9 @@ class _GoalsPageState extends State<GoalsPage> {
                                                       TextOverflow.ellipsis,
                                                   style: const TextStyle(
                                                     fontSize: 14,
-                                                    color: Colors.white70,
+                                                    color:
+                                                        Colors
+                                                            .white70, // Subtle white text for description
                                                   ),
                                                 ),
                                                 const SizedBox(height: 8),
@@ -396,7 +466,9 @@ class _GoalsPageState extends State<GoalsPage> {
                                                           ),
                                                       decoration: BoxDecoration(
                                                         color: Colors.white
-                                                            .withOpacity(0.2),
+                                                            .withOpacity(
+                                                              0.2,
+                                                            ), // Slightly lighter background
                                                         borderRadius:
                                                             BorderRadius.circular(
                                                               20,
@@ -413,7 +485,9 @@ class _GoalsPageState extends State<GoalsPage> {
                                                           fontSize: 14,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          color: Colors.white,
+                                                          color:
+                                                              Colors
+                                                                  .white, // White text for subject
                                                         ),
                                                       ),
                                                     ),
@@ -430,7 +504,8 @@ class _GoalsPageState extends State<GoalsPage> {
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             color:
-                                                                Colors.white70,
+                                                                Colors
+                                                                    .white70, // Subtle white text for status
                                                           ),
                                                         ),
                                                         const SizedBox(

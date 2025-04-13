@@ -1,9 +1,4 @@
-enum GoalSubject {
-  Personal,
-  Work,
-  Studies,
-  Family,
-}
+enum GoalSubject { Personal, Work, Studies, Family }
 
 extension GoalSubjectExtension on GoalSubject {
   static GoalSubject fromString(String subject) {
@@ -78,23 +73,14 @@ class GoalDay {
   final DateTime day;
   final List<GoalInfoCard> goals;
 
-  GoalDay({
-    required this.day,
-    required this.goals,
-  });
+  GoalDay({required this.day, required this.goals});
 
   factory GoalDay.fromJson(Map<String, dynamic> json) {
-    print('STATUS CODE1');
     var goalsJson = json['goals'] as List;
-    print('STATUS CODE2');
     List<GoalInfoCard> goalsList =
         goalsJson.map((i) => GoalInfoCard.fromJson(i)).toList();
-    print('STATUS CODE3');
 
-    return GoalDay(
-      day: DateTime.parse(json['day']),
-      goals: goalsList,
-    );
+    return GoalDay(day: DateTime.parse(json['day']), goals: goalsList);
   }
 }
 

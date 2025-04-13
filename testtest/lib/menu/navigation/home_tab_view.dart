@@ -109,9 +109,11 @@ class _HomeTabViewState extends State<HomeTabView> {
         DateTime.now(),
         DateTime.now(),
         [],
+        3,
+        0,
       );
       setState(() {
-        _goals = goals[0].goals.take(3).toList();
+        _goals = goals[0].goals.toList();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch goals.");

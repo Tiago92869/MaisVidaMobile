@@ -4,10 +4,22 @@ import 'package:testtest/services/goal/goal_model.dart';
 class GoalRepository {
   final GoalService _goalService = GoalService();
 
-  Future<List<GoalDay>> getGoals(bool isCompleted, DateTime startDate,
-      DateTime endDate, List<GoalSubject> goalSubjects) {
+  Future<List<GoalDay>> getGoals(
+    bool isCompleted,
+    DateTime startDate,
+    DateTime endDate,
+    List<GoalSubject> goalSubjects,
+    int page,
+    int size,
+  ) {
     return _goalService.fetchGoals(
-        isCompleted, startDate, endDate, goalSubjects);
+      isCompleted,
+      startDate,
+      endDate,
+      goalSubjects,
+      page,
+      size,
+    );
   }
 
   Future<GoalInfoCard> addGoal(GoalInfoCard goal) {
