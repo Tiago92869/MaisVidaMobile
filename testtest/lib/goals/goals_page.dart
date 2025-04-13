@@ -53,7 +53,7 @@ class _GoalsPageState extends State<GoalsPage> {
       final fetchedGoals = goalDays.expand((goalDay) => goalDay.goals).toList();
 
       setState(() {
-        _goals = fetchedGoals; // Update the goals list
+        _goals = fetchedGoals; // Replace the goals list with the new data
       });
     } catch (e) {
       print('Error fetching goals: $e');
@@ -321,17 +321,25 @@ class _GoalsPageState extends State<GoalsPage> {
                                         final goal = _goals[index];
                                         return GestureDetector(
                                           onTap: () {
-                                            // Navigate to GoalDetailPage for visualizing the goal
+                                            // For editing an existing goal
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                 builder:
                                                     (context) => GoalDetailPage(
-                                                      goal: goal,
-                                                      createResource: false,
+                                                      goal:
+                                                          goal, // Pass the goal for editing
+                                                      createResource:
+                                                          false, // Indicate editing mode
+                                                      onSave:
+                                                          _fetchGoalsForWeek, // Pass the callback to refresh goals
                                                     ),
                                               ),
-                                            );
+                                            ).then((value) {
+                                              if (value == true) {
+                                                _fetchGoalsForWeek(); // Refresh the goals list after returning
+                                              }
+                                            });
                                           },
                                           child: Container(
                                             margin: const EdgeInsets.only(
@@ -659,14 +667,15 @@ class _GoalsPageState extends State<GoalsPage> {
         ), // Move the button 40 pixels upwards
         child: FloatingActionButton(
           onPressed: () {
-            // Navigate to GoalDetailPage for creating a new goal
+            // For creating a new goal
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder:
                     (context) => GoalDetailPage(
-                      createResource:
-                          true, // Indicate that a new goal is being created
+                      createResource: true, // Indicate creating a new goal
+                      onSave:
+                          _fetchGoalsForWeek, // Pass the callback to refresh goals
                     ),
               ),
             ).then((value) {

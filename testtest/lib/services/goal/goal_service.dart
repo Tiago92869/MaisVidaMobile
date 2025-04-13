@@ -48,8 +48,10 @@ class GoalService {
                 'goalSubjects=${subject.toString().split('.').last.toUpperCase()}',
           )
           .join('&');
+      final String isCompletedQuery =
+          isCompleted != null ? '&isCompleted=$isCompleted' : '';
       final String url =
-          '$_baseUrl?&userId=$_userId&isCompleted=$isCompleted&$subjectsQuery'
+          '$_baseUrl?&userId=$_userId$isCompletedQuery&$subjectsQuery'
           '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}';
 
       print('Request URL for fetchGoals: $url'); // Log the request URL

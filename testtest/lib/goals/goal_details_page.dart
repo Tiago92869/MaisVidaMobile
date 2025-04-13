@@ -3,10 +3,18 @@ import 'package:testtest/services/goal/goal_service.dart';
 import 'package:testtest/services/goal/goal_model.dart';
 
 class GoalDetailPage extends StatefulWidget {
-  final GoalInfoCard? goal; // Pass a goal for viewing/editing, or null for a new goal
-  final bool createResource; // Indicates if the page is opened for creating a new goal
+  final GoalInfoCard?
+  goal; // Pass a goal for viewing/editing, or null for a new goal
+  final bool
+  createResource; // Indicates if the page is opened for creating a new goal
+  final VoidCallback? onSave; // Callback to refresh goals in GoalsPage
 
-  const GoalDetailPage({Key? key, this.goal, required this.createResource}) : super(key: key);
+  const GoalDetailPage({
+    Key? key,
+    this.goal,
+    required this.createResource,
+    this.onSave,
+  }) : super(key: key);
 
   @override
   _GoalDetailPageState createState() => _GoalDetailPageState();
@@ -28,12 +36,16 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.goal?.title ?? "");
-    descriptionController = TextEditingController(text: widget.goal?.description ?? "");
+    descriptionController = TextEditingController(
+      text: widget.goal?.description ?? "",
+    );
     selectedDate = widget.goal?.goalDate ?? DateTime.now();
     selectedSubject = widget.goal?.subject;
     hasNotifications = widget.goal?.hasNotifications ?? false;
     completed = widget.goal?.completed ?? false;
-    editMode = widget.createResource; // Automatically enable edit mode if creating a new goal
+    editMode =
+        widget
+            .createResource; // Automatically enable edit mode if creating a new goal
   }
 
   Future<void> _pickDate() async {
@@ -52,14 +64,18 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
 
   Future<void> _saveGoal() async {
     final updatedGoal = GoalInfoCard(
-      id: widget.goal?.id ?? "", // Use the existing ID for updates or an empty ID for new goals
+      id:
+          widget.goal?.id ??
+          "", // Use the existing ID for updates or an empty ID for new goals
       title: titleController.text,
       description: descriptionController.text,
       goalDate: selectedDate ?? DateTime.now(),
       completedDate: completed ? DateTime.now() : null,
       completed: completed,
       hasNotifications: hasNotifications,
-      subject: selectedSubject ?? GoalSubject.Personal, // Default to Personal if no subject is selected
+      subject:
+          selectedSubject ??
+          GoalSubject.Personal, // Default to Personal if no subject is selected
       createdAt: widget.goal?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -78,6 +94,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         await _goalService.updateGoal(updatedGoal.id, updatedGoal);
         print('Goal updated successfully.');
       }
+      if (widget.onSave != null) {
+        widget.onSave!(); // Trigger the callback to refresh goals
+      }
     } catch (e) {
       print('Error saving goal: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,23 +112,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     }
   }
 
-  Future<void> _handleBackButton() async {
-    if (_isLoading) return; // Prevent multiple operations
-
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing the dialog
-      builder: (BuildContext context) {
-        return const Center(
-          child: CircularProgressIndicator(), // Show loading spinner
-        );
-      },
-    );
-
-    await _saveGoal(); // Save the goal (create or update)
-    Navigator.pop(context); // Close the dialog and the page
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,8 +123,18 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
+                    Color.fromRGBO(
+                      72,
+                      85,
+                      204,
+                      0.9,
+                    ), // Start color (darker blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      0.9,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -139,7 +151,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 children: [
                   // Back button
                   GestureDetector(
-                    onTap: _handleBackButton, // Handle back button with loading
+                    onTap: () {
+                      Navigator.pop(context); // Simply go back without saving
+                    },
                     child: const Icon(
                       Icons.arrow_back,
                       color: Colors.white,
@@ -170,15 +184,20 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     DropdownButton<GoalSubject>(
                       value: selectedSubject,
                       dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
-                      items: GoalSubject.values.map((subject) {
-                        return DropdownMenuItem(
-                          value: subject,
-                          child: Text(
-                            subject.toString().split('.').last.capitalizeFirstLetter(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList(),
+                      items:
+                          GoalSubject.values.map((subject) {
+                            return DropdownMenuItem(
+                              value: subject,
+                              child: Text(
+                                subject
+                                    .toString()
+                                    .split('.')
+                                    .last
+                                    .capitalizeFirstLetter(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }).toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedSubject = value!;
@@ -187,13 +206,21 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     )
                   else
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        selectedSubject?.toString().split('.').last.capitalizeFirstLetter() ?? "No Subject",
+                        selectedSubject
+                                ?.toString()
+                                .split('.')
+                                .last
+                                .capitalizeFirstLetter() ??
+                            "No Subject",
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -219,7 +246,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       GestureDetector(
                         onTap: editMode ? _pickDate : null,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
@@ -240,29 +270,31 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   ),
 
                   // Completed Toggle
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Completed",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
+                  if (!widget.createResource) // Show only when editing
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Completed",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70,
+                          ),
                         ),
-                      ),
-                      Switch(
-                        value: completed,
-                        onChanged: editMode
-                            ? (value) {
-                                setState(() {
-                                  completed = value;
-                                });
-                              }
-                            : null,
-                      ),
-                    ],
-                  ),
+                        Switch(
+                          value: completed,
+                          onChanged:
+                              editMode
+                                  ? (value) {
+                                    setState(() {
+                                      completed = value;
+                                    });
+                                  }
+                                  : null,
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 20),
 
                   // Notifications Toggle
@@ -279,13 +311,14 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       ),
                       Switch(
                         value: hasNotifications,
-                        onChanged: editMode
-                            ? (value) {
-                                setState(() {
-                                  hasNotifications = value;
-                                });
-                              }
-                            : null,
+                        onChanged:
+                            editMode
+                                ? (value) {
+                                  setState(() {
+                                    hasNotifications = value;
+                                  });
+                                }
+                                : null,
                       ),
                     ],
                   ),
@@ -297,10 +330,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       controller: descriptionController,
                       enabled: editMode,
                       maxLines: null,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: "Enter Goal Description",
                         hintStyle: TextStyle(color: Colors.white70),
@@ -317,10 +347,96 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             top: 58,
             right: 30,
             child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  editMode = !editMode;
-                });
+              onTap: () async {
+                if (editMode) {
+                  // Validate fields when creating a new goal
+                  if (widget.createResource &&
+                      (titleController.text.isEmpty ||
+                          descriptionController.text.isEmpty ||
+                          selectedDate == null ||
+                          selectedSubject == null)) {
+                    // Show a styled popup message warning of missing fields
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          backgroundColor: const Color.fromRGBO(
+                            72,
+                            85,
+                            204,
+                            1,
+                          ), // Match page background
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              20,
+                            ), // Rounded corners
+                          ),
+                          title: const Text(
+                            "Missing Fields",
+                            style: TextStyle(
+                              color: Colors.white, // White text
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          content: const Text(
+                            "Please fill in all the fields (Title, Description, Date, and Subject) before saving.",
+                            style: TextStyle(
+                              color: Colors.white70, // Subtle white text
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                              child: const Text(
+                                "OK",
+                                style: TextStyle(
+                                  color:
+                                      Colors.white, // White text for the button
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    return; // Stop execution if fields are missing
+                  }
+
+                  // Prevent multiple calls by disabling the button while saving
+                  if (_isLoading) return;
+
+                  // Save the goal and close the page
+                  setState(() {
+                    _isLoading = true; // Prevent duplicate calls
+                  });
+
+                  try {
+                    await _saveGoal();
+
+                    if (widget.onSave != null) {
+                      widget.onSave!(); // Trigger the callback to refresh goals
+                    }
+
+                    Navigator.pop(
+                      context,
+                      true,
+                    ); // Return true to indicate success
+                  } catch (e) {
+                    print('Error saving goal: $e');
+                  } finally {
+                    setState(() {
+                      _isLoading = false; // Re-enable the button
+                    });
+                  }
+                } else {
+                  // Toggle edit mode
+                  setState(() {
+                    editMode = true;
+                  });
+                }
               },
               child: CircleAvatar(
                 backgroundColor: Colors.white,
