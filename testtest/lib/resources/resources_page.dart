@@ -57,9 +57,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
     try {
       final resourcePage = await _resourceService.fetchResources(
         _selectedResourceTypes.toList(), // Pass the selected resource types
-        _currentPage, // Current page number
-        20, // Page size
-        _searchText, // Search query
+        page: _currentPage, // Use named parameter for page
+        size: 10, // Use named parameter for size
+        search: _searchText, // Use named parameter for search
       );
 
       setState(() {
@@ -164,7 +164,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
   // Function to detect when the user scrolls to the bottom
   void _onScroll(ScrollController controller) {
     if (controller.position.pixels >=
-        controller.position.maxScrollExtent - 200) {
+            controller.position.maxScrollExtent - 200 &&
+        !_isLoading &&
+        !_isLastPage) {
       _fetchResources(); // Fetch the next page when near the bottom
     }
   }

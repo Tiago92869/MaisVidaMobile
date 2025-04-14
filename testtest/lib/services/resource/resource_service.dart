@@ -34,11 +34,11 @@ class ResourceService {
   }
 
   Future<ResourcePage> fetchResources(
-    List<ResourceType> resourceTypes,
-    int page,
-    int size,
-    String search,
-  ) async {
+    List<ResourceType> resourceTypes, {
+    int page = 0, // Default page
+    int size = 10, // Default size
+    String search = "", // Default search query
+  }) async {
     await _loadStoredCredentials();
     try {
       print('Fetching resources...');

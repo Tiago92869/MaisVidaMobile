@@ -70,7 +70,12 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   Future<void> _fetchResources() async {
     try {
-      final resources = await _resourceService.fetchResources([], 0, 4, "");
+      final resources = await _resourceService.fetchResources(
+        [],
+        page: 0,
+        size: 4,
+        search: "",
+      );
       setState(() {
         _resources = resources.content;
       });

@@ -4,13 +4,22 @@ import 'package:testtest/services/resource/resource_service.dart';
 class ResourceRepository {
   final ResourceService _resourceService = ResourceService();
 
-  Future<List<Resource>> getResources(List<ResourceType> resourceTypes,
-      int page, int size, String search) async {
+  Future<List<Resource>> getResources(
+    List<ResourceType> resourceTypes,
+    int page,
+    int size,
+    String search,
+  ) async {
     try {
       print(
-          'ResourceRepository: Fetching resources with types: $resourceTypes, page: $page, size: $size, search: $search');
+        'ResourceRepository: Fetching resources with types: $resourceTypes, page: $page, size: $size, search: $search',
+      );
       final ResourcePage resourcePage = await _resourceService.fetchResources(
-          resourceTypes, page, size, search);
+        resourceTypes,
+        page: page, // Pass page as a named parameter
+        size: size, // Pass size as a named parameter
+        search: search,
+      );
       print('ResourceRepository: Successfully fetched resources.');
       return resourcePage.content;
     } catch (e) {
@@ -27,7 +36,8 @@ class ResourceRepository {
       return resource;
     } catch (e) {
       print(
-          'ResourceRepository: Failed to fetch resource by ID: $id. Error: $e');
+        'ResourceRepository: Failed to fetch resource by ID: $id. Error: $e',
+      );
       rethrow;
     }
   }

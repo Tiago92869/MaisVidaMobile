@@ -40,12 +40,6 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       });
     } catch (e) {
       print('Error checking favorite status: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to check favorite status. Please try again."),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
@@ -225,7 +219,9 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         Expanded(
           child: SingleChildScrollView(
             child: Text(
-              resource.description,
+              resource.description.isNotEmpty
+                  ? resource.description
+                  : "No description available.", // Fallback if description is empty
               style: const TextStyle(
                 fontSize: 16,
                 fontFamily: "Inter",

@@ -26,9 +26,9 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
     try {
       final resources = await _resourceService.fetchResources(
         [ResourceType.SOS], // Filter by SOS type
-        0, // Page number
-        20, // Page size
-        "", // No search query
+        page: 0, // Page number
+        size: 10, // Page size
+        search: "", // No search query
       );
       setState(() {
         _sosResources = resources.content;
