@@ -124,10 +124,10 @@ class MedicineService {
     }
   }
 
-  Future<Medicine> createMedicine(Medicine medicine) async {
+  Future<void> createMedicine(MedicineCreate medicineCreate) async {
     await _loadStoredCredentials();
     try {
-      final requestBody = jsonEncode(medicine.toJson());
+      final requestBody = jsonEncode(medicineCreate.toJson());
       print(
         'Request Body for createMedicine: $requestBody',
       ); // Log the request body
@@ -155,7 +155,6 @@ class MedicineService {
 
       if (response.statusCode == 200) {
         print('Medicine created successfully.');
-        return Medicine.fromJson(jsonDecode(response.body));
       } else {
         print('Failed to create medicine. Status Code: ${response.statusCode}');
         throw Exception('Failed to create medicine');

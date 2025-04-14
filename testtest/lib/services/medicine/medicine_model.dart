@@ -130,3 +130,32 @@ class Dosage {
     return {'id': id, 'time': time.toIso8601String(), 'dosage': dosage};
   }
 }
+
+class MedicineCreate {
+  final String name;
+  final String description;
+  final bool archived;
+  final DateTime startedAt;
+  final DateTime endedAt;
+  final bool hasNotifications;
+
+  MedicineCreate({
+    required this.name,
+    required this.description,
+    required this.archived,
+    required this.startedAt,
+    required this.endedAt,
+    required this.hasNotifications,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'archived': archived,
+      'startedAt': startedAt.toIso8601String(),
+      'endedAt': endedAt.toIso8601String(),
+      'hasNotifications': hasNotifications,
+    };
+  }
+}

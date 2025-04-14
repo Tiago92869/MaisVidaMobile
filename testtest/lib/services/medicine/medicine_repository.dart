@@ -24,8 +24,8 @@ class MedicineRepository {
     return await _medicineService.fetchMedicineById(id);
   }
 
-  Future<Medicine> createMedicine(Medicine medicine) async {
-    return await _medicineService.createMedicine(medicine);
+  Future<void> createMedicine(MedicineCreate medicineCreate) async {
+    await _medicineService.createMedicine(medicineCreate);
   }
 
   Future<Medicine> updateMedicine(String id, Medicine medicine) async {
