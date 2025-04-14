@@ -125,7 +125,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           hasNotifications: hasNotifications,
         );
         await _medicineRepository.createMedicine(newMedicine);
-        _showSuccessSnackBar("Medicine created successfully!");
+        Navigator.pop(context, true); // Return true to indicate success
       } else {
         /*
         // Updating an existing medicine
@@ -143,11 +143,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           updatedMedicine,
         );
         */
-        _showSuccessSnackBar("Medicine updated successfully!");
+        Navigator.pop(context, false); // Return false for updates
       }
-
-      // Close the page after saving
-      Navigator.pop(context);
     } catch (e) {
       print("Error saving medicine: $e");
       _showErrorSnackBar("Failed to save medicine. Please try again.");

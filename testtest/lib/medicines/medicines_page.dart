@@ -538,8 +538,8 @@ class _MedicinesPageState extends State<MedicinesPage> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 90.0, right: 20),
         child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final bool? isMedicineCreated = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder:
@@ -549,6 +549,17 @@ class _MedicinesPageState extends State<MedicinesPage> {
                     ),
               ),
             );
+
+            // Refresh the medicines list if a new medicine was created
+            if (isMedicineCreated == true) {
+              if (_selectedDay == null) {
+                _fetchMedicines(); // Fetch medicines for the entire week
+              } else {
+                _fetchMedicinesForDay(
+                  _selectedDay!,
+                ); // Fetch medicines for the selected day
+              }
+            }
           },
           backgroundColor: Colors.white,
           child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
