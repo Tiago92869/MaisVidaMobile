@@ -64,7 +64,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
         _selectedDay ?? _currentWeekStart,
         _selectedDay ?? _currentWeekStart.add(const Duration(days: 6)),
         page: 0, // Pass the page number
-        size: 10, // Pass the page size
+        size: 4, // Pass the page size
       );
 
       setState(() {
@@ -143,7 +143,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
         DateTime.parse(startDate),
         DateTime.parse(endDate),
         page: _currentPage + 1, // Fetch the next page
-        size: 10, // Fetch 10 medicines per page
+        size: 4, // Fetch 10 medicines per page
       );
 
       setState(() {
