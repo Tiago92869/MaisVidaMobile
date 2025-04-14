@@ -10,7 +10,7 @@ enum ResourceType {
   RECIPE,
   MUSIC,
   SOS,
-  OTHER
+  OTHER,
 }
 
 extension ResourceTypeExtension on ResourceType {
@@ -63,7 +63,7 @@ class Resource {
     return Resource(
       id: json['id'],
       title: json['title'],
-      description: '',
+      description: json['description'], // Parse the description from JSON
       type: ResourceTypeExtension.fromString(json['type']),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),

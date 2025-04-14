@@ -536,7 +536,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
             : resource.description;
 
     return Container(
-      constraints: const BoxConstraints(maxHeight: 110),
+      constraints: const BoxConstraints(maxHeight: 120),
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.blueAccent, // Replace with a dynamic color if needed
@@ -554,14 +554,18 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   style: const TextStyle(
                     fontSize: 18,
                     fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold, // Make the title bolder
                     color: Colors.white,
                   ),
+                  maxLines: 2, // Ensure the title doesn't exceed two lines
+                  overflow:
+                      TextOverflow.ellipsis, // Add ellipsis if it overflows
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Text(
                   truncatedDescription,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 12, // Decrease the size of the description text
                     fontFamily: "Inter",
                     color: Colors.white,
                   ),
