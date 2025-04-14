@@ -179,131 +179,148 @@ class _ResourcesPageState extends State<ResourcesPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Main content with blur effect when filter is open
+          // Background gradient
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromRGBO(
+                      102,
+                      122,
+                      236,
+                      1,
+                    ), // Start color (darker blue)
+                    Color.fromRGBO(
+                      255,
+                      255,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: _closeFilterPanel,
             child: IgnorePointer(
               ignoring:
                   _isFilterPanelVisible, // Disable interactions when the filter is open
-              child: Stack(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  RefreshIndicator(
-                    onRefresh: () async {
-                      setState(() {
-                        _resources.clear(); // Clear current resources
-                        _currentPage = 0; // Reset pagination
-                        _isLastPage = false; // Reset last page flag
-                      });
-                      await _fetchResources(); // Fetch resources again
-                    },
-                    child: SingleChildScrollView(
-                      controller:
-                          _scrollController, // Attach the scroll controller
-                      physics:
-                          const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
-                      child: Container(
-                        color:
-                            Colors
-                                .transparent, // Detect taps anywhere on the screen
-                        padding: const EdgeInsets.only(
-                          left: 20,
-                          right: 20,
-                          bottom: 40,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 60,
-                            ), // Add spacing between the top of the screen and the title
-                            // Title (Resources) centered at the top
-                            const Center(
-                              child: Text(
-                                "Resources",
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontFamily: "Poppins",
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-                            // Input TextField with Search icon
-                            TextField(
-                              onChanged:
-                                  _onSearch, // Trigger search on input change
-                              decoration: InputDecoration(
-                                labelText: "Search Resources",
-                                labelStyle: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                                prefixIcon: const Icon(
-                                  Icons.search,
-                                  color: Colors.grey,
-                                  size: 20,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide: const BorderSide(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                  vertical: 10,
-                                ),
-                              ),
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(height: 20),
-                            // Display the resources as HCards
-                            Column(
-                              children:
-                                  _resources
-                                      .map(
-                                        (resource) => Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 10,
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (context) =>
-                                                          ResourceDetailPage(
-                                                            resource: resource,
-                                                          ),
-                                                ),
-                                              );
-                                            },
-                                            child: _buildHCard(resource),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                            ),
-                          ],
-                        ),
+                  const SizedBox(
+                    height: 60,
+                  ), // Add spacing between the top of the screen and the title
+                  // Title (Resources) centered at the top
+                  const Center(
+                    child: Text(
+                      "Resources",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontFamily: "Poppins",
+                        color: Colors.white, // Title color changed to white
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  // Apply blur effect when filter panel is visible
-                  if (_isFilterPanelVisible)
-                    BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: 5.0,
-                        sigmaY: 5.0,
-                      ), // Adjust blur intensity
-                      child: Container(
-                        color: Colors.black.withOpacity(
-                          0.2,
-                        ), // Optional: Add a semi-transparent overlay
+                  const SizedBox(height: 40),
+                  // Input TextField with Search icon
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      onChanged: _onSearch, // Trigger search on input change
+                      decoration: InputDecoration(
+                        labelText: "Search Resources",
+                        labelStyle: const TextStyle(
+                          color:
+                              Colors
+                                  .white, // Search field text color changed to white
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search, // Search icon
+                          color:
+                              Colors
+                                  .white, // Search icon color changed to white
+                          size: 20,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: const BorderSide(
+                            color:
+                                Colors.white, // Border color changed to white
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: const BorderSide(
+                            color:
+                                Colors.white, // Border color for enabled state
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: const BorderSide(
+                            color:
+                                Colors.white, // Border color for focused state
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 10,
+                        ),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color:
+                            Colors.white, // Input text color changed to white
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Scrollable resource entries
+                  Flexible(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() {
+                          _resources.clear(); // Clear current resources
+                          _currentPage = 0; // Reset pagination
+                          _isLastPage = false; // Reset last page flag
+                        });
+                        await _fetchResources(); // Fetch resources again
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: _resources.length,
+                        itemBuilder: (context, index) {
+                          final resource = _resources[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => ResourceDetailPage(
+                                          resource: resource,
+                                        ),
+                                  ),
+                                );
+                              },
+                              child: _buildHCard(resource),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -367,7 +384,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
                             blurRadius: 5,
-                            offset: Offset(0, 5),
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
