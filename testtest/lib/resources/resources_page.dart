@@ -200,6 +200,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       physics:
                           const AlwaysScrollableScrollPhysics(), // Ensure pull-to-refresh works
                       child: Container(
+                        color:
+                            Colors
+                                .transparent, // Detect taps anywhere on the screen
                         padding: const EdgeInsets.only(
                           left: 20,
                           right: 20,
@@ -281,7 +284,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                       )
                                       .toList(),
                             ),
-                            const SizedBox(height: 30),
                           ],
                         ),
                       ),
@@ -306,6 +308,224 @@ class _ResourcesPageState extends State<ResourcesPage> {
           ),
           // Loading indicator in the center of the screen
           if (_isLoading) const Center(child: CircularProgressIndicator()),
+          // Filter Icon Positioned
+          Positioned(
+            top: 58,
+            right: 20,
+            child: Row(
+              children: [
+                // Star Icon
+                GestureDetector(
+                  onTap: _toggleStarGlow,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                _isStarGlowing
+                                    ? Colors.blue.withOpacity(
+                                      0.8,
+                                    ) // Glowing shadow when pressed
+                                    : Colors.black.withOpacity(
+                                      0.2,
+                                    ), // Default shadow when not pressed
+                            blurRadius: _isStarGlowing ? 15 : 5,
+                            spreadRadius: _isStarGlowing ? 5 : 0,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.star,
+                        color: _isStarGlowing ? Colors.blue : Colors.grey,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // Filter Icon
+                GestureDetector(
+                  onTap: _toggleFilterPanel,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.filter_alt,
+                        color: Colors.blue,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Sliding filter panel
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            right: _isFilterPanelVisible ? 0 : -230, // Slide in/out effect
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 230,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      1,
+                    ), // End color (lighter blue)
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(-5, 0), // Shadow on the left side
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 40,
+                  ), // Space between the arrow and text
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20, left: 15),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _toggleFilterPanel,
+                          child: const Icon(
+                            Icons.arrow_forward,
+                            size: 30,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        const Text(
+                          "Filter by Type",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: "Poppins",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children:
+                              _resourceTypes.map((resourceType) {
+                                bool isSelected = _selectedResourceTypes
+                                    .contains(resourceType);
+                                return GestureDetector(
+                                  onTap:
+                                      () => _toggleResourceType(resourceType),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color:
+                                          isSelected
+                                              ? const Color.fromRGBO(
+                                                85,
+                                                123,
+                                                233,
+                                                1,
+                                              ) // Selected button color
+                                              : Colors
+                                                  .white, // Default button color
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 15,
+                                    ),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        StringCapitalization(
+                                          resourceType
+                                              .toString()
+                                              .split('.')
+                                              .last,
+                                        ).capitalizeFirstLetter(),
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : const Color.fromRGBO(
+                                                    72,
+                                                    85,
+                                                    204,
+                                                    1,
+                                                  ),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Poppins",
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
