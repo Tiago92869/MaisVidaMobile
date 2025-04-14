@@ -4,14 +4,13 @@ class Token {
   final String accessToken;
   final String refreshToken;
 
-  Token({
-    required this.accessToken,
-    required this.refreshToken,
-  });
+  Token({required this.accessToken, required this.refreshToken});
 
   factory Token.fromJson(Map<String, dynamic> json) {
     return Token(
-        accessToken: json['access_token'], refreshToken: json['refresh_token']);
+      accessToken: json['access_token'],
+      refreshToken: json['refresh_token'],
+    );
   }
 }
 
@@ -19,16 +18,10 @@ class PasswordUpdateDTO {
   final String currentPassword;
   final String newPassword;
 
-  PasswordUpdateDTO({
-    required this.currentPassword,
-    required this.newPassword,
-  });
+  PasswordUpdateDTO({required this.currentPassword, required this.newPassword});
 
   Map<String, dynamic> toJson() {
-    return {
-      'currentPassword': currentPassword,
-      'newPassword': newPassword,
-    };
+    return {'currentPassword': currentPassword, 'newPassword': newPassword};
   }
 }
 
@@ -40,6 +33,7 @@ class User {
   final String city;
   final String aboutMe;
   final DateTime dateOfBirth;
+  final String emergencyContact; // Added emergencyContact field
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -51,6 +45,7 @@ class User {
     required this.city,
     required this.aboutMe,
     required this.dateOfBirth,
+    required this.emergencyContact, // Added emergencyContact to constructor
     this.createdAt,
     this.updatedAt,
   });
@@ -64,6 +59,8 @@ class User {
       city: json['city'],
       aboutMe: json['aboutMe'],
       dateOfBirth: DateTime.parse(json['dateOfBirth']),
+      emergencyContact:
+          json['emergencyContact'] ?? '', // Parse emergencyContact
       createdAt: parseDate(json['createdAt']),
       updatedAt: parseDate(json['updatedAt']),
     );
@@ -78,6 +75,7 @@ class User {
       'city': city,
       'aboutMe': aboutMe,
       'dateOfBirth': dateOfBirth.toIso8601String(),
+      'emergencyContact': emergencyContact, // Include emergencyContact in JSON
     };
   }
 

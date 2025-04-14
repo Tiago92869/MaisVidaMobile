@@ -27,7 +27,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   String lastSavedAboutMe = "";
 
   // UserRepository instance
-  final UserRepository userRepository = UserRepository(userService: UserService());
+  final UserRepository userRepository = UserRepository(
+    userService: UserService(),
+  );
 
   void toggleEditMode() {
     print("Toggling edit mode. Current state: $editMode");
@@ -47,7 +49,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
         nameController.text = "${user.firstName} ${user.secondName}";
         emailController.text = user.email;
         cityController.text = user.city;
-        birthdayController.text = user.dateOfBirth.toIso8601String().split('T')[0];
+        birthdayController.text =
+            user.dateOfBirth.toIso8601String().split('T')[0];
         aboutMeController.text = user.aboutMe;
 
         lastSavedName = nameController.text;
@@ -72,7 +75,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     try {
       List<String> nameParts = nameController.text.split(" ");
       String firstName = nameParts.isNotEmpty ? nameParts[0] : "";
-      String secondName = nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
+      String secondName =
+          nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
 
       print("Preparing updated user data...");
       User updatedUser = User(
@@ -83,6 +87,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         city: cityController.text,
         aboutMe: aboutMeController.text,
         dateOfBirth: DateTime.parse(birthdayController.text),
+        emergencyContact: "",
       );
 
       print("Sending updated user data to repository...");
@@ -140,14 +145,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: const Color(0xFF1565C0), // Darker blue for header
-            hintColor: const Color(0xFF1565C0), // Darker blue for active elements
+            hintColor: const Color(
+              0xFF1565C0,
+            ), // Darker blue for active elements
             colorScheme: ColorScheme.light(
               primary: const Color(0xFF1565C0), // Darker blue for selected date
               onPrimary: Colors.white, // White text on selected date
               surface: Colors.white, // White background for the calendar
               onSurface: Colors.black, // Black text for unselected dates
             ),
-            dialogBackgroundColor: Colors.white, // White background for the dialog
+            dialogBackgroundColor:
+                Colors.white, // White background for the dialog
           ),
           child: child!,
         );
@@ -157,7 +165,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (pickedDate != null) {
       print("Date selected: ${pickedDate.toIso8601String()}");
       setState(() {
-        birthdayController.text = pickedDate.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
+        birthdayController.text =
+            pickedDate.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
       });
     } else {
       print("No date selected.");
@@ -194,10 +203,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFE3F2FD),
-                    const Color(0xFFFFFFFF),
-                  ],
+                  colors: [const Color(0xFFE3F2FD), const Color(0xFFFFFFFF)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -290,7 +296,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             fontSize: 16,
                             color: Colors.grey[800],
                           ),
-                          decoration: InputDecoration.collapsed(hintText: 'Enter About Me'),
+                          decoration: InputDecoration.collapsed(
+                            hintText: 'Enter About Me',
+                          ),
                           maxLines: null,
                         ),
                       ),
@@ -370,10 +378,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: TextField(
             controller: controller,
             enabled: editMode,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[800]),
             decoration: InputDecoration.collapsed(hintText: 'Enter $title'),
           ),
         ),
@@ -397,7 +402,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
         SizedBox(height: 8),
         GestureDetector(
           onTap: () => _selectDate(context), // Open the date picker
-          child: AbsorbPointer( // Prevent manual text input
+          child: AbsorbPointer(
+            // Prevent manual text input
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
@@ -416,11 +422,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: TextField(
                 controller: birthdayController,
                 enabled: editMode,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[800],
+                style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+                decoration: InputDecoration.collapsed(
+                  hintText: 'Select your birthday',
                 ),
-                decoration: InputDecoration.collapsed(hintText: 'Select your birthday'),
               ),
             ),
           ),

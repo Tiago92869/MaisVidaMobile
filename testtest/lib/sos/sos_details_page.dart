@@ -13,40 +13,64 @@ class SosDetailsPage extends StatefulWidget {
 class _SosDetailsPageState extends State<SosDetailsPage> {
   final ResourceService _resourceService = ResourceService();
   List<Resource> _sosResources = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   String? _errorMessage;
+  int _currentPage = 0;
+  bool _isLastPage = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _fetchSosResources();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        _fetchSosResources(loadNextPage: true);
+      }
+    });
   }
 
-  Future<void> _fetchSosResources() async {
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchSosResources({bool loadNextPage = false}) async {
+    if (_isLoading || (loadNextPage && _isLastPage)) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final resources = await _resourceService.fetchResources(
         [ResourceType.SOS], // Filter by SOS type
-        page: 0, // Page number
+        page: loadNextPage ? _currentPage : 0, // Page number
         size: 10, // Page size
         search: "", // No search query
       );
+
       setState(() {
-        _sosResources = resources.content;
-        _isLoading = false;
+        if (loadNextPage) {
+          _sosResources.addAll(resources.content ?? []);
+        } else {
+          _sosResources = resources.content ?? [];
+        }
+        _isLastPage = resources.last ?? true;
+        _currentPage = (resources.number ?? 0) + 1;
       });
     } catch (e) {
-      print('Error fetching SOS resources: $e');
+      setState(() {
+        _errorMessage = "Failed to fetch SOS resources.";
+      });
+    } finally {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            "Failed to fetch SOS resources. Please try again.",
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
 
@@ -103,7 +127,6 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                       GestureDetector(
                         onTap: () {
                           // Handle Medical Emergency click
-                          print("Medical Emergency clicked");
                         },
                         child: Container(
                           width: 140,
@@ -135,7 +158,6 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                       GestureDetector(
                         onTap: () {
                           // Handle Emergency Contact click
-                          print("Emergency Contact clicked");
                         },
                         child: Container(
                           width: 140,
@@ -181,76 +203,98 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                   ),
                   const SizedBox(height: 20),
                   Expanded(
-                    child:
-                        _isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : _errorMessage != null
-                            ? Center(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            )
-                            : ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 30),
-                              itemCount: _sosResources.length,
-                              itemBuilder: (context, index) {
-                                final resource = _sosResources[index];
-                                return GestureDetector(
-                                  onTap:
-                                      () => _navigateToResourceDetail(
-                                        context,
-                                        resource,
-                                      ),
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                    ),
-                                    padding: const EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF2C3E50,
-                                      ), // Darker blue for resource cards
-                                      borderRadius: BorderRadius.circular(15),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.3),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 5),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundColor: Colors.redAccent,
-                                          radius: 25,
-                                          child: const Icon(
-                                            Icons.info,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: Text(
-                                            resource.title,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _currentPage = 0; // Reset to the first page
+                        _isLastPage = false; // Reset last page flag
+                        await _fetchSosResources(); // Fetch the first page of resources
+                      },
+                      child:
+                          _isLoading && _sosResources.isEmpty
+                              ? const Center(child: CircularProgressIndicator())
+                              : _errorMessage != null
+                              ? Center(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
                                   ),
-                                );
-                              },
-                            ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                              : ListView.builder(
+                                controller: _scrollController,
+                                padding: const EdgeInsets.only(bottom: 30),
+                                itemCount:
+                                    _sosResources.length + (_isLoading ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (index < _sosResources.length) {
+                                    final resource = _sosResources[index];
+                                    return GestureDetector(
+                                      onTap:
+                                          () => _navigateToResourceDetail(
+                                            context,
+                                            resource,
+                                          ),
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                        padding: const EdgeInsets.all(15),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF2C3E50),
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.3,
+                                              ),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 5),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: Colors.redAccent,
+                                              radius: 25,
+                                              child: const Icon(
+                                                Icons.info,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 15),
+                                            Expanded(
+                                              child: Text(
+                                                resource.title ?? "Untitled",
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(20),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                    ),
                   ),
                 ],
               ),
