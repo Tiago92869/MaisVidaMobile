@@ -204,6 +204,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
               ),
             ),
           ),
+          // Main content
           GestureDetector(
             onTap: _closeFilterPanel,
             child: IgnorePointer(
@@ -212,86 +213,64 @@ class _ResourcesPageState extends State<ResourcesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(
-                    height: 60,
-                  ), // Add spacing between the top of the screen and the title
-                  // Title (Resources) centered at the top
+                  const SizedBox(height: 60),
                   const Center(
                     child: Text(
                       "Resources",
                       style: TextStyle(
                         fontSize: 28,
                         fontFamily: "Poppins",
-                        color: Colors.white, // Title color changed to white
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Input TextField with Search icon
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextField(
-                      onChanged: _onSearch, // Trigger search on input change
+                      onChanged: _onSearch,
                       decoration: InputDecoration(
                         labelText: "Search Resources",
                         labelStyle: const TextStyle(
-                          color:
-                              Colors
-                                  .white, // Search field text color changed to white
+                          color: Colors.white,
                           fontSize: 14,
                         ),
                         prefixIcon: const Icon(
-                          Icons.search, // Search icon
-                          color:
-                              Colors
-                                  .white, // Search icon color changed to white
+                          Icons.search,
+                          color: Colors.white,
                           size: 20,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(
-                            color:
-                                Colors.white, // Border color changed to white
-                          ),
+                          borderSide: const BorderSide(color: Colors.white),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(
-                            color:
-                                Colors.white, // Border color for enabled state
-                          ),
+                          borderSide: const BorderSide(color: Colors.white),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(
-                            color:
-                                Colors.white, // Border color for focused state
-                          ),
+                          borderSide: const BorderSide(color: Colors.white),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 15,
                           vertical: 10,
                         ),
                       ),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color:
-                            Colors.white, // Input text color changed to white
-                      ),
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Scrollable resource entries
                   Flexible(
                     child: RefreshIndicator(
                       onRefresh: () async {
                         setState(() {
-                          _resources.clear(); // Clear current resources
-                          _currentPage = 0; // Reset pagination
-                          _isLastPage = false; // Reset last page flag
+                          _resources.clear();
+                          _currentPage = 0;
+                          _isLastPage = false;
                         });
-                        await _fetchResources(); // Fetch resources again
+                        await _fetchResources();
                       },
                       child: ListView.builder(
                         controller: _scrollController,
@@ -325,227 +304,224 @@ class _ResourcesPageState extends State<ResourcesPage> {
               ),
             ),
           ),
+          // Filter Icon
+          _buildFilterIcon(),
+          // Blur effect under the filter panel
+          if (_isFilterPanelVisible) _buildBlurEffect(),
+          // Sliding Filter Panel
+          _buildFilterPanel(),
           // Loading indicator in the center of the screen
           if (_isLoading) const Center(child: CircularProgressIndicator()),
-          // Filter Icon Positioned
-          Positioned(
-            top: 58,
-            right: 20,
-            child: Row(
-              children: [
-                // Star Icon
-                GestureDetector(
-                  onTap: _toggleStarGlow,
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                _isStarGlowing
-                                    ? Colors.blue.withOpacity(
-                                      0.8,
-                                    ) // Glowing shadow when pressed
-                                    : Colors.black.withOpacity(
-                                      0.2,
-                                    ), // Default shadow when not pressed
-                            blurRadius: _isStarGlowing ? 15 : 5,
-                            spreadRadius: _isStarGlowing ? 5 : 0,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.star,
-                        color: _isStarGlowing ? Colors.blue : Colors.grey,
-                        size: 28,
-                      ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterIcon() {
+    return Positioned(
+      top: 58,
+      right: 20,
+      child: Row(
+        children: [
+          // Star Icon
+          GestureDetector(
+            onTap: _toggleStarGlow,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          _isStarGlowing
+                              ? Colors.blue.withOpacity(
+                                0.8,
+                              ) // Glowing shadow when pressed
+                              : Colors.black.withOpacity(
+                                0.2,
+                              ), // Default shadow when not pressed
+                      blurRadius: _isStarGlowing ? 15 : 5,
+                      spreadRadius: _isStarGlowing ? 5 : 0,
+                      offset: const Offset(0, 5),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                // Filter Icon
-                GestureDetector(
-                  onTap: _toggleFilterPanel,
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 5,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.filter_alt,
-                        color: Colors.blue,
-                        size: 28,
-                      ),
-                    ),
-                  ),
+                child: Icon(
+                  Icons.star,
+                  color: _isStarGlowing ? Colors.blue : Colors.grey,
+                  size: 28,
                 ),
-              ],
+              ),
             ),
           ),
-          // Sliding filter panel
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            right: _isFilterPanelVisible ? 0 : -230, // Slide in/out effect
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 230,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(
-                      123,
-                      144,
-                      255,
-                      1,
-                    ), // End color (lighter blue)
+          const SizedBox(width: 10),
+          // Filter Icon
+          GestureDetector(
+            onTap: _toggleFilterPanel,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 5,
+                      offset: const Offset(0, 5),
+                    ),
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(-5, 0), // Shadow on the left side
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 40,
-                  ), // Space between the arrow and text
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20, left: 15),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _toggleFilterPanel,
-                          child: const Icon(
-                            Icons.arrow_forward,
-                            size: 30,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 30),
-                        const Text(
-                          "Filter by Type",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: "Poppins",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children:
-                              _resourceTypes.map((resourceType) {
-                                bool isSelected = _selectedResourceTypes
-                                    .contains(resourceType);
-                                return GestureDetector(
-                                  onTap:
-                                      () => _toggleResourceType(resourceType),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color:
-                                            isSelected
-                                                ? Colors.white
-                                                : Colors.transparent,
-                                        width: 1.5,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      color:
-                                          isSelected
-                                              ? const Color.fromRGBO(
-                                                85,
-                                                123,
-                                                233,
-                                                1,
-                                              ) // Selected button color
-                                              : Colors
-                                                  .white, // Default button color
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                      horizontal: 15,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        StringCapitalization(
-                                          resourceType
-                                              .toString()
-                                              .split('.')
-                                              .last,
-                                        ).capitalizeFirstLetter(),
-                                        style: TextStyle(
-                                          color:
-                                              isSelected
-                                                  ? Colors.white
-                                                  : const Color.fromRGBO(
-                                                    72,
-                                                    85,
-                                                    204,
-                                                    1,
-                                                  ),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: "Poppins",
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                child: const Icon(
+                  Icons.filter_alt,
+                  color: Colors.blue,
+                  size: 28,
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterPanel() {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300),
+      right: _isFilterPanelVisible ? 0 : -230, // Slide in/out effect
+      top: 0,
+      bottom: 0,
+      child: Container(
+        width: 230,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
+              Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(-5, 0), // Shadow on the left side
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 40), // Space between the arrow and text
+            Padding(
+              padding: const EdgeInsets.only(top: 20, left: 15),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: _toggleFilterPanel,
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 30),
+                  const Text(
+                    "Filter by Type",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontFamily: "Poppins",
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children:
+                        _resourceTypes.map((resourceType) {
+                          bool isSelected = _selectedResourceTypes.contains(
+                            resourceType,
+                          );
+                          return GestureDetector(
+                            onTap: () => _toggleResourceType(resourceType),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color:
+                                      isSelected
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                color:
+                                    isSelected
+                                        ? const Color.fromRGBO(
+                                          85,
+                                          123,
+                                          233,
+                                          1,
+                                        ) // Selected button color
+                                        : Colors.white, // Default button color
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 15,
+                              ),
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: Center(
+                                child: Text(
+                                  StringCapitalization(
+                                    resourceType.toString().split('.').last,
+                                  ).capitalizeFirstLetter(),
+                                  style: TextStyle(
+                                    color:
+                                        isSelected
+                                            ? Colors.white
+                                            : const Color.fromRGBO(
+                                              72,
+                                              85,
+                                              204,
+                                              1,
+                                            ),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
     );
   }
@@ -613,6 +589,13 @@ class _ResourcesPageState extends State<ResourcesPage> {
       ),
     );
   }
+}
+
+Widget _buildBlurEffect() {
+  return BackdropFilter(
+    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+    child: Container(color: Colors.black.withOpacity(0.2)),
+  );
 }
 
 // Extension to capitalize the first letter of a string
