@@ -28,8 +28,8 @@ class MedicineRepository {
     await _medicineService.createMedicine(medicineCreate);
   }
 
-  Future<Medicine> updateMedicine(String id, Medicine medicine) async {
-    return await _medicineService.modifyMedicine(id, medicine);
+  Future<void> updateMedicine(String id, Medicine medicine) async {
+    await _medicineService.modifyMedicine(id, medicine);
   }
 
   Future<void> deleteMedicine(String id) async {

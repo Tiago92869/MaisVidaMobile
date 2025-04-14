@@ -74,13 +74,18 @@ class Medicine {
       'name': name,
       'description': description,
       'archived': archived,
-      'startedAt': startedAt.toIso8601String(),
-      'endedAt': endedAt.toIso8601String(),
+      'startedAt': _formatDateTime(startedAt), // Use custom formatter
+      'endedAt': _formatDateTime(endedAt), // Use custom formatter
       'hasNotifications': hasNotifications,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': _formatDateTime(createdAt),
+      'updatedAt': _formatDateTime(updatedAt),
       'plans': plans.map((plan) => plan.toJson()).toList(),
     };
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    // Convert to ISO 8601 and remove the 'Z' if it exists
+    return dateTime.toIso8601String().replaceFirst('Z', '');
   }
 }
 

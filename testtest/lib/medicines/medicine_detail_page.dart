@@ -127,22 +127,23 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         await _medicineRepository.createMedicine(newMedicine);
         Navigator.pop(context, true); // Return true to indicate success
       } else {
-        /*
         // Updating an existing medicine
-        final updatedMedicine = widget.medicine!.copyWith(
+        final updatedMedicine = Medicine(
+          id: widget.medicine!.id,
           name: name,
           description: description,
           archived: isArchived,
           startedAt: startDate!,
           endedAt: endDate!,
           hasNotifications: hasNotifications,
+          createdAt: widget.medicine!.createdAt,
           updatedAt: DateTime.now(),
+          plans: widget.medicine!.plans, // Include plans
         );
         await _medicineRepository.updateMedicine(
           updatedMedicine.id,
           updatedMedicine,
         );
-        */
         Navigator.pop(context, false); // Return false for updates
       }
     } catch (e) {
@@ -192,12 +193,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 

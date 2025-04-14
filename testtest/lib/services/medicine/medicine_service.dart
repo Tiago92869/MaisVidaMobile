@@ -165,17 +165,13 @@ class MedicineService {
     }
   }
 
-  Future<Medicine> modifyMedicine(String id, Medicine medicine) async {
+  Future<void> modifyMedicine(String id, Medicine medicine) async {
     await _loadStoredCredentials();
     try {
       final requestBody = jsonEncode(medicine.toJson());
       final String requestUrl = '$_baseUrl/$id';
-      print(
-        'Request URL for modifyMedicine: $requestUrl',
-      ); // Log the request URL
-      print(
-        'Request Body for modifyMedicine: $requestBody',
-      ); // Log the request body
+      print('Request URL for modifyMedicine: $requestUrl');
+      print('Request Body for modifyMedicine: $requestBody');
 
       final response = await http
           .patch(
@@ -200,7 +196,6 @@ class MedicineService {
 
       if (response.statusCode == 200) {
         print('Medicine updated successfully.');
-        return Medicine.fromJson(jsonDecode(response.body));
       } else {
         print('Failed to update medicine. Status Code: ${response.statusCode}');
         throw Exception('Failed to update medicine');
