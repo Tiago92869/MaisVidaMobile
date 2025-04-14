@@ -265,23 +265,25 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 child: Text(
                   "Activities",
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 28, // Match the font size from ResourcesPage
                     fontFamily: "Poppins",
-                    color: Colors.white, // Title color changed to white
+                    color: Colors.white, // Title color
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                ), // Match padding
                 child: TextField(
                   onChanged: _onSearch,
                   decoration: InputDecoration(
                     labelText: "Search Activities",
                     labelStyle: const TextStyle(
                       color: Colors.white, // Search input text color
-                      fontSize: 14,
+                      fontSize: 14, // Match font size
                     ),
                     prefixIcon: const Icon(
                       Icons.search,
@@ -306,7 +308,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     ),
                   ),
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 14, // Match font size
                     color: Colors.white, // Input text color
                   ),
                 ),
@@ -329,21 +331,28 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                         controller: _scrollController,
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount: _activities.length,
+                        itemCount:
+                            _activities.length +
+                            1, // Add 1 to include the SizedBox
                         itemBuilder: (context, index) {
-                          final activity = _activities[index];
-                          final backgroundColor =
-                              _activityColors[index % _activityColors.length];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 20,
-                            ), // Added horizontal padding
-                            child: _buildActivityCard(
-                              activity,
-                              backgroundColor,
-                            ),
-                          );
+                          if (index < _activities.length) {
+                            final activity = _activities[index];
+                            final backgroundColor =
+                                _activityColors[index % _activityColors.length];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 20,
+                              ), // Added horizontal padding
+                              child: _buildActivityCard(
+                                activity,
+                                backgroundColor,
+                              ),
+                            );
+                          } else {
+                            // Add a SizedBox at the end of the list
+                            return const SizedBox(height: 60);
+                          }
                         },
                       ),
                     ),

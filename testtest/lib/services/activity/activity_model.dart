@@ -68,31 +68,42 @@ class Activity {
   factory Activity.fromJson(Map<String, dynamic> json) {
     var resourcesJson = json['resources'] as List?;
 
-    List<Resource> resourcesList = resourcesJson != null
-        ? resourcesJson.map((i) => Resource.fromJson(i)).toList()
-        : [];
+    List<Resource> resourcesList =
+        resourcesJson != null
+            ? resourcesJson.map((i) => Resource.fromJson(i)).toList()
+            : [];
 
     return Activity(
       id: json['id'],
       title: json['title'],
       description: json['description'],
-      createdAt: json.containsKey('createdAt')
-          ? DateTime.parse(json['createdAt'])
-          : null,
-      updatedAt: json.containsKey('updatedAt')
-          ? DateTime.parse(json['updatedAt'])
-          : null,
+      createdAt:
+          json.containsKey('createdAt')
+              ? DateTime.parse(json['createdAt'])
+              : null,
+      updatedAt:
+          json.containsKey('updatedAt')
+              ? DateTime.parse(json['updatedAt'])
+              : null,
       resources: resourcesList,
     );
   }
 
   factory Activity.fromJsonPage(Map<String, dynamic> json) {
+    var resourcesJson = json['resources'] as List?;
+
+    List<Resource> resourcesList =
+        resourcesJson != null
+            ? resourcesJson.map((i) => Resource.fromJson(i)).toList()
+            : [];
+
     return Activity(
       id: json['id'],
       title: json['title'],
-      description: '',
+      description: json['description'], // Parse the description
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      resources: resourcesList, // Parse the resources
     );
   }
 
