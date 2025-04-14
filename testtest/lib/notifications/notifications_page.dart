@@ -34,6 +34,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Future<void> _fetchNotifications({bool isNextPage = false}) async {
+    if (isNextPage && (!_hasMore || _isFetchingNextPage)) return;
+
     if (isNextPage) {
       setState(() {
         _isFetchingNextPage = true;
@@ -47,9 +49,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
     try {
       // Fetch notifications from the NotificationService
       final notifications = await _notificationService.fetchNotifications(
-        page: _currentPage,
+        page: isNextPage ? _currentPage : 0,
         size: 10,
       );
+
       setState(() {
         if (isNextPage) {
           _notifications.addAll(notifications); // Append new notifications
@@ -150,10 +153,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   const SizedBox(height: 20),
                   Expanded(
                     child: RefreshIndicator(
-                      onRefresh:
-                          () => _fetchNotifications(
-                            isNextPage: false,
-                          ), // Refresh notifications
+                      onRefresh: () async {
+                        setState(() {
+                          _currentPage = 0; // Reset to the first page
+                          _hasMore = true; // Allow fetching more pages
+                        });
+                        await _fetchNotifications(isNextPage: false);
+                      },
                       child:
                           _isLoading
                               ? const Center(
@@ -209,8 +215,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
+                                          // Title with one line
                                           Text(
                                             notification.title,
+                                            maxLines:
+                                                1, // Limit the title to one line
+                                            overflow:
+                                                TextOverflow
+                                                    .ellipsis, // Add ellipsis if it overflows
                                             style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -218,16 +230,21 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                             ),
                                           ),
                                           const SizedBox(height: 5),
+                                          // Description with one line
                                           Text(
                                             notification.description,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                            maxLines:
+                                                1, // Limit the description to one line
+                                            overflow:
+                                                TextOverflow
+                                                    .ellipsis, // Add ellipsis if it overflows
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.white70,
                                             ),
                                           ),
                                           const SizedBox(height: 10),
+                                          // Date and time
                                           Text(
                                             "${notification.createdAt.hour.toString().padLeft(2, '0')}:${notification.createdAt.minute.toString().padLeft(2, '0')} - ${notification.createdAt.day.toString().padLeft(2, '0')}/${notification.createdAt.month.toString().padLeft(2, '0')}/${notification.createdAt.year}",
                                             style: const TextStyle(
