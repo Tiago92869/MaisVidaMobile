@@ -84,20 +84,31 @@ class _HomeTabViewState extends State<HomeTabView> {
   }
 
   Future<void> _fetchMedications() async {
+    setState(() {
+      _isLoadingMedications = true; // Start loading
+    });
+
     try {
-      final medications = await _medicineService.fetchMedicines(
-        false,
-        DateTime.now(),
-        DateTime.now(),
+      // Fetch medicines using the updated method
+      final medicinePage = await _medicineService.fetchMedicines(
+        false, // Archived status
+        DateTime.now(), // Start date
+        DateTime.now(), // End date
+        page: 0, // Fetch the first page
+        size: 3, // Fetch only 3 medicines
       );
+
+      // Update the state with the fetched medicines
       setState(() {
-        _medications = medications[0].medicines.take(3).toList();
+        _medications =
+            medicinePage.content; // Use the content from MedicinePage
       });
     } catch (e) {
+      print('Error fetching medications: $e');
       _showErrorSnackBar("Failed to fetch medications.");
     } finally {
       setState(() {
-        _isLoadingMedications = false;
+        _isLoadingMedications = false; // Stop loading
       });
     }
   }

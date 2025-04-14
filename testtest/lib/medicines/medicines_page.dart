@@ -49,18 +49,20 @@ class _MedicinesPageState extends State<MedicinesPage> {
       }
 
       // Fetch medicines from the repository
-      final medicineDays = await _medicineRepository.getMedicines(
+      final medicinePage = await _medicineRepository.getMedicines(
         _showArchived,
         startDate,
         endDate,
+        page: 0, // Start with the first page
+        size: 10, // Fetch 10 medicines per page
       );
 
       // Update the _medicines list with the fetched data
       setState(() {
         _medicines.clear();
-        for (var medicineDay in medicineDays) {
-          _medicines.addAll(medicineDay.medicines);
-        }
+        _medicines.addAll(
+          medicinePage.content,
+        ); // Add medicines from the response
       });
     } catch (e) {
       print('Error fetching medicines: $e');
@@ -120,6 +122,98 @@ class _MedicinesPageState extends State<MedicinesPage> {
     }
   }
 
+  Widget _buildCalendar(List<DateTime> weekDays) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          onPressed: () => _moveWeek(-1),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          iconSize: 30,
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekDays.map((day) => _buildDayTile(day)).toList(),
+          ),
+        ),
+        IconButton(
+          onPressed: () => _moveWeek(1),
+          icon: const Icon(Icons.arrow_forward, color: Colors.white),
+          iconSize: 30,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDayTile(DateTime day) {
+    final isSelected =
+        _selectedDay?.day == day.day &&
+        _selectedDay?.month == day.month &&
+        _selectedDay?.year == day.year;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            // Deselect the day and fetch medicines for the entire week
+            _selectedDay = null;
+            _fetchMedicines();
+          } else {
+            // Select the day and fetch medicines for that specific day
+            _selectedDay = day;
+            _fetchMedicines();
+          }
+        });
+      },
+      child: Column(
+        children: [
+          Text(
+            ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][day.weekday - 1],
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration:
+                isSelected
+                    ? BoxDecoration(
+                      color: const Color.fromRGBO(85, 123, 233, 1),
+                      borderRadius: BorderRadius.circular(12),
+                    )
+                    : null,
+            child: Text(
+              day.day.toString(),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ][day.month - 1],
+            style: const TextStyle(fontSize: 12, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final weekDays = _getWeekDays(_currentWeekStart);
@@ -160,7 +254,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+                    horizontal: 10,
                     vertical: 20,
                   ),
                   child: Column(
@@ -180,120 +274,14 @@ class _MedicinesPageState extends State<MedicinesPage> {
                       ),
                       const SizedBox(height: 20),
                       // Calendar
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Left Arrow
-                          IconButton(
-                            onPressed: () => _moveWeek(-1),
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                            ),
-                            iconSize: 30, // Arrow size
-                          ),
-                          // Week Days
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              transitionBuilder: (child, animation) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                              child: Row(
-                                key: ValueKey(_currentWeekStart),
-                                mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceAround, // Adjust spacing
-                                children:
-                                    weekDays.map((day) {
-                                      final isSelected =
-                                          _selectedDay?.day == day.day &&
-                                          _selectedDay?.month == day.month &&
-                                          _selectedDay?.year == day.year;
-
-                                      return GestureDetector(
-                                        onTap: () => _onDaySelected(day),
-                                        child: Column(
-                                          children: [
-                                            // Day of the week
-                                            Text(
-                                              "${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day.weekday - 1]}",
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-
-                                            // Date with conditional purple container
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 6,
-                                              ), // Reduced horizontal padding
-                                              decoration:
-                                                  isSelected
-                                                      ? BoxDecoration(
-                                                        color: const Color.fromRGBO(
-                                                          85,
-                                                          123,
-                                                          233,
-                                                          1,
-                                                        ), // Purple background
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              12,
-                                                            ),
-                                                      )
-                                                      : null, // No decoration if not selected
-                                              child: Text(
-                                                day.day.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-
-                                            // Month abbreviation
-                                            Text(
-                                              "${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][day.month - 1]}",
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                              ),
-                            ),
-                          ),
-                          // Right Arrow
-                          IconButton(
-                            onPressed: () => _moveWeek(1),
-                            icon: const Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white,
-                            ),
-                            iconSize: 30, // Arrow size
-                          ),
-                        ],
-                      ),
+                      _buildCalendar(weekDays),
                       const SizedBox(height: 20),
                       // Medicines Container
                       Expanded(
                         child:
                             _isLoading
                                 ? const Center(
-                                  child:
-                                      CircularProgressIndicator(), // Show loading indicator
+                                  child: CircularProgressIndicator(),
                                 )
                                 : _medicines.isEmpty
                                 ? const Center(
@@ -318,7 +306,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
                                       final medicine = _medicines[index];
                                       return GestureDetector(
                                         onTap: () {
-                                          // Navigate to MedicineDetailPage for visualizing the medicine
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -358,8 +345,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                                                 ),
                                               ),
                                               const SizedBox(height: 8),
-
-                                              // Medicine Description (limited to 2 lines)
+                                              // Medicine Description
                                               Text(
                                                 medicine.description,
                                                 maxLines: 2,
@@ -370,7 +356,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
                                                 ),
                                               ),
                                               const SizedBox(height: 8),
-
                                               // Start and End Dates
                                               Row(
                                                 mainAxisAlignment:
@@ -414,17 +399,14 @@ class _MedicinesPageState extends State<MedicinesPage> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  _showArchived =
-                      !_showArchived; // Toggle between archived and open medicines
+                  _showArchived = !_showArchived;
                 });
-                _fetchMedicines(); // Refresh the medicines list
+                _fetchMedicines();
               },
               child: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(
-                  _showArchived
-                      ? Icons.folder_open
-                      : Icons.archive, // Switch icon based on _showArchived
+                  _showArchived ? Icons.folder_open : Icons.archive,
                   color: const Color.fromRGBO(72, 85, 204, 1),
                 ),
               ),
@@ -433,13 +415,9 @@ class _MedicinesPageState extends State<MedicinesPage> {
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(
-          bottom: 90.0,
-          right: 20,
-        ), // Move the button 40 pixels upwards
+        padding: const EdgeInsets.only(bottom: 90.0, right: 20),
         child: FloatingActionButton(
           onPressed: () {
-            // Navigate to MedicineDetailPage for creating a new medicine
             Navigator.push(
               context,
               MaterialPageRoute(

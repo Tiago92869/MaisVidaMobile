@@ -1,139 +1,29 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class MedicinePage {
-  final int totalElements;
   final int totalPages;
-  final bool first;
-  final bool last;
-  final int size;
-  final int number;
+  final int totalElements;
   final List<Medicine> content;
+  final int number;
 
   MedicinePage({
-    required this.totalElements,
     required this.totalPages,
-    required this.first,
-    required this.last,
-    required this.size,
-    required this.number,
+    required this.totalElements,
     required this.content,
+    required this.number,
   });
 
   factory MedicinePage.fromJson(Map<String, dynamic> json) {
-    var contentJson = json['content'] as List;
-    List<Medicine> contentList =
-        contentJson.map((i) => Medicine.fromJson(i)).toList();
-
     return MedicinePage(
-      totalElements: json['totalElements'],
       totalPages: json['totalPages'],
-      first: json['first'],
-      last: json['last'],
-      size: json['size'],
+      totalElements: json['totalElements'],
+      content:
+          (json['content'] as List)
+              .map((item) => Medicine.fromJson(item))
+              .toList(),
       number: json['number'],
-      content: contentList,
     );
-  }
-}
-
-enum WeekDay {
-  MONDAY,
-  TUESDAY,
-  WEDNESDAY,
-  THURSDAY,
-  FRIDAY,
-  SATURDAY,
-  SUNDAY,
-}
-
-extension WeekDayExtension on WeekDay {
-  static WeekDay fromString(String day) {
-    switch (day) {
-      case 'MONDAY':
-        return WeekDay.MONDAY;
-      case 'TUESDAY':
-        return WeekDay.TUESDAY;
-      case 'WEDNESDAY':
-        return WeekDay.WEDNESDAY;
-      case 'THURSDAY':
-        return WeekDay.THURSDAY;
-      case 'FRIDAY':
-        return WeekDay.FRIDAY;
-      case 'SATURDAY':
-        return WeekDay.SATURDAY;
-      case 'SUNDAY':
-        return WeekDay.SUNDAY;
-      default:
-        throw ArgumentError('Unknown WeekDay: $day');
-    }
-  }
-}
-
-class Dosage {
-  final String id;
-  final TimeOfDay time;
-  final double dosage;
-
-  Dosage({
-    required this.id,
-    required this.time,
-    required this.dosage,
-  });
-
-  factory Dosage.fromJson(Map<String, dynamic> json) {
-    String timeString = json['time'];
-    List<String> parts = timeString.split(':');
-    TimeOfDay timeOfDay = TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
-
-    return Dosage(
-      id: json['id'],
-      time: timeOfDay,
-      dosage: json['dosage'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'time':
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:00',
-      'dosage': dosage,
-    };
-  }
-}
-
-class Plan {
-  final String id;
-  final WeekDay weekDay;
-  final List<Dosage> dosages;
-
-  Plan({
-    required this.id,
-    required this.weekDay,
-    required this.dosages,
-  });
-
-  factory Plan.fromJson(Map<String, dynamic> json) {
-    var dosagesJson = json['dosages'] as List;
-    List<Dosage> dosageList =
-        dosagesJson.map((i) => Dosage.fromJson(i)).toList();
-
-    return Plan(
-      id: json['id'],
-      weekDay: WeekDayExtension.fromString(json['weekDay']),
-      dosages: dosageList,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'weekDay': weekDay.toString().split('.').last,
-      'dosages': dosages.map((d) => d.toJson()).toList(),
-    };
   }
 }
 
@@ -145,9 +35,9 @@ class Medicine {
   final DateTime startedAt;
   final DateTime endedAt;
   final bool hasNotifications;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  List<Plan> plans;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final List<Plan> plans;
 
   Medicine({
     required this.id,
@@ -157,15 +47,12 @@ class Medicine {
     required this.startedAt,
     required this.endedAt,
     required this.hasNotifications,
-    this.createdAt,
-    this.updatedAt,
+    required this.createdAt,
+    required this.updatedAt,
     required this.plans,
   });
 
   factory Medicine.fromJson(Map<String, dynamic> json) {
-    var plansJson = json['plans'] as List;
-    List<Plan> plansList = plansJson.map((i) => Plan.fromJson(i)).toList();
-
     return Medicine(
       id: json['id'],
       name: json['name'],
@@ -176,7 +63,8 @@ class Medicine {
       hasNotifications: json['hasNotifications'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      plans: plansList,
+      plans:
+          (json['plans'] as List).map((item) => Plan.fromJson(item)).toList(),
     );
   }
 
@@ -189,52 +77,56 @@ class Medicine {
       'startedAt': startedAt.toIso8601String(),
       'endedAt': endedAt.toIso8601String(),
       'hasNotifications': hasNotifications,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'plans': plans.map((p) => p.toJson()).toList(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'plans': plans.map((plan) => plan.toJson()).toList(),
     };
-  }
-
-  Medicine copyWith({
-    String? id,
-    String? name,
-    String? description,
-    bool? archived,
-    DateTime? startedAt,
-    DateTime? endedAt,
-    bool? hasNotifications,
-    List<Plan>? plans,
-  }) {
-    return Medicine(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      archived: archived ?? this.archived,
-      startedAt: startedAt ?? this.startedAt,
-      endedAt: endedAt ?? this.endedAt,
-      hasNotifications: hasNotifications ?? this.hasNotifications,
-      plans: plans ?? this.plans,
-    );
   }
 }
 
-class MedicineDay {
-  final DateTime day;
-  final List<Medicine> medicines;
+class Plan {
+  final String id;
+  final String weekDay;
+  final List<Dosage> dosages;
 
-  MedicineDay({
-    required this.day,
-    required this.medicines,
-  });
+  Plan({required this.id, required this.weekDay, required this.dosages});
 
-  factory MedicineDay.fromJson(Map<String, dynamic> json) {
-    var medicinesJson = json['medicines'] as List;
-    List<Medicine> medicinesList =
-        medicinesJson.map((i) => Medicine.fromJson(i)).toList();
-
-    return MedicineDay(
-      day: DateTime.parse(json['day'] as String),
-      medicines: medicinesList,
+  factory Plan.fromJson(Map<String, dynamic> json) {
+    return Plan(
+      id: json['id'],
+      weekDay: json['weekDay'],
+      dosages:
+          (json['dosages'] as List)
+              .map((item) => Dosage.fromJson(item))
+              .toList(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'weekDay': weekDay,
+      'dosages': dosages.map((dosage) => dosage.toJson()).toList(),
+    };
+  }
+}
+
+class Dosage {
+  final String id;
+  final DateTime time;
+  final int dosage;
+
+  Dosage({required this.id, required this.time, required this.dosage});
+
+  factory Dosage.fromJson(Map<String, dynamic> json) {
+    return Dosage(
+      id: json['id'],
+      time: DateTime.parse(json['time']),
+      dosage: json['dosage'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'time': time.toIso8601String(), 'dosage': dosage};
   }
 }

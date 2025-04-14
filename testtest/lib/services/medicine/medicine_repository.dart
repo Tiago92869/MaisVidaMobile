@@ -4,66 +4,35 @@ import 'package:testtest/services/medicine/medicine_model.dart';
 class MedicineRepository {
   final MedicineService _medicineService = MedicineService();
 
-  Future<List<MedicineDay>> getMedicines(
-  bool archived,
-  DateTime startDate,
-  DateTime endDate,
-) async {
-  try {
-    print('Requesting medicines: archived=$archived, startDate=$startDate, endDate=$endDate');
-    final medicineDays = await _medicineService.fetchMedicines(archived, startDate, endDate);
-    print('Successfully fetched medicines: ${medicineDays.length} days');
-    return medicineDays;
-  } catch (e) {
-    print('Error fetching medicines: $e');
-    rethrow; // Re-throw the error to be handled by the caller
+  Future<MedicinePage> getMedicines(
+    bool archived,
+    DateTime startDate,
+    DateTime endDate, {
+    int page = 0,
+    int size = 10,
+  }) async {
+    return await _medicineService.fetchMedicines(
+      archived,
+      startDate,
+      endDate,
+      page: page,
+      size: size,
+    );
   }
-}
 
   Future<Medicine> getMedicineById(String id) async {
-    try {
-      print('Requesting medicine by ID: $id');
-      final medicine = await _medicineService.fetchMedicineById(id);
-      print('Successfully fetched medicine: ${medicine.name}');
-      return medicine;
-    } catch (e) {
-      print('Error fetching medicine by ID: $e');
-      rethrow;
-    }
+    return await _medicineService.fetchMedicineById(id);
   }
 
-  Future<Medicine> addMedicine(Medicine medicine) async {
-    try {
-      print('Adding new medicine: ${medicine.name}');
-      final addedMedicine = await _medicineService.createMedicine(medicine);
-      print('Successfully added medicine: ${addedMedicine.name}');
-      return addedMedicine;
-    } catch (e) {
-      print('Error adding medicine: $e');
-      rethrow;
-    }
+  Future<Medicine> createMedicine(Medicine medicine) async {
+    return await _medicineService.createMedicine(medicine);
   }
 
   Future<Medicine> updateMedicine(String id, Medicine medicine) async {
-    try {
-      print('Updating medicine ID: $id');
-      final updatedMedicine = await _medicineService.modifyMedicine(id, medicine);
-      print('Successfully updated medicine: ${updatedMedicine.name}');
-      return updatedMedicine;
-    } catch (e) {
-      print('Error updating medicine: $e');
-      rethrow;
-    }
+    return await _medicineService.modifyMedicine(id, medicine);
   }
 
-  Future<void> removeMedicine(String id) async {
-    try {
-      print('Removing medicine ID: $id');
-      await _medicineService.deleteMedicine(id);
-      print('Successfully removed medicine ID: $id');
-    } catch (e) {
-      print('Error removing medicine: $e');
-      rethrow;
-    }
+  Future<void> deleteMedicine(String id) async {
+    await _medicineService.deleteMedicine(id);
   }
 }

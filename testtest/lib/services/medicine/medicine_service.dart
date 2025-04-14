@@ -33,15 +33,17 @@ class MedicineService {
     }
   }
 
-  Future<List<MedicineDay>> fetchMedicines(
+  Future<MedicinePage> fetchMedicines(
     bool archived,
     DateTime startDate,
-    DateTime endDate,
-  ) async {
+    DateTime endDate, {
+    int page = 0,
+    int size = 10,
+  }) async {
     await _loadStoredCredentials();
     try {
       final String url =
-          '$_baseUrl?archived=$archived&startDate=${startDate.toIso8601String()}&endDate=${endDate.toIso8601String()}';
+          '$_baseUrl?archived=$archived&startDate=${_formatDate(startDate)}&endDate=${_formatDate(startDate)}&page=$page&size=$size';
       print('Request URL for fetchMedicines: $url'); // Log the request URL
 
       final response = await http
@@ -67,8 +69,8 @@ class MedicineService {
 
       if (response.statusCode == 200) {
         print('Medicines fetched successfully.');
-        var jsonList = jsonDecode(response.body) as List;
-        return jsonList.map((json) => MedicineDay.fromJson(json)).toList();
+        final json = jsonDecode(response.body);
+        return MedicinePage.fromJson(json); // Map the response to MedicinePage
       } else {
         print('Failed to load medicines. Status Code: ${response.statusCode}');
         throw Exception('Failed to load medicines');
@@ -240,5 +242,13 @@ class MedicineService {
       print('Error deleting medicine: $e');
       throw Exception('Failed to delete medicine');
     }
+  }
+
+  // Helper method to format dates
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+    return '$year-$month-$day';
   }
 }

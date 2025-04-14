@@ -4,18 +4,23 @@ import 'package:testtest/services/medicine/medicine_model.dart'; // Import the m
 import 'package:testtest/services/medicine/medicine_repository.dart'; // Import the repository
 import 'medicines_page.dart';
 
+// Define WeekDay enum if not already defined elsewhere
+enum WeekDay { monday, tuesday, wednesday, thursday, friday, saturday, sunday }
+
 class MedicineDetailPage extends StatefulWidget {
   final Medicine? medicine; // Use the Medicine model
   final bool isEditing; // Indicates if the page is in editing mode
 
-  const MedicineDetailPage({Key? key, this.medicine, this.isEditing = false}) : super(key: key);
+  const MedicineDetailPage({Key? key, this.medicine, this.isEditing = false})
+    : super(key: key);
 
   @override
   _MedicineDetailPageState createState() => _MedicineDetailPageState();
 }
 
 class _MedicineDetailPageState extends State<MedicineDetailPage> {
-  final MedicineRepository _medicineRepository = MedicineRepository(); // Repository instance
+  final MedicineRepository _medicineRepository =
+      MedicineRepository(); // Repository instance
   bool editMode = false; // Tracks if the user is editing
   bool isSaving = false; // Tracks if the save operation is in progress
   late TextEditingController nameController;
@@ -24,25 +29,39 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   late TextEditingController endDateController;
   bool hasNotifications = false; // Local variable for notifications toggle
   bool isArchived = false; // Local variable for archived toggle
-  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
+  bool _showFirstStarfish = Random().nextBool();
 
+  //REMOVE
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  } // Randomly decide which starfish to show
+
+  /*
   @override
   void initState() {
     super.initState();
     editMode = widget.isEditing;
     nameController = TextEditingController(text: widget.medicine?.name ?? "");
-    descriptionController = TextEditingController(text: widget.medicine?.description ?? "");
+    descriptionController = TextEditingController(
+      text: widget.medicine?.description ?? "",
+    );
     startDateController = TextEditingController(
-      text: widget.medicine?.startedAt != null
-          ? "${widget.medicine!.startedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.year}"
-          : "",
+      text:
+          widget.medicine?.startedAt != null
+              ? "${widget.medicine!.startedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.year}"
+              : "",
     );
     endDateController = TextEditingController(
-      text: widget.medicine?.endedAt != null
-          ? "${widget.medicine!.endedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.year}"
-          : "",
+      text:
+          widget.medicine?.endedAt != null
+              ? "${widget.medicine!.endedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.year}"
+              : "",
     );
-    hasNotifications = widget.medicine?.hasNotifications ?? false; // Initialize from medicine or default to false
+    hasNotifications =
+        widget.medicine?.hasNotifications ??
+        false; // Initialize from medicine or default to false
     isArchived = widget.medicine?.archived ?? false;
   }
 
@@ -54,18 +73,25 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     try {
       final String name = nameController.text.trim();
       final String description = descriptionController.text.trim();
-      final DateTime? startedAt = startDateController.text.isNotEmpty
-          ? _parseDate(startDateController.text)
-          : null;
-      final DateTime? endedAt = endDateController.text.isNotEmpty
-          ? _parseDate(endDateController.text)
-          : null;
+      final DateTime? startedAt =
+          startDateController.text.isNotEmpty
+              ? _parseDate(startDateController.text)
+              : null;
+      final DateTime? endedAt =
+          endDateController.text.isNotEmpty
+              ? _parseDate(endDateController.text)
+              : null;
 
       // Validation: Check if required fields are filled
-      if (name.isEmpty || description.isEmpty || startedAt == null || endedAt == null) {
+      if (name.isEmpty ||
+          description.isEmpty ||
+          startedAt == null ||
+          endedAt == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Please fill in all required fields: Name, Description, Start Date, and End Date."),
+            content: Text(
+              "Please fill in all required fields: Name, Description, Start Date, and End Date.",
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -79,7 +105,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       if (startedAt.isAfter(endedAt)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Start Date must be earlier than or equal to End Date."),
+            content: Text(
+              "Start Date must be earlier than or equal to End Date.",
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -100,8 +128,24 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           endedAt: endedAt,
           hasNotifications: hasNotifications,
           plans: [],
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         );
-        await _medicineRepository.addMedicine(newMedicine);
+
+        if (widget.medicine == null && newMedicine.plans.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Please add at least one plan before saving."),
+              backgroundColor: Colors.red,
+            ),
+          );
+          setState(() {
+            isSaving = false; // Hide loading indicator
+          });
+          return;
+        }
+
+        await _medicineRepository.createMedicine(newMedicine);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Medicine created successfully!")),
         );
@@ -114,8 +158,12 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           startedAt: startedAt,
           endedAt: endedAt,
           hasNotifications: hasNotifications,
+          plans: widget.medicine!.plans ?? [], // Ensure plans are not null
         );
-        await _medicineRepository.updateMedicine(updatedMedicine.id, updatedMedicine);
+        await _medicineRepository.updateMedicine(
+          updatedMedicine.id,
+          updatedMedicine,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Medicine updated successfully!")),
         );
@@ -149,12 +197,14 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       // Revert changes and exit edit mode
       nameController.text = widget.medicine?.name ?? "";
       descriptionController.text = widget.medicine?.description ?? "";
-      startDateController.text = widget.medicine?.startedAt != null
-          ? "${widget.medicine!.startedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.year}"
-          : "";
-      endDateController.text = widget.medicine?.endedAt != null
-          ? "${widget.medicine!.endedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.year}"
-          : "";
+      startDateController.text =
+          widget.medicine?.startedAt != null
+              ? "${widget.medicine!.startedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.startedAt.year}"
+              : "";
+      endDateController.text =
+          widget.medicine?.endedAt != null
+              ? "${widget.medicine!.endedAt.day.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.month.toString().padLeft(2, '0')}-${widget.medicine!.endedAt.year}"
+              : "";
       hasNotifications = widget.medicine?.hasNotifications ?? false;
       editMode = false;
     });
@@ -179,8 +229,18 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
-                      Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
+                      Color.fromRGBO(
+                        72,
+                        85,
+                        204,
+                        0.9,
+                      ), // Start color (darker blue)
+                      Color.fromRGBO(
+                        123,
+                        144,
+                        255,
+                        0.9,
+                      ), // End color (lighter blue)
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -212,30 +272,50 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       const SizedBox(height: 10),
                       Wrap(
                         spacing: 8.0,
-                        children: WeekDay.values.map((day) {
-                          return FilterChip(
-                            label: Text(
-                              "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}",
-                              style: TextStyle(
-                                color: selectedDays.contains(day)
-                                    ? Colors.white
-                                    : Colors.black87,
-                              ),
-                            ),
-                            selected: selectedDays.contains(day),
-                            selectedColor: const Color.fromRGBO(123, 144, 255, 1),
-                            backgroundColor: Colors.white10,
-                            onSelected: (isSelected) {
-                              setState(() {
-                                if (isSelected) {
-                                  selectedDays.add(day);
-                                } else {
-                                  selectedDays.remove(day);
-                                }
-                              });
-                            },
-                          );
-                        }).toList(),
+                        children:
+                            [
+                              "Jan",
+                              "Feb",
+                              "Mar",
+                              "Apr",
+                              "May",
+                              "Jun",
+                              "Jul",
+                              "Aug",
+                              "Sep",
+                              "Oct",
+                              "Nov",
+                              "Dec",
+                            ].map((month) {
+                              return FilterChip(
+                                label: Text(
+                                  "${day.name[0].toUpperCase()}${day.name.substring(1).toLowerCase()}",
+                                  style: TextStyle(
+                                    color:
+                                        selectedDays.contains(day)
+                                            ? Colors.white
+                                            : Colors.black87,
+                                  ),
+                                ),
+                                selected: selectedDays.contains(day),
+                                selectedColor: const Color.fromRGBO(
+                                  123,
+                                  144,
+                                  255,
+                                  1,
+                                ),
+                                backgroundColor: Colors.white10,
+                                onSelected: (isSelected) {
+                                  setState(() {
+                                    if (isSelected) {
+                                      selectedDays.add(day);
+                                    } else {
+                                      selectedDays.remove(day);
+                                    }
+                                  });
+                                },
+                              );
+                            }).toList(),
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -266,13 +346,25 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   return Theme(
                                     data: Theme.of(context).copyWith(
                                       colorScheme: const ColorScheme.light(
-                                        primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
-                                        onPrimary: Colors.white, // Header text color
-                                        onSurface: Colors.black, // Body text color
+                                        primary: Color.fromRGBO(
+                                          72,
+                                          85,
+                                          204,
+                                          1,
+                                        ), // Header background color
+                                        onPrimary:
+                                            Colors.white, // Header text color
+                                        onSurface:
+                                            Colors.black, // Body text color
                                       ),
                                       textButtonTheme: TextButtonThemeData(
                                         style: TextButton.styleFrom(
-                                          foregroundColor: Color.fromRGBO(72, 85, 204, 1), // Button text color
+                                          foregroundColor: Color.fromRGBO(
+                                            72,
+                                            85,
+                                            204,
+                                            1,
+                                          ), // Button text color
                                         ),
                                       ),
                                     ),
@@ -340,7 +432,12 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
+                              foregroundColor: const Color.fromRGBO(
+                                72,
+                                85,
+                                204,
+                                1,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -352,11 +449,15 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                 setState(() {
                                   for (var day in selectedDays) {
                                     // Find the plan for the selected day
-                                    final plan = widget.medicine?.plans.firstWhere(
-                                      (p) => p.weekDay == day,
-                                      orElse: () => throw Exception(
-                                          "Plan for $day not found"),
-                                    );
+                                    final plan = widget.medicine?.plans
+                                        .firstWhere(
+                                          (p) => p.weekDay == day,
+                                          orElse:
+                                              () =>
+                                                  throw Exception(
+                                                    "Plan for $day not found",
+                                                  ),
+                                        );
 
                                     // Add the dosage to the existing plan
                                     plan?.dosages.add(
@@ -416,8 +517,18 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(72, 85, 204, 0.9), // Start color (darker blue)
-                    Color.fromRGBO(123, 144, 255, 0.9), // End color (lighter blue)
+                    Color.fromRGBO(
+                      72,
+                      85,
+                      204,
+                      0.9,
+                    ), // Start color (darker blue)
+                    Color.fromRGBO(
+                      123,
+                      144,
+                      255,
+                      0.9,
+                    ), // End color (lighter blue)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -428,11 +539,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
           // Loading Indicator
           if (isSaving)
-            const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            ),
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
 
           // Randomly show one of the starfish images
           if (_showFirstStarfish)
@@ -476,7 +583,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
+                    ),
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,12 +637,14 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           const SizedBox(height: 20),
 
                           // Plans Section
-                          if (widget.medicine?.plans != null && widget.medicine!.plans.isNotEmpty)
+                          if (widget.medicine?.plans != null &&
+                              widget.medicine!.plans.isNotEmpty)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
                                       "Weekly Plan",
@@ -544,80 +656,132 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                     ),
                                     if (editMode)
                                       IconButton(
-                                        icon: const Icon(Icons.add, color: Colors.white),
+                                        icon: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
                                         onPressed: _showAddPlanDialog,
                                       ),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 ...widget.medicine!.plans
-                                    .where((plan) => plan.dosages.isNotEmpty) // Filter out days without dosages
+                                    .where(
+                                      (plan) => plan.dosages.isNotEmpty,
+                                    ) // Filter out days without dosages
                                     .map((plan) {
-                                  return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${plan.weekDay.name[0].toUpperCase()}${plan.weekDay.name.substring(1).toLowerCase()}", // Capitalize only the first letter
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Stack(
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          // Medicine row with horizontal scrolling
-                                          Scrollbar(
-                                            controller: ScrollController(), // Add a controller for the scrollbar
-                                            thumbVisibility: true, // Ensure the scrollbar is visible
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: Row(
-                                                children: plan.dosages.map((dosage) {
-                                                  return Container(
-                                                    margin: const EdgeInsets.only(right: 10),
-                                                    padding: const EdgeInsets.all(8.0),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color.fromRGBO(255, 255, 255, 0.1), // Slightly brighter background
-                                                      border: Border.all(color: Colors.white), // Brighter border
-                                                      borderRadius: BorderRadius.circular(8),
-                                                    ),
-                                                    child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Text(
-                                                          dosage.time.format(context),
-                                                          style: const TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.bold, // Make the text bold
-                                                            color: Colors.white, // Bright white for better contrast
-                                                          ),
-                                                          textAlign: TextAlign.center,
-                                                        ),
-                                                        const SizedBox(height: 5),
-                                                        Text(
-                                                          "${dosage.dosage}",
-                                                          style: const TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight: FontWeight.bold, // Make the text bold
-                                                            color: Colors.white, // Bright white for better contrast
-                                                          ),
-                                                          textAlign: TextAlign.center,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                }).toList(),
-                                              ),
+                                          Text(
+                                            "${plan.weekDay.name[0].toUpperCase()}${plan.weekDay.name.substring(1).toLowerCase()}", // Capitalize only the first letter
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
                                             ),
                                           ),
+                                          const SizedBox(height: 5),
+                                          Stack(
+                                            children: [
+                                              // Medicine row with horizontal scrolling
+                                              Scrollbar(
+                                                controller:
+                                                    ScrollController(), // Add a controller for the scrollbar
+                                                thumbVisibility:
+                                                    true, // Ensure the scrollbar is visible
+                                                child: SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  child: Row(
+                                                    children:
+                                                        plan.dosages.map((
+                                                          dosage,
+                                                        ) {
+                                                          return Container(
+                                                            margin:
+                                                                const EdgeInsets.only(
+                                                                  right: 10,
+                                                                ),
+                                                            padding:
+                                                                const EdgeInsets.all(
+                                                                  8.0,
+                                                                ),
+                                                            decoration: BoxDecoration(
+                                                              color: const Color.fromRGBO(
+                                                                255,
+                                                                255,
+                                                                255,
+                                                                0.1,
+                                                              ), // Slightly brighter background
+                                                              border: Border.all(
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                              ), // Brighter border
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    8,
+                                                                  ),
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                Text(
+                                                                  dosage.time
+                                                                      .format(
+                                                                        context,
+                                                                      ),
+                                                                  style: const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold, // Make the text bold
+                                                                    color:
+                                                                        Colors
+                                                                            .white, // Bright white for better contrast
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 5,
+                                                                ),
+                                                                Text(
+                                                                  "${dosage.dosage}",
+                                                                  style: const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold, // Make the text bold
+                                                                    color:
+                                                                        Colors
+                                                                            .white, // Bright white for better contrast
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        }).toList(),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
                                         ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                    ],
-                                  );
-                                }).toList(),
+                                      );
+                                    })
+                                    .toList(),
                               ],
                             )
                           else
@@ -632,39 +796,60 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
                           // Start Date
                           InkWell(
-                            onTap: editMode
-                                ? () async {
-                                    final selectedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: _parseDate(startDateController.text) ?? DateTime.now(),
-                                      firstDate: DateTime(2000),
-                                      lastDate: DateTime(2100),
-                                      builder: (context, child) {
-                                        return Theme(
-                                          data: Theme.of(context).copyWith(
-                                            colorScheme: const ColorScheme.light(
-                                              primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
-                                              onPrimary: Colors.white, // Header text color
-                                              onSurface: Colors.black, // Body text color
-                                            ),
-                                            textButtonTheme: TextButtonThemeData(
-                                              style: TextButton.styleFrom(
-                                                foregroundColor: Color.fromRGBO(72, 85, 204, 1), // Button text color
+                            onTap:
+                                editMode
+                                    ? () async {
+                                      final selectedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate:
+                                            _parseDate(
+                                              startDateController.text,
+                                            ) ??
+                                            DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime(2100),
+                                        builder: (context, child) {
+                                          return Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: const ColorScheme.light(
+                                                primary: Color.fromRGBO(
+                                                  72,
+                                                  85,
+                                                  204,
+                                                  1,
+                                                ), // Header background color
+                                                onPrimary:
+                                                    Colors
+                                                        .white, // Header text color
+                                                onSurface:
+                                                    Colors
+                                                        .black, // Body text color
                                               ),
+                                              textButtonTheme:
+                                                  TextButtonThemeData(
+                                                    style: TextButton.styleFrom(
+                                                      foregroundColor:
+                                                          Color.fromRGBO(
+                                                            72,
+                                                            85,
+                                                            204,
+                                                            1,
+                                                          ), // Button text color
+                                                    ),
+                                                  ),
                                             ),
-                                          ),
-                                          child: child!,
-                                        );
-                                      },
-                                    );
-                                    if (selectedDate != null) {
-                                      setState(() {
-                                        startDateController.text =
-                                            "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}";
-                                      });
+                                            child: child!,
+                                          );
+                                        },
+                                      );
+                                      if (selectedDate != null) {
+                                        setState(() {
+                                          startDateController.text =
+                                              "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}";
+                                        });
+                                      }
                                     }
-                                  }
-                                : null,
+                                    : null,
                             child: IgnorePointer(
                               child: TextField(
                                 controller: startDateController,
@@ -685,39 +870,60 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
                           // End Date
                           InkWell(
-                            onTap: editMode
-                                ? () async {
-                                    final selectedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: _parseDate(endDateController.text) ?? DateTime.now(),
-                                      firstDate: DateTime(2000),
-                                      lastDate: DateTime(2100),
-                                      builder: (context, child) {
-                                        return Theme(
-                                          data: Theme.of(context).copyWith(
-                                            colorScheme: const ColorScheme.light(
-                                              primary: Color.fromRGBO(72, 85, 204, 1), // Header background color
-                                              onPrimary: Colors.white, // Header text color
-                                              onSurface: Colors.black, // Body text color
-                                            ),
-                                            textButtonTheme: TextButtonThemeData(
-                                              style: TextButton.styleFrom(
-                                                foregroundColor: Color.fromRGBO(72, 85, 204, 1), // Button text color
+                            onTap:
+                                editMode
+                                    ? () async {
+                                      final selectedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate:
+                                            _parseDate(
+                                              endDateController.text,
+                                            ) ??
+                                            DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime(2100),
+                                        builder: (context, child) {
+                                          return Theme(
+                                            data: Theme.of(context).copyWith(
+                                              colorScheme: const ColorScheme.light(
+                                                primary: Color.fromRGBO(
+                                                  72,
+                                                  85,
+                                                  204,
+                                                  1,
+                                                ), // Header background color
+                                                onPrimary:
+                                                    Colors
+                                                        .white, // Header text color
+                                                onSurface:
+                                                    Colors
+                                                        .black, // Body text color
                                               ),
+                                              textButtonTheme:
+                                                  TextButtonThemeData(
+                                                    style: TextButton.styleFrom(
+                                                      foregroundColor:
+                                                          Color.fromRGBO(
+                                                            72,
+                                                            85,
+                                                            204,
+                                                            1,
+                                                          ), // Button text color
+                                                    ),
+                                                  ),
                                             ),
-                                          ),
-                                          child: child!,
-                                        );
-                                      },
-                                    );
-                                    if (selectedDate != null) {
-                                      setState(() {
-                                        endDateController.text =
-                                            "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}";
-                                      });
+                                            child: child!,
+                                          );
+                                        },
+                                      );
+                                      if (selectedDate != null) {
+                                        setState(() {
+                                          endDateController.text =
+                                              "${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}";
+                                        });
+                                      }
                                     }
-                                  }
-                                : null,
+                                    : null,
                             child: IgnorePointer(
                               child: TextField(
                                 controller: endDateController,
@@ -749,17 +955,20 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                               ),
                               Switch(
                                 value: hasNotifications,
-                                onChanged: editMode
-                                    ? (value) {
-                                        setState(() {
-                                          hasNotifications = value;
-                                        });
-                                      }
-                                    : null,
+                                onChanged:
+                                    editMode
+                                        ? (value) {
+                                          setState(() {
+                                            hasNotifications = value;
+                                          });
+                                        }
+                                        : null,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10), // Add spacing between switches
+                          const SizedBox(
+                            height: 10,
+                          ), // Add spacing between switches
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -772,13 +981,14 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                               ),
                               Switch(
                                 value: isArchived,
-                                onChanged: widget.medicine != null && editMode
-                                    ? (value) {
-                                        setState(() {
-                                          isArchived = value;
-                                        });
-                                      }
-                                    : null, // Disable toggle when creating a new medicine
+                                onChanged:
+                                    widget.medicine != null && editMode
+                                        ? (value) {
+                                          setState(() {
+                                            isArchived = value;
+                                          });
+                                        }
+                                        : null, // Disable toggle when creating a new medicine
                               ),
                             ],
                           ),
@@ -812,11 +1022,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.cancel,
-                    color: Colors.red,
-                    size: 28,
-                  ),
+                  child: const Icon(Icons.cancel, color: Colors.red, size: 28),
                 ),
               ),
             ),
@@ -840,4 +1046,5 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       ),
     );
   }
+  */
 }
