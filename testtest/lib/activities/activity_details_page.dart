@@ -7,7 +7,8 @@ import 'dart:math';
 class ActivityDetailsPage extends StatefulWidget {
   final Activity activity;
 
-  const ActivityDetailsPage({Key? key, required this.activity}) : super(key: key);
+  const ActivityDetailsPage({Key? key, required this.activity})
+    : super(key: key);
 
   @override
   _ActivityDetailsPageState createState() => _ActivityDetailsPageState();
@@ -30,7 +31,9 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
 
   Future<void> _checkIfFavorite() async {
     try {
-      final isFavorite = await _favoriteService.isFavorite(activityId: widget.activity.id);
+      final isFavorite = await _favoriteService.isFavorite(
+        activityId: widget.activity.id,
+      );
       setState(() {
         _isFavorite = isFavorite;
       });
@@ -45,38 +48,47 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     }
   }
 
-  void _toggleFavoriteStatus() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-      _hasFavoriteChanged = true; // Mark that the favorite status has changed
-    });
-  }
+  Future<void> _toggleFavoriteStatus() async {
+    try {
+      final favoriteInput = FavoriteInput(
+        activities: [widget.activity.id],
+        resources: [],
+      );
 
-  Future<void> _updateFavoriteStatus() async {
-    if (_hasFavoriteChanged) {
-      try {
-        final favoriteInput = FavoriteInput(
-          activities: [widget.activity.id],
-          resources: [],
-        );
+      // Call modifyFavorite with the appropriate add/remove flag
+      await _favoriteService.modifyFavorite(favoriteInput, !_isFavorite);
 
-        await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
-      } catch (e) {
-        print('Error updating favorite status: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update favorite status.')),
-        );
-      }
+      setState(() {
+        _isFavorite = !_isFavorite; // Toggle the favorite status
+        _hasFavoriteChanged = true; // Mark that the favorite status has changed
+      });
+    } catch (e) {
+      print('Error updating favorite status: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update favorite status.')),
+      );
     }
   }
 
   @override
   void dispose() {
-    _updateFavoriteStatus(); // Update the favorite status when the page is closed
     super.dispose();
   }
 
-  void _startActivity() {
+  Future<void> _updateFavoriteStatus() async {
+    try {
+      final favoriteInput = FavoriteInput(
+        activities: [widget.activity.id],
+        resources: [],
+      );
+
+      await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
+    } catch (e) {
+      print('Error updating favorite status on dispose: $e');
+    }
+  }
+
+  void _startActivity() async {
     setState(() {
       _isViewingResources = true;
       _currentResourceIndex = 0;
@@ -104,10 +116,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF0D1B2A),
-                    Color(0xFF1B263B),
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -182,12 +191,15 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: _toggleFavoriteStatus, // Toggle the favorite status locally
+                        onTap: _toggleFavoriteStatus,
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: _isFavorite ? Colors.yellow : Colors.transparent,
+                            color:
+                                _isFavorite
+                                    ? Colors.yellow
+                                    : Colors.transparent,
                             border: Border.all(color: Colors.yellow, width: 2),
                           ),
                           child: Icon(
@@ -204,15 +216,23 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: activity.resources?.map((resource) {
+                      children:
+                          activity.resources?.map((resource) {
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                resource.type.toString().split('.').last.capitalizeFirstLetter(),
+                                resource.type
+                                    .toString()
+                                    .split('.')
+                                    .last
+                                    .capitalizeFirstLetter(),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -226,19 +246,20 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                   const SizedBox(height: 20),
                   // Description or Resource View
                   Expanded(
-                    child: _isViewingResources
-                        ? _buildResourceView()
-                        : SingleChildScrollView(
-                            child: Text(
-                              activity.description,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontFamily: "Inter",
-                                color: Colors.white,
-                                height: 1.5,
+                    child:
+                        _isViewingResources
+                            ? _buildResourceView()
+                            : SingleChildScrollView(
+                              child: Text(
+                                activity.description,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: "Inter",
+                                  color: Colors.white,
+                                  height: 1.5,
+                                ),
                               ),
                             ),
-                          ),
                   ),
                   const SizedBox(height: 20),
                   // Created At
@@ -247,7 +268,10 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildDateInfo("Created At", activity.createdAt),
-                        _buildDateInfo("Resources", activity.resources?.length.toString() ?? "0"),
+                        _buildDateInfo(
+                          "Resources",
+                          activity.resources?.length.toString() ?? "0",
+                        ),
                       ],
                     ),
                   const SizedBox(height: 20),
@@ -266,7 +290,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                         child: const Text(
                           "Start",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -300,10 +324,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
           value is DateTime
               ? "${value.day.toString().padLeft(2, '0')}-${value.month.toString().padLeft(2, '0')}-${value.year}"
               : value.toString(),
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-          ),
+          style: const TextStyle(fontSize: 14, color: Colors.white),
         ),
       ],
     );
@@ -313,53 +334,60 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     final resource = widget.activity.resources?[_currentResourceIndex];
 
     return resource == null
-        ? const Center(child: Text("No resources available", style: TextStyle(color: Colors.white)))
+        ? const Center(
+          child: Text(
+            "No resources available",
+            style: TextStyle(color: Colors.white),
+          ),
+        )
         : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                resource.title,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              resource.title,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Resource Type
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                resource.type
+                    .toString()
+                    .split('.')
+                    .last
+                    .capitalizeFirstLetter(),
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 10),
-              // Resource Type
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  resource.type.toString().split('.').last.capitalizeFirstLetter(),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                resource.description,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          );
+            ),
+            const SizedBox(height: 16),
+            Text(
+              resource.description,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
+        );
   }
 
   Widget _buildNavigationButtons() {
     return Center(
       child: ElevatedButton(
-        onPressed: _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
-            ? _nextResource
-            : () => Navigator.pop(context),
+        onPressed:
+            _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
+                ? _nextResource
+                : () => Navigator.pop(context),
         style: ElevatedButton.styleFrom(
           foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
           backgroundColor: Colors.white,
@@ -368,11 +396,10 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
           ),
         ),
         child: Text(
-          _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1 ? "Next" : "Finish",
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
+              ? "Next"
+              : "Finish",
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
