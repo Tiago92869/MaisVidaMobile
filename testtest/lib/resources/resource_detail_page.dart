@@ -25,7 +25,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   @override
   void initState() {
     super.initState();
-    _checkIfFavorite();
+    _checkIfFavorite(); // Check if the resource is a favorite when the page loads
   }
 
   Future<void> _checkIfFavorite() async {
@@ -43,35 +43,35 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     }
   }
 
-  void _toggleFavoriteStatus() {
+  Future<void> _toggleFavoriteStatus() async {
     setState(() {
-      _isFavorite = !_isFavorite;
+      _isFavorite = !_isFavorite; // Toggle the favorite status locally
     });
-  }
 
-  Future<void> _updateFavoriteStatus() async {
-    if (_isFavorite != _initialFavoriteStatus) {
-      // Only call modifyFavorite if the status has changed
-      try {
-        final favoriteInput = FavoriteInput(
-          activities: [],
-          resources: [widget.resource.id],
-        );
+    try {
+      final favoriteInput = FavoriteInput(
+        activities: [],
+        resources: [widget.resource.id], // Pass the resource ID
+      );
 
-        await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
-      } catch (e) {
-        print('Error updating favorite status: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update favorite status.')),
-        );
-      }
+      // Call modifyFavorite with the appropriate `add` value
+      await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
+      print(
+        _isFavorite
+            ? 'Resource added to favorites.'
+            : 'Resource removed from favorites.',
+      );
+    } catch (e) {
+      print('Error updating favorite status: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update favorite status.')),
+      );
+
+      // Revert the favorite status if the request fails
+      setState(() {
+        _isFavorite = !_isFavorite;
+      });
     }
-  }
-
-  @override
-  void dispose() {
-    _updateFavoriteStatus(); // Call to update the favorite status when the page is closed
-    super.dispose();
   }
 
   @override
@@ -174,8 +174,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               ),
             ),
             GestureDetector(
-              onTap:
-                  _toggleFavoriteStatus, // Toggle the favorite status locally
+              onTap: _toggleFavoriteStatus, // Toggle the favorite status
               child: AnimatedContainer(
                 duration: const Duration(
                   milliseconds: 300,
@@ -213,7 +212,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 40),
 
         // Description
         Expanded(
