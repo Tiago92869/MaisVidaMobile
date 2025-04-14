@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:testtest/resources/resource_detail_page.dart';
 import 'package:testtest/services/resource/resource_service.dart';
 import 'package:testtest/services/resource/resource_model.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SosDetailsPage extends StatefulWidget {
   const SosDetailsPage({Key? key}) : super(key: key);
@@ -38,9 +40,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
   }
 
   Future<void> _fetchSosResources({bool loadNextPage = false}) async {
-    if (_isLoading || (loadNextPage && _isLastPage)) {
-      return;
-    }
+    if (_isLoading || (loadNextPage && _isLastPage)) return;
 
     setState(() {
       _isLoading = true;
@@ -48,10 +48,10 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
 
     try {
       final resources = await _resourceService.fetchResources(
-        [ResourceType.SOS], // Filter by SOS type
-        page: loadNextPage ? _currentPage : 0, // Page number
-        size: 10, // Page size
-        search: "", // No search query
+        [ResourceType.SOS],
+        page: loadNextPage ? _currentPage : 0,
+        size: 10,
+        search: "",
       );
 
       setState(() {
@@ -74,6 +74,36 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
     }
   }
 
+  Future<void> _makePhoneCall(String number) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: number);
+    print("Trying to dial: $phoneUri");
+    print("Can launch: ${await canLaunchUrl(phoneUri)}");
+    final status = await Permission.phone.status;
+    if (status.isDenied || status.isRestricted) {
+      final result = await Permission.phone.request();
+      if (!result.isGranted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Phone call permission is required."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Unable to launch phone dialer."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void _navigateToResourceDetail(BuildContext context, Resource resource) {
     Navigator.push(
       context,
@@ -88,15 +118,11 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF0D1B2A), // Dark blue start color
-                    Color(0xFF1B263B), // Dark blue end color
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -110,86 +136,35 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  // Title
                   const Text(
                     "SOS Details",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, // Highlighted urgent color
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Two clickable squares
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          // Handle Medical Emergency click
-                        },
-                        child: Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "Medical Emergency",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                        onTap: () => _makePhoneCall("+351910774893"),
+                        child: _buildEmergencyBox(
+                          "Medical Emergency",
+                          Colors.redAccent,
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          // Handle Emergency Contact click
-                        },
-                        child: Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            color: Colors.orangeAccent,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "Emergency Contact",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                        onTap: () => _makePhoneCall("+351910774893"),
+                        child: _buildEmergencyBox(
+                          "Emergency Contact",
+                          Colors.orangeAccent,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 40),
-                  // Resources section
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -205,9 +180,9 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {
-                        _currentPage = 0; // Reset to the first page
-                        _isLastPage = false; // Reset last page flag
-                        await _fetchSosResources(); // Fetch the first page of resources
+                        _currentPage = 0;
+                        _isLastPage = false;
+                        await _fetchSosResources();
                       },
                       child:
                           _isLoading && _sosResources.isEmpty
@@ -301,6 +276,35 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmergencyBox(String title, Color color) {
+    return Container(
+      width: 140,
+      height: 140,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
