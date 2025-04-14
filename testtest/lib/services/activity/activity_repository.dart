@@ -5,11 +5,17 @@ class ActivityRepository {
   final ActivityService _activityService = ActivityService();
 
   Future<ActivityPage> getActivitiesByUserId(
-      int page, int size, String searchQuery) async {
+    int page,
+    int size,
+    String searchQuery,
+  ) async {
     try {
       print('Fetching activities by user ID...');
-      final activityPage =
-          await _activityService.fetchActivities(page, size, searchQuery);
+      final activityPage = await _activityService.fetchActivities(
+        page: page,
+        size: size,
+        searchQuery: searchQuery,
+      );
       print('Fetched ${activityPage.content.length} activities on page $page.');
       return activityPage;
     } catch (e) {

@@ -55,7 +55,11 @@ class _HomeTabViewState extends State<HomeTabView> {
 
   Future<void> _fetchActivities() async {
     try {
-      final activities = await _activityService.fetchActivities(0, 3, "");
+      final activities = await _activityService.fetchActivities(
+        page: 0,
+        size: 3,
+        searchQuery: "",
+      );
       setState(() {
         _activities = activities.content;
       });

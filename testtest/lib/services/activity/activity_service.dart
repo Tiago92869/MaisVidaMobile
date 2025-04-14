@@ -33,11 +33,11 @@ class ActivityService {
     }
   }
 
-  Future<ActivityPage> fetchActivities(
-    int page,
-    int size,
-    String searchQuery,
-  ) async {
+  Future<ActivityPage> fetchActivities({
+    int page = 0,
+    int size = 10,
+    String searchQuery = "",
+  }) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl?page=$page&size=$size&search=$searchQuery';
     print('Request URL for fetchActivities: $url'); // Log the request URL

@@ -37,8 +37,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     _fetchActivities();
   }
 
-  Future<void> _fetchActivities() async {
-    if (_isLoading || _isLastPage) return;
+  Future<void> _fetchActivities({bool loadNextPage = false}) async {
+    if (_isLoading || (loadNextPage && _isLastPage)) return;
 
     setState(() {
       _isLoading = true;
@@ -46,15 +46,19 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
     try {
       final activityPage = await _activityService.fetchActivities(
-        _currentPage,
-        20,
-        _searchText,
+        page: loadNextPage ? _currentPage : 0,
+        size: 10,
+        searchQuery: _searchText,
       );
 
       setState(() {
-        _activities.addAll(activityPage.content);
+        if (loadNextPage) {
+          _activities.addAll(activityPage.content); // Append new activities
+        } else {
+          _activities = activityPage.content; // Replace activities
+        }
         _isLastPage = activityPage.last;
-        _currentPage++;
+        _currentPage = activityPage.number + 1; // Increment page for next fetch
       });
     } catch (e) {
       print('Error fetching activities: $e');
@@ -84,7 +88,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   void _onScroll(ScrollController controller) {
     if (controller.position.pixels >=
         controller.position.maxScrollExtent - 200) {
-      _fetchActivities();
+      _fetchActivities(loadNextPage: true); // Fetch the next page
     }
   }
 
@@ -154,6 +158,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title with a maximum of 2 lines
           Text(
             activity.title,
             style: const TextStyle(
@@ -162,32 +167,29 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
+            maxLines: 2, // Limit the title to a maximum of 2 lines
+            overflow: TextOverflow.ellipsis, // Add ellipsis if it overflows
           ),
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 30,
+          ), // Increased spacing between title and description
+          // Description with a maximum of 3 lines
           Text(
             activity.description,
             overflow: TextOverflow.ellipsis,
-            maxLines: 2,
+            maxLines: 3, // Limit the description to a maximum of 3 lines
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 20,
+          ), // Increased spacing between description and resources
           Text(
-            "Created At: ${activity.createdAt?.toLocal().toString().split(' ')[0]}",
+            "Resources: ${activity.resources?.length ?? 0}",
             style: const TextStyle(
-              fontSize: 14,
-              fontFamily: "Inter",
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "Resources: ${activity.resources?.length}",
-            style: const TextStyle(
-              fontSize: 14,
+              fontSize: 17,
               fontFamily: "Inter",
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -214,7 +216,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               ),
               child: const Text(
                 "Start",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -265,29 +267,27 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 child: Text(
                   "Activities",
                   style: TextStyle(
-                    fontSize: 28, // Match the font size from ResourcesPage
+                    fontSize: 28,
                     fontFamily: "Poppins",
-                    color: Colors.white, // Title color
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               const SizedBox(height: 40),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ), // Match padding
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: TextField(
                   onChanged: _onSearch,
                   decoration: InputDecoration(
                     labelText: "Search Activities",
                     labelStyle: const TextStyle(
-                      color: Colors.white, // Search input text color
-                      fontSize: 14, // Match font size
+                      color: Colors.white,
+                      fontSize: 14,
                     ),
                     prefixIcon: const Icon(
                       Icons.search,
-                      color: Colors.white, // Search icon color
+                      color: Colors.white,
                       size: 20,
                     ),
                     border: OutlineInputBorder(
@@ -307,33 +307,23 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       vertical: 10,
                     ),
                   ),
-                  style: const TextStyle(
-                    fontSize: 14, // Match font size
-                    color: Colors.white, // Input text color
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 20),
-              // Scrollable activities list
               Expanded(
                 child: Stack(
                   children: [
                     RefreshIndicator(
                       onRefresh: () async {
-                        setState(() {
-                          _activities.clear();
-                          _currentPage = 0;
-                          _isLastPage = false;
-                        });
-                        await _fetchActivities();
+                        await _fetchActivities(); // Refresh the list
                       },
                       child: ListView.builder(
                         controller: _scrollController,
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         itemCount:
-                            _activities.length +
-                            1, // Add 1 to include the SizedBox
+                            _activities.length + 1, // Add 1 for the SizedBox
                         itemBuilder: (context, index) {
                           if (index < _activities.length) {
                             final activity = _activities[index];
@@ -343,24 +333,22 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               padding: const EdgeInsets.symmetric(
                                 vertical: 15,
                                 horizontal: 20,
-                              ), // Added horizontal padding
+                              ),
                               child: _buildActivityCard(
                                 activity,
                                 backgroundColor,
                               ),
                             );
                           } else {
-                            // Add a SizedBox at the end of the list
-                            return const SizedBox(height: 60);
+                            return const SizedBox(
+                              height: 60,
+                            ); // Add spacing at the end
                           }
                         },
                       ),
                     ),
                     if (_isLoading)
-                      const Center(
-                        child:
-                            CircularProgressIndicator(), // Centered loading indicator
-                      ),
+                      const Center(child: CircularProgressIndicator()),
                   ],
                 ),
               ),
