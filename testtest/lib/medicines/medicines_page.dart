@@ -19,6 +19,11 @@ class _MedicinesPageState extends State<MedicinesPage> {
   bool _isLoading = false; // Track loading state
   bool _showArchived = false; // Track whether to show archived medicines
 
+  late ScrollController _scrollController;
+  int _currentPage = 0; // Track the current page
+  int _totalPages = 1; // Track the total number of pages (default to 1)
+  bool _isFetchingMore = false; // Prevent multiple fetches at the same time
+
   final MedicineRepository _medicineRepository = MedicineRepository();
 
   final List<Medicine> _medicines = []; // Use the Medicine model directly
@@ -26,33 +31,49 @@ class _MedicinesPageState extends State<MedicinesPage> {
   @override
   void initState() {
     super.initState();
-    _fetchMedicines();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    _fetchMedicines(); // Fetch the first page of medicines
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 50 &&
+        !_isFetchingMore &&
+        _currentPage < _totalPages - 1) {
+      _fetchMoreMedicines();
+    }
   }
 
   Future<void> _fetchMedicines() async {
     setState(() {
       _isLoading = true; // Start loading
+      _currentPage = 0; // Reset to the first page
+      _totalPages = 1; // Reset total pages
     });
 
     try {
-      DateTime startDate = _currentWeekStart;
-      DateTime endDate = _currentWeekStart.add(const Duration(days: 6));
-
-      // Fetch medicines for the week
       final medicinePage = await _medicineRepository.getMedicines(
         _showArchived,
-        startDate,
-        endDate,
-        page: 0, // Start with the first page
-        size: 10, // Fetch 10 medicines per page
+        _selectedDay ?? _currentWeekStart,
+        _selectedDay ?? _currentWeekStart.add(const Duration(days: 6)),
+        page: 0, // Pass the page number
+        size: 10, // Pass the page size
       );
 
-      // Update the _medicines list with the fetched data
       setState(() {
         _medicines.clear();
         _medicines.addAll(
           medicinePage.content,
         ); // Add medicines from the response
+        _currentPage = medicinePage.number; // Update the current page
+        _totalPages = medicinePage.totalPages; // Update the total pages
       });
     } catch (e) {
       print('Error fetching medicines: $e');
@@ -75,16 +96,16 @@ class _MedicinesPageState extends State<MedicinesPage> {
     });
 
     try {
-      // Fetch medicines for the specific day
+      final formattedDay = _formatDate(day);
+
       final medicinePage = await _medicineRepository.getMedicines(
         _showArchived,
-        day, // Start date (specific day)
-        day, // End date (same day)
+        DateTime.parse(formattedDay), // Pass formatted day as start date
+        DateTime.parse(formattedDay), // Pass formatted day as end date
         page: 0, // Start with the first page
         size: 10, // Fetch 10 medicines per page
       );
 
-      // Update the _medicines list with the fetched data
       setState(() {
         _medicines.clear();
         _medicines.addAll(
@@ -102,6 +123,45 @@ class _MedicinesPageState extends State<MedicinesPage> {
     } finally {
       setState(() {
         _isLoading = false; // Stop loading
+      });
+    }
+  }
+
+  Future<void> _fetchMoreMedicines() async {
+    setState(() {
+      _isFetchingMore = true; // Start fetching more medicines
+    });
+
+    try {
+      final startDate = _formatDate(_selectedDay ?? _currentWeekStart);
+      final endDate = _formatDate(
+        _selectedDay ?? _currentWeekStart.add(const Duration(days: 6)),
+      );
+
+      final medicinePage = await _medicineRepository.getMedicines(
+        _showArchived,
+        DateTime.parse(startDate),
+        DateTime.parse(endDate),
+        page: _currentPage + 1, // Fetch the next page
+        size: 10, // Fetch 10 medicines per page
+      );
+
+      setState(() {
+        _medicines.addAll(medicinePage.content); // Append new medicines
+        _currentPage = medicinePage.number; // Update the current page
+        _totalPages = medicinePage.totalPages; // Update the total pages
+      });
+    } catch (e) {
+      print('Error fetching more medicines: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch more medicines. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isFetchingMore = false; // Stop fetching
       });
     }
   }
@@ -147,6 +207,10 @@ class _MedicinesPageState extends State<MedicinesPage> {
         _isFilterPanelVisible = false;
       });
     }
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
   Widget _buildCalendar(List<DateTime> weekDays) {
@@ -260,17 +324,20 @@ class _MedicinesPageState extends State<MedicinesPage> {
 
     return Expanded(
       child: RefreshIndicator(
-        onRefresh: () async {
-          if (_selectedDay != null) {
-            await _fetchMedicines(); // Fetch medicines for the selected day
-          } else {
-            await _fetchMedicines(); // Fetch medicines for the entire week
-          }
-        },
+        onRefresh: _fetchMedicines,
         child: ListView.builder(
+          controller: _scrollController, // Attach the ScrollController
           padding: const EdgeInsets.all(20),
-          itemCount: _medicines.length,
+          itemCount: _medicines.length + (_isFetchingMore ? 1 : 0),
           itemBuilder: (context, index) {
+            if (index == _medicines.length) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(), // Loading indicator
+                ),
+              );
+            }
             final medicine = _medicines[index];
             return _buildMedicineCard(medicine);
           },

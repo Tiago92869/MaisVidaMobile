@@ -42,38 +42,41 @@ class MedicineService {
   }) async {
     await _loadStoredCredentials();
     try {
+      // Format the dates to yyyy-MM-dd
+      final String formattedStartDate = _formatDate(startDate);
+      final String formattedEndDate = _formatDate(endDate);
+
       final String url =
-          '$_baseUrl?archived=$archived&startDate=${_formatDate(startDate)}&endDate=${_formatDate(startDate)}&page=$page&size=$size';
-      print('Request URL for fetchMedicines: $url'); // Log the request URL
+          '$_baseUrl?archived=$archived&startDate=$formattedStartDate&endDate=$formattedEndDate&page=$page&size=$size';
 
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: {
-              'Authorization': 'Bearer $_accessToken',
-              'Content-Type': 'application/json',
-            },
-          )
-          .timeout(
-            _timeoutDuration,
-            onTimeout: () {
-              print('Request to $url timed out.');
-              throw TimeoutException(
-                'The connection has timed out, please try again later.',
-              );
-            },
-          );
+      // Log the request details
+      print('Request URL: $url');
+      print(
+        'Request Headers: {Authorization: Bearer $_accessToken, Content-Type: application/json}',
+      );
+      print(
+        'Request Parameters: archived=$archived, startDate=$formattedStartDate, endDate=$formattedEndDate, page=$page, size=$size',
+      );
 
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      // Log the response details
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('Medicines fetched successfully.');
         final json = jsonDecode(response.body);
-        return MedicinePage.fromJson(json); // Map the response to MedicinePage
+        print('Medicines fetched successfully.');
+        return MedicinePage.fromJson(json);
       } else {
-        print('Failed to load medicines. Status Code: ${response.statusCode}');
-        throw Exception('Failed to load medicines');
+        print('Failed to fetch medicines. Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch medicines');
       }
     } catch (e) {
       print('Error fetching medicines: $e');
@@ -244,11 +247,8 @@ class MedicineService {
     }
   }
 
-  // Helper method to format dates
+  // Helper method to format DateTime to yyyy-MM-dd
   String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year;
-    return '$year-$month-$day';
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 }
