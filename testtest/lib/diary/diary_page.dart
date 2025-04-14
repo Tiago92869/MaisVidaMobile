@@ -390,25 +390,43 @@ class _DiaryPageState extends State<DiaryPage> {
               onTap: _toggleFilterPanel,
               child: MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: const Offset(0, 5),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.filter_alt,
-                    color: Colors.blue,
-                    size: 28,
-                  ),
+                      child: const Icon(
+                        Icons.filter_alt,
+                        color: Colors.blue,
+                        size: 28,
+                      ),
+                    ),
+                    if (_selectedEmotions
+                        .isNotEmpty) // Show the small circle if filters are selected
+                      Positioned(
+                        top: 3,
+                        right: 4,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue, // Blue color for the indicator
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ),
