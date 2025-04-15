@@ -52,6 +52,10 @@ class _LoginPageState extends State<LoginPage> {
       await _storage.write(key: 'firstName', value: user.firstName);
       await _storage.write(key: 'secondName', value: user.secondName);
       await _storage.write(key: 'email', value: user.email);
+      await _storage.write(
+        key: 'emergencyContact',
+        value: user.emergencyContact,
+      );
 
       print('User simple data saved successfully.');
 

@@ -45,7 +45,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> fetchUserData() async {
     try {
-      User user = await userRepository.getUserById();
+      // Fetch user data using getSimpleUser
+      User user = await userRepository.getSimpleUser();
       setState(() {
         firstNameController.text = user.firstName;
         familyNameController.text = user.secondName;
@@ -58,7 +59,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         emergencyContactController.text =
             user.emergencyContact.startsWith('+')
                 ? user.emergencyContact.substring(
-                  2,
+                  1,
                 ) // Remove the "+" prefix for editing
                 : user.emergencyContact;
 
@@ -123,19 +124,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
         return;
       }
 
-      // Validate Emergency Contact Format
-      final emergencyContact = '+${emergencyContactController.text.trim()}';
-      final emergencyContactRegex = RegExp(r'^\+\d{7,15}$');
-      if (!emergencyContactRegex.hasMatch(emergencyContact)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Emergency Contact must follow the format + followed by 7 to 15 digits.",
+      // Allow empty Emergency Contact
+      final emergencyContact =
+          emergencyContactController.text.trim().isNotEmpty
+              ? '+${emergencyContactController.text.trim()}'
+              : ''; // Save as an empty string if the field is empty
+
+      // Validate Emergency Contact Format (only if not empty)
+      if (emergencyContact.isNotEmpty) {
+        final emergencyContactRegex = RegExp(r'^\+\d{7,15}$');
+        if (!emergencyContactRegex.hasMatch(emergencyContact)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Emergency Contact must follow the format + followed by 7 to 15 digits.",
+              ),
+              backgroundColor: Colors.red,
             ),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
+          );
+          return;
+        }
       }
 
       // Create updated user object
@@ -153,9 +161,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Update user in the repository
       await userRepository.updateUser(updatedUser);
 
-      // Update secure storage with the new first name and family name
+      // Update secure storage with the new first name, family name, and emergency contact
       await _storage.write(key: 'firstName', value: updatedUser.firstName);
       await _storage.write(key: 'secondName', value: updatedUser.secondName);
+      await _storage.write(
+        key: 'emergencyContact',
+        value: updatedUser.emergencyContact,
+      );
 
       // Update the last saved values
       setState(() {

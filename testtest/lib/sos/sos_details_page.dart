@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testtest/resources/resource_detail_page.dart';
 import 'package:testtest/services/resource/resource_service.dart';
 import 'package:testtest/services/resource/resource_model.dart';
@@ -74,11 +75,81 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
     }
   }
 
-  Future<void> _makePhoneCall(String number) async {
+  Future<void> _makePhoneCall(String? number) async {
+    if (number == null || number.isEmpty) {
+      // Show a custom-styled popup message if no emergency contact is set up
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Error",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Emergency Contact not set.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.white70),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Text(
+                        "OK",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      return; // Do not proceed with the call
+    }
+
     final Uri phoneUri = Uri(scheme: 'tel', path: number);
-    print("Trying to dial: $phoneUri");
-    print("Can launch: ${await canLaunchUrl(phoneUri)}");
     final status = await Permission.phone.status;
+
     if (status.isDenied || status.isRestricted) {
       final result = await Permission.phone.request();
       if (!result.isGranted) {
@@ -156,7 +227,11 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => _makePhoneCall("+351910774893"),
+                        onTap: () async {
+                          final emergencyContact =
+                              await _fetchEmergencyContact();
+                          _makePhoneCall(emergencyContact);
+                        },
                         child: _buildEmergencyBox(
                           "Emergency Contact",
                           Colors.orangeAccent,
@@ -307,5 +382,10 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
         ),
       ),
     );
+  }
+
+  Future<String?> _fetchEmergencyContact() async {
+    final FlutterSecureStorage storage = const FlutterSecureStorage();
+    return await storage.read(key: 'emergencyContact');
   }
 }
