@@ -47,7 +47,8 @@ class UserRepository {
     try {
       final token = await userService.login(username, password);
       print(
-          'UserRepository: Successfully logged in, access token: ${token.accessToken}');
+        'UserRepository: Successfully logged in, access token: ${token.accessToken}',
+      );
       return token;
     } catch (e) {
       print('UserRepository: Error logging in user: $e');
@@ -67,7 +68,22 @@ class UserRepository {
   }
 
   // Method to update the user's password
-  Future<void> updateUserPassword(String userId, PasswordUpdateDTO passwordUpdateDTO) async {
+  Future<void> updateUserPassword(
+    String userId,
+    PasswordUpdateDTO passwordUpdateDTO,
+  ) async {
     await userService.updateUserPassword(userId, passwordUpdateDTO);
+  }
+
+  Future<User> getSimpleUser() async {
+    print('UserRepository: Fetching simplified user data...');
+    try {
+      final user = await userService.getSimpleUser();
+      print('UserRepository: Successfully fetched simplified user: ${user.id}');
+      return user;
+    } catch (e) {
+      print('UserRepository: Error fetching simplified user: $e');
+      rethrow;
+    }
   }
 }

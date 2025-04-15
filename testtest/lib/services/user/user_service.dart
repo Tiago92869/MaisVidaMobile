@@ -75,6 +75,49 @@ class UserService {
     }
   }
 
+  Future<User> getSimpleUser() async {
+    print('Fetching simplified user data...');
+    await _loadStoredCredentials();
+
+    if (_accessToken == null) throw Exception('No access token found');
+
+    try {
+      final requestUrl = '$_baseUrl/mine/simple';
+      print(
+        'Request URL for getSimpleUser: $requestUrl',
+      ); // Log the request URL
+
+      final response = await http
+          .get(
+            Uri.parse(requestUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $_accessToken',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
+
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return User.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to fetch simplified user data');
+      }
+    } catch (e) {
+      print('Error fetching simplified user data: $e');
+      rethrow;
+    }
+  }
+
   Future<Token> login(String username, String password) async {
     print('Attempting login with username: $username');
     final queryParameters = {'username': username, 'password': password};

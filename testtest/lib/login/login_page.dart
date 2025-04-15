@@ -44,8 +44,15 @@ class _LoginPageState extends State<LoginPage> {
 
       print('Access token and user ID saved successfully.');
 
-      // Simulate a delay for loading (e.g., fetching user data)
-      await Future.delayed(const Duration(seconds: 4));
+      // Fetch the user's simple data
+      final user = await _userService.getSimpleUser();
+
+      // Save the user's first name, second name, and email securely
+      await _storage.write(key: 'firstName', value: user.firstName);
+      await _storage.write(key: 'secondName', value: user.secondName);
+      await _storage.write(key: 'email', value: user.email);
+
+      print('User simple data saved successfully.');
 
       // Navigate to the MenuScreen
       Navigator.pushReplacement(

@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:testtest/menu/components/menu_row.dart';
 import 'package:testtest/menu/models/menu_item.dart';
 import 'package:testtest/menu/theme.dart';
-import 'dart:developer'; // Import the log function
+import 'dart:developer';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:testtest/services/user/user_service.dart'; // Import the log function
 
 class SideMenu extends StatefulWidget {
   const SideMenu({Key? key, required this.onMenuPress}) : super(key: key);
@@ -19,23 +22,63 @@ class _SideMenuState extends State<SideMenu> {
   final List<MenuItemModel> _historyMenuIcons = MenuItemModel.menuItems2;
   String _selectedMenu = MenuItemModel.menuItems[0].title;
 
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  // Variables to store user data
+  String _userName = "Not Found";
+  String _userEmail = "Not Found";
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData(); // Fetch user data when the menu is initialized
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      // Retrieve the user's first name, second name, and email from secure storage
+      final firstName = await _storage.read(key: 'firstName') ?? "Ashu";
+      final secondName = await _storage.read(key: 'secondName') ?? "";
+      final email = await _storage.read(key: 'email') ?? "Software Engineer";
+
+      // Limit the size of the name and email strings
+      final String limitedName = _limitString(
+        "$firstName $secondName",
+        15,
+      ); // Limit to 20 characters
+      final String limitedEmail = _limitString(
+        email,
+        18,
+      ); // Limit to 30 characters
+
+      setState(() {
+        _userName = limitedName;
+        _userEmail = limitedEmail;
+      });
+    } catch (e) {
+      print("Error fetching user data: $e");
+      // Optionally, show a fallback or error message
+    }
+  }
+
+  String _limitString(String text, int maxLength) {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  }
+
   void onMenuPress(MenuItemModel menu) {
-    print('SideMenu onMenuPress called for: ${menu.title}'); // Debugging print
     setState(() {
       _selectedMenu = menu.title;
-      print('Selected menu updated to: $_selectedMenu'); // Debugging print
     });
     if (widget.onMenuPress != null) {
       widget.onMenuPress(menu.title);
-      print('Callback to parent triggered with menu title: ${menu.title}'); // Debugging print
-    } else {
-      print('Error: widget.onMenuPress is null'); // Debugging print
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    log('Building SideMenu widget'); // Log when the SideMenu widget is built
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top,
@@ -53,8 +96,7 @@ class _SideMenuState extends State<SideMenu> {
             padding: const EdgeInsets.all(16),
             child: GestureDetector(
               onTap: () {
-                print('User section pressed'); // Debugging print
-                widget.onMenuPress("User"); // Call _updateTabBody with "User"
+                widget.onMenuPress("User");
               },
               child: Row(
                 children: [
@@ -68,9 +110,11 @@ class _SideMenuState extends State<SideMenu> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Ashu",
-                        style: TextStyle(
+                      Text(
+                        _userName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 17,
                           fontFamily: "Inter",
@@ -78,7 +122,9 @@ class _SideMenuState extends State<SideMenu> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        "Software Engineer",
+                        _userEmail,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 15,
@@ -99,16 +145,13 @@ class _SideMenuState extends State<SideMenu> {
                     title: "BROWSE",
                     selectedMenu: _selectedMenu,
                     menuIcons: _browseMenuIcons,
-                    onMenuPress: (menu) {
-                      print('MenuButtonSection onMenuPress called for: ${menu.title}'); // Debugging print
-                      onMenuPress(menu);
-                    },
+                    onMenuPress: onMenuPress,
                   ),
                   MenuButtonSection(
                     title: "HISTORY",
                     selectedMenu: _selectedMenu,
                     menuIcons: _historyMenuIcons,
-                    onMenuPress: onMenuPress, // Ensure this is not null
+                    onMenuPress: onMenuPress,
                   ),
                 ],
               ),
@@ -136,7 +179,9 @@ class MenuButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('Building MenuButtonSection: $title'); // Log when a MenuButtonSection is built
+    log(
+      'Building MenuButtonSection: $title',
+    ); // Log when a MenuButtonSection is built
     if (onMenuPress == null) {
       log('Warning: onMenuPress is null in MenuButtonSection: $title');
     }
