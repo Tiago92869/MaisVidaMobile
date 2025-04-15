@@ -228,8 +228,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   if (title != "Resources")
                     ElevatedButton(
                       onPressed: () {
-                        // Handle the "Add New" button action
-                        print("Add New $title button pressed");
+                        widget.onTabChange(tabIndex); // Pass the tab index
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
