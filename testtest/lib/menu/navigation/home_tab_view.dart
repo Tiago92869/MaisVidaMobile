@@ -431,7 +431,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   "Activities",
                   _activities,
                   _isLoadingActivities,
-                  4, // Tab index for "Activities"
+                  5, // Tab index for "Activities"
                 ),
                 _buildSection(
                   "Resources",
@@ -455,7 +455,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       ),
                     );
                   },
-                  3, // Tab index for "Resources"
+                  4, // Tab index for "Resources"
                 ),
                 _buildSection(
                   "Medication",
@@ -530,7 +530,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       ),
                     );
                   },
-                  2, // Tab index for "Medication"
+                  3, // Tab index for "Medication"
                 ),
                 _buildSection(
                   "Goals",
@@ -632,7 +632,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       ),
                     );
                   },
-                  1, // Tab index for "Goals"
+                  2, // Tab index for "Goals"
                 ),
                 _buildSection(
                   "Diary",
@@ -711,7 +711,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       ),
                     );
                   },
-                  0, // Tab index for "Diary"
+                  1, // Tab index for "Diary"
                 ),
               ],
             ),
