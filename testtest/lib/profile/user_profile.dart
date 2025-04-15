@@ -241,6 +241,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  Future<void> _refreshPage() async {
+    await fetchUserData(); // Re-fetch user data
+  }
+
   @override
   void initState() {
     super.initState();
@@ -277,92 +281,100 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
 
-          // Content
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 40),
+          // Content with RefreshIndicator
+          RefreshIndicator(
+            onRefresh: _refreshPage, // Trigger refresh logic
+            child: SingleChildScrollView(
+              physics:
+                  const AlwaysScrollableScrollPhysics(), // Ensure scrollable even if content is small
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 50,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
 
-                  // Profile Image
-                  Center(
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: const AssetImage(
-                        'assets/images/starfish.png',
+                    // Profile Image
+                    Center(
+                      child: CircleAvatar(
+                        radius: 60,
+                        backgroundImage: const AssetImage(
+                          'assets/images/starfish.png',
+                        ),
+                        backgroundColor: Colors.grey[300],
                       ),
-                      backgroundColor: Colors.grey[300],
                     ),
-                  ),
 
-                  const SizedBox(height: 40),
+                    const SizedBox(height: 40),
 
-                  // User Info Fields
-                  _buildUserInfo("First Name", firstNameController),
-                  const SizedBox(height: 20),
-                  _buildUserInfo("Family Name", familyNameController),
-                  const SizedBox(height: 20),
-                  _buildUserInfo(
-                    "Email",
-                    emailController,
-                    editable: false,
-                  ), // Email is not editable
-                  const SizedBox(height: 20),
-                  _buildUserInfo("City", cityController),
-                  const SizedBox(height: 20),
-                  _buildBirthdayField(),
-                  const SizedBox(height: 20),
-                  _buildEmergencyContactField(),
+                    // User Info Fields
+                    _buildUserInfo("First Name", firstNameController),
+                    const SizedBox(height: 20),
+                    _buildUserInfo("Family Name", familyNameController),
+                    const SizedBox(height: 20),
+                    _buildUserInfo(
+                      "Email",
+                      emailController,
+                      editable: false,
+                    ), // Email is not editable
+                    const SizedBox(height: 20),
+                    _buildUserInfo("City", cityController),
+                    const SizedBox(height: 20),
+                    _buildBirthdayField(),
+                    const SizedBox(height: 20),
+                    _buildEmergencyContactField(),
 
-                  const SizedBox(height: 30),
+                    const SizedBox(height: 30),
 
-                  // About Me Section
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "About Me",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.90),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey[400]!),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10.0,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: aboutMeController,
-                          enabled: editMode,
+                    // About Me Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "About Me",
                           style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[800],
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
                           ),
-                          decoration: const InputDecoration.collapsed(
-                            hintText: 'Enter About Me',
-                          ),
-                          maxLines: null,
                         ),
-                      ),
-                      const SizedBox(height: 70),
-                    ],
-                  ),
-                ],
+                        const SizedBox(height: 10),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.90),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey[400]!),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10.0,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: aboutMeController,
+                            enabled: editMode,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[800],
+                            ),
+                            decoration: const InputDecoration.collapsed(
+                              hintText: 'Enter About Me',
+                            ),
+                            maxLines: null,
+                          ),
+                        ),
+                        const SizedBox(height: 70),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
