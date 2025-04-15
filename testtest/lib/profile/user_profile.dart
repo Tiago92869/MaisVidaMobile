@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:testtest/services/user/user_repository.dart';
 import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -13,54 +13,63 @@ class _UserProfilePageState extends State<UserProfilePage> {
   bool editMode = false;
 
   // Controllers for text fields
-  TextEditingController nameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController familyNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController birthdayController = TextEditingController();
   TextEditingController aboutMeController = TextEditingController();
+  TextEditingController emergencyContactController = TextEditingController();
 
   // Variables to store the last saved values
-  String lastSavedName = "";
-  String lastSavedEmail = "";
+  String lastSavedFirstName = "";
+  String lastSavedFamilyName = "";
   String lastSavedCity = "";
   String lastSavedBirthday = "";
   String lastSavedAboutMe = "";
+  String lastSavedEmergencyContact = "";
 
   // UserRepository instance
   final UserRepository userRepository = UserRepository(
     userService: UserService(),
   );
 
+  // Secure storage instance
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+
   void toggleEditMode() {
-    print("Toggling edit mode. Current state: $editMode");
     setState(() {
       editMode = !editMode;
     });
-    print("Edit mode toggled. New state: $editMode");
   }
 
   Future<void> fetchUserData() async {
-    print("Fetching user data...");
     try {
       User user = await userRepository.getUserById();
-      print("User data fetched successfully: ${user.toJson()}");
-
       setState(() {
-        nameController.text = "${user.firstName} ${user.secondName}";
-        emailController.text = user.email;
+        firstNameController.text = user.firstName;
+        familyNameController.text = user.secondName;
+        emailController.text =
+            user.email; // Email is pre-filled but not editable
         cityController.text = user.city;
         birthdayController.text =
             user.dateOfBirth.toIso8601String().split('T')[0];
         aboutMeController.text = user.aboutMe;
+        emergencyContactController.text =
+            user.emergencyContact.startsWith('+')
+                ? user.emergencyContact.substring(
+                  2,
+                ) // Remove the "+" prefix for editing
+                : user.emergencyContact;
 
-        lastSavedName = nameController.text;
-        lastSavedEmail = emailController.text;
+        lastSavedFirstName = firstNameController.text;
+        lastSavedFamilyName = familyNameController.text;
         lastSavedCity = cityController.text;
         lastSavedBirthday = birthdayController.text;
         lastSavedAboutMe = aboutMeController.text;
+        lastSavedEmergencyContact = emergencyContactController.text;
       });
     } catch (e) {
-      print("Error fetching user data: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to fetch user data. Please try again."),
@@ -71,47 +80,105 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future<void> saveChanges() async {
-    print("Saving changes...");
     try {
-      List<String> nameParts = nameController.text.split(" ");
-      String firstName = nameParts.isNotEmpty ? nameParts[0] : "";
-      String secondName =
-          nameParts.length > 1 ? nameParts.sublist(1).join(" ") : "";
+      // Validate First Name (must not be empty and only one word)
+      if (firstNameController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("First Name cannot be empty."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+      if (firstNameController.text.trim().contains(' ')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("First Name must be a single word."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
-      print("Preparing updated user data...");
+      // Validate Family Name (must not be empty)
+      if (familyNameController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Family Name cannot be empty."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Validate Birthdate (must not be empty)
+      if (birthdayController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Birthdate cannot be empty."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Validate Emergency Contact Format
+      final emergencyContact = '+${emergencyContactController.text.trim()}';
+      final emergencyContactRegex = RegExp(r'^\+\d{7,15}$');
+      if (!emergencyContactRegex.hasMatch(emergencyContact)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Emergency Contact must follow the format + followed by 7 to 15 digits.",
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Create updated user object
       User updatedUser = User(
         id: "user-id-placeholder", // Replace with actual user ID if available
-        firstName: firstName,
-        secondName: secondName,
-        email: emailController.text,
-        city: cityController.text,
-        aboutMe: aboutMeController.text,
+        firstName: firstNameController.text.trim(),
+        secondName: familyNameController.text.trim(),
+        email: emailController.text, // Email remains unchanged
+        city: cityController.text.trim(),
+        aboutMe: aboutMeController.text.trim(),
         dateOfBirth: DateTime.parse(birthdayController.text),
-        emergencyContact: "",
+        emergencyContact: emergencyContact,
       );
 
-      print("Sending updated user data to repository...");
-      User savedUser = await userRepository.updateUser(updatedUser);
-      print("User updated successfully: ${savedUser.toJson()}");
+      // Update user in the repository
+      await userRepository.updateUser(updatedUser);
 
+      // Update secure storage with the new first name and family name
+      await _storage.write(key: 'firstName', value: updatedUser.firstName);
+      await _storage.write(key: 'secondName', value: updatedUser.secondName);
+
+      // Update the last saved values
       setState(() {
-        lastSavedName = nameController.text;
-        lastSavedEmail = emailController.text;
+        lastSavedFirstName = firstNameController.text;
+        lastSavedFamilyName = familyNameController.text;
         lastSavedCity = cityController.text;
         lastSavedBirthday = birthdayController.text;
         lastSavedAboutMe = aboutMeController.text;
+        lastSavedEmergencyContact = emergencyContactController.text;
       });
 
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Data saved successfully!"),
           backgroundColor: Colors.green,
         ),
       );
 
+      // Exit edit mode
       toggleEditMode();
     } catch (e) {
-      print("Error saving changes: $e");
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to save changes. Please try again."),
@@ -122,40 +189,45 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void cancelEdit() {
-    print("Cancelling edit...");
     setState(() {
-      nameController.text = lastSavedName;
-      emailController.text = lastSavedEmail;
+      firstNameController.text = lastSavedFirstName;
+      familyNameController.text = lastSavedFamilyName;
       cityController.text = lastSavedCity;
       birthdayController.text = lastSavedBirthday;
       aboutMeController.text = lastSavedAboutMe;
+      emergencyContactController.text = lastSavedEmergencyContact;
       editMode = false;
     });
-    print("Edit cancelled. Reverted to last saved values.");
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    print("Opening date picker...");
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(), // Default date
-      firstDate: DateTime(1900), // Earliest selectable date
-      lastDate: DateTime.now(), // Latest selectable date
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFF1565C0), // Darker blue for header
-            hintColor: const Color(
-              0xFF1565C0,
-            ), // Darker blue for active elements
-            colorScheme: ColorScheme.light(
-              primary: const Color(0xFF1565C0), // Darker blue for selected date
-              onPrimary: Colors.white, // White text on selected date
-              surface: Colors.white, // White background for the calendar
-              onSurface: Colors.black, // Black text for unselected dates
+            primaryColor: const Color.fromRGBO(
+              72,
+              85,
+              204,
+              1,
+            ), // Header background color
+            hintColor: const Color.fromRGBO(
+              123,
+              144,
+              255,
+              1,
+            ), // Selected date color
+            colorScheme: const ColorScheme.light(
+              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              onPrimary: Colors.white, // Header text color
+              onSurface: Colors.black, // Body text color
             ),
             dialogBackgroundColor:
-                Colors.white, // White background for the dialog
+                Colors.white, // Background color of the calendar
           ),
           child: child!,
         );
@@ -163,42 +235,36 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
 
     if (pickedDate != null) {
-      print("Date selected: ${pickedDate.toIso8601String()}");
       setState(() {
-        birthdayController.text =
-            pickedDate.toIso8601String().split('T')[0]; // Format as YYYY-MM-DD
+        birthdayController.text = pickedDate.toIso8601String().split('T')[0];
       });
-    } else {
-      print("No date selected.");
     }
   }
 
   @override
   void initState() {
     super.initState();
-    print("Initializing UserProfilePage...");
     fetchUserData();
   }
 
   @override
   void dispose() {
-    print("Disposing controllers...");
-    nameController.dispose();
+    firstNameController.dispose();
+    familyNameController.dispose();
     emailController.dispose();
     cityController.dispose();
     birthdayController.dispose();
     aboutMeController.dispose();
+    emergencyContactController.dispose();
     super.dispose();
-    print("Controllers disposed.");
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Building UserProfilePage...");
     return Scaffold(
       body: Stack(
         children: [
-          // Light Blue Gradient Background
+          // Background
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -211,61 +277,52 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
 
-          // Starfish Image
-          Positioned(
-            left: 30,
-            top: 240,
-            width: 700,
-            height: 700,
-            child: Opacity(
-              opacity: 0.7,
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/startfhis1blue.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
           // Content
           SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
                   // Profile Image
                   Center(
                     child: CircleAvatar(
                       radius: 60,
-                      backgroundImage: AssetImage('assets/images/starfish.png'),
+                      backgroundImage: const AssetImage(
+                        'assets/images/starfish.png',
+                      ),
                       backgroundColor: Colors.grey[300],
                     ),
                   ),
 
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
                   // User Info Fields
-                  _buildUserInfo("Full Name", nameController),
-                  SizedBox(height: 20),
-                  _buildUserInfo("Email", emailController),
-                  SizedBox(height: 20),
+                  _buildUserInfo("First Name", firstNameController),
+                  const SizedBox(height: 20),
+                  _buildUserInfo("Family Name", familyNameController),
+                  const SizedBox(height: 20),
+                  _buildUserInfo(
+                    "Email",
+                    emailController,
+                    editable: false,
+                  ), // Email is not editable
+                  const SizedBox(height: 20),
                   _buildUserInfo("City", cityController),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   _buildBirthdayField(),
+                  const SizedBox(height: 20),
+                  _buildEmergencyContactField(),
 
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
                   // About Me Section
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "About Me",
                         style: TextStyle(
                           fontSize: 18,
@@ -273,10 +330,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           color: Colors.black87,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.90),
                           borderRadius: BorderRadius.circular(10),
@@ -285,7 +342,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             BoxShadow(
                               color: Colors.black.withOpacity(0.05),
                               blurRadius: 10.0,
-                              offset: Offset(0, 5),
+                              offset: const Offset(0, 5),
                             ),
                           ],
                         ),
@@ -296,13 +353,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             fontSize: 16,
                             color: Colors.grey[800],
                           ),
-                          decoration: InputDecoration.collapsed(
+                          decoration: const InputDecoration.collapsed(
                             hintText: 'Enter About Me',
                           ),
                           maxLines: null,
                         ),
                       ),
-                      SizedBox(height: 70),
+                      const SizedBox(height: 70),
                     ],
                   ),
                 ],
@@ -310,35 +367,67 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
 
-          // Edit/Save Button
+          // Edit/Save/Cancel Buttons
           Positioned(
             top: 58,
             right: 30,
-            child: GestureDetector(
-              onTap: editMode ? saveChanges : toggleEditMode,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 5,
-                        offset: Offset(0, 5),
+            child: Row(
+              children: [
+                if (editMode)
+                  GestureDetector(
+                    onTap: cancelEdit,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        margin: const EdgeInsets.only(right: 10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 5,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.cancel,
+                          color: Colors.red,
+                          size: 28,
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                  child: Icon(
-                    editMode ? Icons.save : Icons.edit,
-                    color: Color.fromRGBO(85, 123, 233, 1),
-                    size: 28,
+                GestureDetector(
+                  onTap: editMode ? saveChanges : toggleEditMode,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        editMode ? Icons.save : Icons.edit,
+                        color: const Color.fromRGBO(85, 123, 233, 1),
+                        size: 28,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
@@ -346,23 +435,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildUserInfo(String title, TextEditingController controller) {
-    print("Building user info field: $title");
+  Widget _buildUserInfo(
+    String title,
+    TextEditingController controller, {
+    bool editable = true,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.90),
             borderRadius: BorderRadius.circular(10),
@@ -371,13 +463,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10.0,
-                offset: Offset(0, 5),
+                offset: const Offset(0, 5),
               ),
             ],
           ),
           child: TextField(
             controller: controller,
-            enabled: editMode,
+            enabled: editable && editMode,
             style: TextStyle(fontSize: 16, color: Colors.grey[800]),
             decoration: InputDecoration.collapsed(hintText: 'Enter $title'),
           ),
@@ -387,11 +479,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Widget _buildBirthdayField() {
-    print("Building birthday field...");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Birthday",
           style: TextStyle(
             fontSize: 18,
@@ -399,14 +490,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
             color: Colors.black87,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         GestureDetector(
-          onTap: () => _selectDate(context), // Open the date picker
+          onTap: () => _selectDate(context),
           child: AbsorbPointer(
-            // Prevent manual text input
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.90),
                 borderRadius: BorderRadius.circular(10),
@@ -415,7 +505,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
                     blurRadius: 10.0,
-                    offset: Offset(0, 5),
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
@@ -423,11 +513,64 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 controller: birthdayController,
                 enabled: editMode,
                 style: TextStyle(fontSize: 16, color: Colors.grey[800]),
-                decoration: InputDecoration.collapsed(
+                decoration: const InputDecoration.collapsed(
                   hintText: 'Select your birthday',
                 ),
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmergencyContactField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Emergency Contact",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.90),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey[400]!),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10.0,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.add, // Plus icon
+                color: Colors.grey,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: emergencyContactController,
+                  enabled: editMode,
+                  keyboardType: TextInputType.phone,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+                  decoration: const InputDecoration.collapsed(
+                    hintText: 'Enter Phone Number', // No placeholder text
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
