@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart'; // Import the jwt_decoder package
+import 'package:testtest/login/loading_screen.dart';
 import 'create_account_page.dart';
 import 'reset_password_page.dart';
 import 'package:testtest/menu/menu.dart';
@@ -54,26 +55,34 @@ class _LoginPageState extends State<LoginPage> {
 
       print('User simple data saved successfully.');
 
-      // Navigate to the MenuScreen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MenuScreen()),
-      );
+      // Navigate to the LoadingScreen which will handle the transition to MenuScreen
+      if (mounted) {
+        print('Navigating to LoadingScreen...');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoadingScreen()),
+        );
+      }
     } catch (e) {
       // Show a red warning message if login fails
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Failed to login: ${e.toString()}",
-            style: const TextStyle(color: Colors.white),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to login: ${e.toString()}",
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
           ),
-          backgroundColor: Colors.red,
-        ),
-      );
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false; // Hide the loading overlay
-      });
+      // Check if the widget is still mounted before calling setState
+      if (mounted) {
+        setState(() {
+          _isLoading = false; // Hide the loading overlay
+        });
+      }
     }
   }
 
