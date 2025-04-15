@@ -61,7 +61,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         searchQuery: "",
       );
       setState(() {
-        _activities = activities.content;
+        //_activities = activities.content;
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch activities.");
@@ -81,7 +81,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         search: "",
       );
       setState(() {
-        _resources = resources.content;
+        //_resources = resources.content;
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch resources.");
@@ -109,8 +109,8 @@ class _HomeTabViewState extends State<HomeTabView> {
 
       // Update the state with the fetched medicines
       setState(() {
-        _medications =
-            medicinePage.content; // Use the content from MedicinePage
+        //_medications =
+        //    medicinePage.content; // Use the content from MedicinePage
       });
     } catch (e) {
       print('Error fetching medications: $e');
@@ -133,7 +133,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         size: 3, // Fetch only the first 3 goals
       );
       setState(() {
-        _goals = pagezGoals.goals; // Extract goals from the PagezGoalsDTO
+        //_goals = pagezGoals.goals; // Extract goals from the PagezGoalsDTO
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch goals.");
@@ -152,7 +152,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         DateTime.now(),
       );
       setState(() {
-        _diaries = diaries[0].diaries.take(3).toList();
+        //_diaries = diaries[0].diaries.take(3).toList();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch diaries.");
@@ -208,18 +208,55 @@ class _HomeTabViewState extends State<HomeTabView> {
         isLoading
             ? const Center(child: CircularProgressIndicator())
             : items.isEmpty
-            ? const Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 20),
-              child: Text(
-                "No data available",
-                style: TextStyle(color: Colors.grey),
+            ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 40), // Add spacing at the top
+                  Text(
+                    title == "Resources"
+                        ? "No Resources Created"
+                        : "No Data Available",
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 18, // Increased text size
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ), // Add spacing between the text and the button
+                  if (title != "Resources")
+                    ElevatedButton(
+                      onPressed: () {
+                        // Handle the "Add New" button action
+                        print("Add New $title button pressed");
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        "Add New $title",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18, // Increased button text size
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 40), // Add spacing at the bottom
+                ],
               ),
             )
             : SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               child: Column(children: items.map(itemBuilder).toList()),
             ),
-        const SizedBox(height: 20),
+        const SizedBox(
+          height: 30,
+        ), // Increased padding at the end of the section
       ],
     );
   }
@@ -262,9 +299,14 @@ class _HomeTabViewState extends State<HomeTabView> {
         isLoading
             ? const Center(child: CircularProgressIndicator())
             : activities.isEmpty
-            ? const Text(
-              "No activities available",
-              style: TextStyle(color: Colors.grey),
+            ? Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 50),
+                child: Text(
+                  "No Activities Available",
+                  style: const TextStyle(color: Colors.grey, fontSize: 18),
+                ),
+              ),
             )
             : SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -713,6 +755,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   },
                   1, // Tab index for "Diary"
                 ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
