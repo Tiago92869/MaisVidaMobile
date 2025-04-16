@@ -493,19 +493,22 @@ class _MedicinesPageState extends State<MedicinesPage> {
               ignoring: _isFilterPanelVisible,
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: 20,
+                    vertical: _showArchived ? 26 : 20,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Title
-                      const Center(
+                      Center(
                         child: Text(
-                          "Medicines",
+                          _showArchived ? "Archived Medicines" : "Medicines",
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize:
+                                _showArchived
+                                    ? 24
+                                    : 28, // Reduce font size for Archived Medicines
                             fontWeight: FontWeight.bold,
                             fontFamily: "Poppins",
                             color: Colors.white,
