@@ -345,12 +345,14 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          RiveAppTheme.background.withOpacity(0),
                           RiveAppTheme.background.withOpacity(
-                            1 -
+                            0,
+                          ), // Fully transparent at the top
+                          RiveAppTheme.background.withOpacity(
+                            0.35 - // Reduced opacity for a more transparent effect
                                 (!_showOnBoarding
-                                    ? _sidebarAnim.value
-                                    : _onBoardingAnim.value),
+                                    ? _sidebarAnim.value * 0.3
+                                    : _onBoardingAnim.value * 0.3),
                           ),
                         ],
                         begin: Alignment.topCenter,
