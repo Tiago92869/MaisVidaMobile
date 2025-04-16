@@ -25,6 +25,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter App',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const LoginPage(), // Replace with your app's home screen
+      routes: {
+        '/login': (context) => const LoginPage(), // Define the login route
+        '/menu': (context) => const MenuScreen(), // Define the menu route
+      },
     );
   }
 }

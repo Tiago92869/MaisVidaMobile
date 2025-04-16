@@ -61,7 +61,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         searchQuery: "",
       );
       setState(() {
-        //_activities = activities.content;
+        _activities = activities.content;
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch activities.");
@@ -81,7 +81,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         search: "",
       );
       setState(() {
-        //_resources = resources.content;
+        _resources = resources.content;
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch resources.");
@@ -109,8 +109,8 @@ class _HomeTabViewState extends State<HomeTabView> {
 
       // Update the state with the fetched medicines
       setState(() {
-        //_medications =
-        //    medicinePage.content; // Use the content from MedicinePage
+        _medications =
+            medicinePage.content; // Use the content from MedicinePage
       });
     } catch (e) {
       print('Error fetching medications: $e');
@@ -133,7 +133,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         size: 3, // Fetch only the first 3 goals
       );
       setState(() {
-        //_goals = pagezGoals.goals; // Extract goals from the PagezGoalsDTO
+        _goals = pagezGoals.goals; // Extract goals from the PagezGoalsDTO
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch goals.");
@@ -152,7 +152,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         DateTime.now(),
       );
       setState(() {
-        //_diaries = diaries[0].diaries.take(3).toList();
+        _diaries = diaries[0].diaries.take(3).toList();
       });
     } catch (e) {
       _showErrorSnackBar("Failed to fetch diaries.");

@@ -157,6 +157,36 @@ class _SideMenuState extends State<SideMenu> {
               ),
             ),
           ),
+          const Divider(
+            color: Colors.white54,
+            thickness: 1,
+          ), // Divider before Logout
+          ListTile(
+            contentPadding: const EdgeInsets.only(
+              left: 28,
+            ), // Add padding to the left
+            leading: const Icon(
+              Icons.logout,
+              color: Colors.red,
+            ), // Set icon color to red
+            title: const Text(
+              "Logout",
+              style: TextStyle(
+                color: Colors.red, // Set text color to red
+                fontSize: 16,
+                fontFamily: "Inter",
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            onTap: () async {
+              final userService = UserService();
+              await userService.logout(); // Call the logout method
+              Navigator.pushReplacementNamed(
+                context,
+                '/login',
+              ); // Redirect to login screen
+            },
+          ),
         ],
       ),
     );
