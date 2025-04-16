@@ -348,8 +348,8 @@ class _MedicinesPageState extends State<MedicinesPage> {
 
   Widget _buildMedicineCard(Medicine medicine) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final bool? isMedicineUpdatedOrDeleted = await Navigator.push(
           context,
           MaterialPageRoute(
             builder:
@@ -357,6 +357,17 @@ class _MedicinesPageState extends State<MedicinesPage> {
                     MedicineDetailPage(medicine: medicine, isEditing: false),
           ),
         );
+
+        // Refresh the medicines list if a medicine was updated or deleted
+        if (isMedicineUpdatedOrDeleted == true) {
+          if (_selectedDay == null) {
+            _fetchMedicines(); // Fetch medicines for the entire week
+          } else {
+            _fetchMedicinesForDay(
+              _selectedDay!,
+            ); // Fetch medicines for the selected day
+          }
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),

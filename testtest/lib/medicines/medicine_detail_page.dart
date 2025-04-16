@@ -144,7 +144,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           updatedMedicine.id,
           updatedMedicine,
         );
-        Navigator.pop(context, false); // Return false for updates
+        Navigator.pop(context, true); // Return true to indicate success
       }
     } catch (e) {
       print("Error saving medicine: $e");
@@ -168,7 +168,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       print('Medicine deleted successfully.');
 
       // Navigate back and pass a flag to indicate deletion
-      Navigator.pop(context, true);
+      Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
       print('Error deleting medicine: $e');
       ScaffoldMessenger.of(context).showSnackBar(
