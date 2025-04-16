@@ -274,9 +274,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "7-Day Plan",
+          "Week Plan",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -303,7 +303,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   Text(
                     plan.weekDay,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -521,8 +521,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         const Text(
                           "Notifications",
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold, // Make text bold
+                            fontSize: 16, // Match font size with "Start Date"
+                            fontWeight: FontWeight.bold, // Keep bold style
                             color: Colors.white,
                           ),
                         ),
@@ -549,8 +549,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           const Text(
                             "Archived",
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold, // Make text bold
+                              fontSize: 16, // Match font size with "Start Date"
+                              fontWeight: FontWeight.bold, // Keep bold style
                               color: Colors.white,
                             ),
                           ),
