@@ -316,8 +316,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             ? "No dosages"
                             : "${plan.dosages.length} dosage${plan.dosages.length > 1 ? 's' : ''}",
                         style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
+                          fontSize: 15,
+                          color: Color.fromARGB(220, 255, 255, 255),
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -348,16 +349,17 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                     dosage
                                         .time, // Assuming `time` is a property of dosage
                                     style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
+                                      fontSize: 15,
+                                      color: Color.fromARGB(195, 255, 255, 255),
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   // Quantity
                                   Text(
                                     "${dosage.dosage} pill", // Assuming `quantity` is a property of dosage
                                     style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
+                                      fontSize: 15,
+                                      color: Color.fromARGB(195, 255, 255, 255),
                                     ),
                                   ),
                                 ],

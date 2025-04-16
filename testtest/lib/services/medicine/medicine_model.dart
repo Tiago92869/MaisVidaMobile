@@ -137,9 +137,9 @@ class Dosage {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'time': time,
+      'time': "$time:00", // Append ":00" to the time
       'dosage': dosage,
-    }; // Output dosage as double
+    };
   }
 }
 
