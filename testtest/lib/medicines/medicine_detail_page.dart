@@ -25,6 +25,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
   DateTime? endDate; // End date for the medicine
   bool hasNotifications = false; // Local variable for notifications toggle
   bool isArchived = false; // Local variable for archived toggle
+  final bool _showFirstStarfish =
+      Random().nextBool(); // Randomly decide which starfish to show
 
   @override
   void initState() {
@@ -266,6 +268,63 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     );
   }
 
+  // Function to display the 7-day plan
+  Widget _build7DayPlan() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "7-Day Plan",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ListView.builder(
+          shrinkWrap:
+              true, // Ensures the ListView takes only the required space
+          physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+          itemCount: widget.medicine?.plans.length ?? 0,
+          itemBuilder: (context, index) {
+            final plan = widget.medicine!.plans[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Weekday
+                  Text(
+                    plan.weekDay,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  // Dosages (Placeholder for now)
+                  Text(
+                    plan.dosages.isEmpty
+                        ? "No dosages"
+                        : "${plan.dosages.length} dosages",
+                    style: const TextStyle(fontSize: 14, color: Colors.white70),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -287,174 +346,231 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             ),
           ),
 
+          // Add starfish logic
+          if (_showFirstStarfish)
+            Positioned(
+              right: 80,
+              top: 320,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.7,
+                  child: Image.asset(
+                    'assets/images/starfish2.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            )
+          else
+            Positioned(
+              left: 100,
+              top: 250,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.5,
+                  child: Image.asset(
+                    'assets/images/starfish1.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+
           // Loading Indicator
           if (isSaving)
             const Center(child: CircularProgressIndicator(color: Colors.white)),
 
           // Content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Name
-                  TextField(
-                    controller: nameController,
-                    enabled: editMode,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: "Enter Medicine Name",
-                      hintStyle: TextStyle(color: Colors.white70),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Description
-                  TextField(
-                    controller: descriptionController,
-                    enabled: editMode,
-                    maxLines: null,
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                    decoration: const InputDecoration(
-                      hintText: "Enter Medicine Description",
-                      hintStyle: TextStyle(color: Colors.white70),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Start Date
-                  const Text(
-                    "Start Date",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  GestureDetector(
-                    onTap: editMode ? () => _pickDate(isStartDate: true) : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
+            child: SizedBox.expand(
+              child: SingleChildScrollView(
+                // Make the page scrollable
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Back button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Name
+                    TextField(
+                      controller: nameController,
+                      enabled: editMode,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      child: Text(
-                        startDate != null
-                            ? "${startDate!.day.toString().padLeft(2, '0')}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.year}"
-                            : "Select a start date",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
+                      decoration: const InputDecoration(
+                        hintText: "Enter Medicine Name",
+                        hintStyle: TextStyle(color: Colors.white70),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Description
+                    TextField(
+                      controller: descriptionController,
+                      enabled: editMode,
+                      maxLines: null,
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: "Enter Medicine Description",
+                        hintStyle: TextStyle(color: Colors.white70),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Start Date
+                    const Text(
+                      "Start Date",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    GestureDetector(
+                      onTap:
+                          editMode ? () => _pickDate(isStartDate: true) : null,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          startDate != null
+                              ? "${startDate!.day.toString().padLeft(2, '0')}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.year}"
+                              : "Select a start date",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // End Date
-                  const Text(
-                    "End Date",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    // End Date
+                    const Text(
+                      "End Date",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  GestureDetector(
-                    onTap:
-                        editMode ? () => _pickDate(isStartDate: false) : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        endDate != null
-                            ? "${endDate!.day.toString().padLeft(2, '0')}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.year}"
-                            : "Select a end date",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
+                    const SizedBox(height: 5),
+                    GestureDetector(
+                      onTap:
+                          editMode ? () => _pickDate(isStartDate: false) : null,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          endDate != null
+                              ? "${endDate!.day.toString().padLeft(2, '0')}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.year}"
+                              : "Select an end date",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Notifications Toggle
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Notifications",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                      Switch(
-                        value: hasNotifications,
-                        onChanged:
-                            editMode
-                                ? (value) {
-                                  setState(() {
-                                    hasNotifications = value;
-                                  });
-                                }
-                                : null,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
+                    // 7-Day Plan (Only visible when editing an existing medicine)
+                    if (widget.medicine != null) _build7DayPlan(),
+                    const SizedBox(height: 20),
 
-                  // Archived Toggle (only visible when editing an existing medicine)
-                  if (widget.medicine != null)
+                    // Notifications Toggle
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Archived",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          "Notifications",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold, // Make text bold
+                            color: Colors.white,
+                          ),
                         ),
                         Switch(
-                          value: isArchived,
+                          value: hasNotifications,
                           onChanged:
                               editMode
                                   ? (value) {
                                     setState(() {
-                                      isArchived = value;
+                                      hasNotifications = value;
                                     });
                                   }
                                   : null,
                         ),
                       ],
                     ),
-                ],
+                    const SizedBox(height: 10),
+
+                    // Archived Toggle (only visible when editing an existing medicine)
+                    if (widget.medicine != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Archived",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold, // Make text bold
+                              color: Colors.white,
+                            ),
+                          ),
+                          Switch(
+                            value: isArchived,
+                            onChanged:
+                                editMode
+                                    ? (value) {
+                                      setState(() {
+                                        isArchived = value;
+                                      });
+                                    }
+                                    : null,
+                          ),
+                        ],
+                      ),
+
+                    const SizedBox(height: 100),
+                  ],
+                ),
               ),
             ),
           ),
@@ -479,11 +595,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           ),
 
           // Delete Button
-          if (widget.medicine !=
-              null) // Show only when editing an existing medicine
+          if (widget.medicine != null)
             Positioned(
               bottom: 20,
-              right: 20, // Move the button to the right side
+              right: 20,
               child: GestureDetector(
                 onTap: () async {
                   final shouldDelete = await _showDeleteConfirmationDialog();
@@ -492,12 +607,12 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   }
                 },
                 child: CircleAvatar(
-                  radius: 30, // Increase the size of the button
+                  radius: 30,
                   backgroundColor: Colors.red,
                   child: const Icon(
                     Icons.delete,
                     color: Colors.white,
-                    size: 28, // Increase the size of the icon
+                    size: 28,
                   ),
                 ),
               ),
