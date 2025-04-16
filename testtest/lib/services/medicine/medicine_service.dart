@@ -241,7 +241,7 @@ class MedicineService {
     }
   }
 
-  // Helper method to format DateTime to yyyy-MM-dd
+  // Updated to exclude time from the date format
   String _formatDate(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }

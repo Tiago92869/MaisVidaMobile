@@ -118,21 +118,28 @@ class Plan {
 
 class Dosage {
   final String id;
-  final DateTime time;
-  final int dosage;
+  final String time; // Store time as HH:mm
+  final double dosage; // Change dosage to double
 
   Dosage({required this.id, required this.time, required this.dosage});
 
   factory Dosage.fromJson(Map<String, dynamic> json) {
+    // Extract only the HH:mm part of the time
+    final fullTime = json['time'];
+    final formattedTime = fullTime.split(':').take(2).join(':');
     return Dosage(
       id: json['id'],
-      time: DateTime.parse(json['time']),
-      dosage: json['dosage'],
+      time: formattedTime,
+      dosage: (json['dosage'] as num).toDouble(), // Ensure dosage is a double
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'time': time.toIso8601String(), 'dosage': dosage};
+    return {
+      'id': id,
+      'time': time,
+      'dosage': dosage,
+    }; // Output dosage as double
   }
 }
 
