@@ -371,9 +371,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                       ),
                                     ),
                                     const SizedBox(
-                                      width: 60,
+                                      width: 48,
                                     ), // Add spacing here
-                                    // Horizontally scrollable dosage images with indicators
+                                    // Horizontally scrollable dosage images with shadow indicators
                                     Expanded(
                                       child: Stack(
                                         children: [
@@ -385,40 +385,40 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                               ),
                                             ),
                                           ),
-                                          // Left fade effect or arrow
+                                          // Left shadow
                                           Positioned(
                                             left: 0,
-                                            child: Container(
-                                              width: 30,
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.black.withOpacity(
-                                                      0.5,
-                                                    ),
-                                                    Colors.transparent,
-                                                  ],
-                                                  begin: Alignment.centerLeft,
-                                                  end: Alignment.centerRight,
+                                            child: IgnorePointer(
+                                              child: Container(
+                                                width: 30,
+                                                decoration: const BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Colors.black26,
+                                                      Colors.transparent,
+                                                    ],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          // Right fade effect or arrow
+                                          // Right shadow
                                           Positioned(
                                             right: 0,
-                                            child: Container(
-                                              width: 30,
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.transparent,
-                                                    Colors.black.withOpacity(
-                                                      0.5,
-                                                    ),
-                                                  ],
-                                                  begin: Alignment.centerLeft,
-                                                  end: Alignment.centerRight,
+                                            child: IgnorePointer(
+                                              child: Container(
+                                                width: 30,
+                                                decoration: const BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Colors.transparent,
+                                                      Colors.black26,
+                                                    ],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                  ),
                                                 ),
                                               ),
                                             ),
