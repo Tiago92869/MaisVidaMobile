@@ -109,7 +109,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       // Validation: Check if start date is earlier than or equal to end date
       if (startDate!.isAfter(endDate!)) {
         _showErrorSnackBar(
-          "Start Date must be earlier than or equal to End Date.",
+          "End Date can only be equal or bigger then Start Date",
         );
         return;
       }
