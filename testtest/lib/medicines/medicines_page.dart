@@ -348,26 +348,26 @@ class _MedicinesPageState extends State<MedicinesPage> {
 
   Widget _buildMedicineCard(Medicine medicine) {
     return GestureDetector(
-      onTap: () async {
-        final bool? isMedicineUpdatedOrDeleted = await Navigator.push(
+      onTap: () {
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder:
                 (context) =>
                     MedicineDetailPage(medicine: medicine, isEditing: false),
           ),
-        );
-
-        // Refresh the medicines list if a medicine was updated or deleted
-        if (isMedicineUpdatedOrDeleted == true) {
-          if (_selectedDay == null) {
-            _fetchMedicines(); // Fetch medicines for the entire week
-          } else {
-            _fetchMedicinesForDay(
-              _selectedDay!,
-            ); // Fetch medicines for the selected day
+        ).then((isMedicineUpdatedOrDeleted) {
+          // Refresh the medicines list if a medicine was updated or deleted
+          if (isMedicineUpdatedOrDeleted == true) {
+            if (_selectedDay == null) {
+              _fetchMedicines(); // Fetch medicines for the entire week
+            } else {
+              _fetchMedicinesForDay(
+                _selectedDay!,
+              ); // Fetch medicines for the selected day
+            }
           }
-        }
+        });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
@@ -549,8 +549,8 @@ class _MedicinesPageState extends State<MedicinesPage> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 90.0, right: 20),
         child: FloatingActionButton(
-          onPressed: () async {
-            final bool? isMedicineCreated = await Navigator.push(
+          onPressed: () {
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder:
@@ -559,18 +559,18 @@ class _MedicinesPageState extends State<MedicinesPage> {
                       isEditing: true,
                     ),
               ),
-            );
-
-            // Refresh the medicines list if a new medicine was created
-            if (isMedicineCreated == true) {
-              if (_selectedDay == null) {
-                _fetchMedicines(); // Fetch medicines for the entire week
-              } else {
-                _fetchMedicinesForDay(
-                  _selectedDay!,
-                ); // Fetch medicines for the selected day
+            ).then((isMedicineCreated) {
+              // Refresh the medicines list if a new medicine was created
+              if (isMedicineCreated == true) {
+                if (_selectedDay == null) {
+                  _fetchMedicines(); // Fetch medicines for the entire week
+                } else {
+                  _fetchMedicinesForDay(
+                    _selectedDay!,
+                  ); // Fetch medicines for the selected day
+                }
               }
-            }
+            });
           },
           backgroundColor: Colors.white,
           child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
