@@ -6,6 +6,7 @@ import 'package:testtest/activities/activities_page.dart';
 import 'package:testtest/diary/diary_page.dart';
 import 'package:testtest/goals/goals_page.dart';
 import 'package:testtest/medicines/medicines_page.dart';
+import 'package:testtest/menu/components/day_night_switch.dart';
 import 'package:testtest/menu/models/menu_item.dart';
 import 'dart:math' as math;
 import 'package:testtest/menu/navigation/custom_tab_bar.dart';
@@ -76,6 +77,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   late SMIBool _menuBtn;
 
   bool _showOnBoarding = false;
+  bool _isDarkMode = false;
 
   // Reference to HomeTabView
   late HomeTabView _homeTabView;
@@ -284,7 +286,32 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   ),
                 );
               },
-              child: _tabBody,
+              child: Stack(
+                children: [
+                  _tabBody,
+                  Positioned(
+                    top: 55,
+                    right: 20,
+                    child: DayNightSwitch(
+                      value: _isDarkMode,
+                      onChanged: (value) {
+                        setState(() {
+                          _isDarkMode = value;
+                          print(
+                            _isDarkMode
+                                ? "Switched to Dark Mode"
+                                : "Switched to Light Mode",
+                          );
+                        });
+                      },
+                      sunColor: const Color(0xFFFDB813),
+                      moonColor: const Color(0xFFf5f3ce),
+                      dayColor: const Color(0xFF87CEEB),
+                      nightColor: const Color(0xFF003366),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           RepaintBoundary(
@@ -294,9 +321,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 return SafeArea(
                   child: Row(
                     children: [
-                      // There's an issue/behaviour in flutter where translating the GestureDetector or any button
-                      // doesn't translate the touch area, making the Widget unclickable, so instead setting a SizedBox
-                      // in a Row to have a similar effect
                       SizedBox(width: _sidebarAnim.value * 216),
                       child!,
                     ],
@@ -332,7 +356,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               ),
             ),
           ),
-          // White underlay behind the bottom tab bar
           IgnorePointer(
             ignoring: true,
             child: Align(
@@ -345,11 +368,9 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
+                          RiveAppTheme.background.withOpacity(0),
                           RiveAppTheme.background.withOpacity(
-                            0,
-                          ), // Fully transparent at the top
-                          RiveAppTheme.background.withOpacity(
-                            0.35 - // Reduced opacity for a more transparent effect
+                            0.35 -
                                 (!_showOnBoarding
                                     ? _sidebarAnim.value * 0.3
                                     : _onBoardingAnim.value * 0.3),
