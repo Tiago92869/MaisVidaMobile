@@ -118,8 +118,8 @@ class Plan {
 
 class Dosage {
   final String id;
-  final String time; // Store time as HH:mm
-  final double dosage; // Change dosage to double
+  String time; // Store time as HH:mm
+  double dosage; // Change dosage to double
 
   Dosage({required this.id, required this.time, required this.dosage});
 

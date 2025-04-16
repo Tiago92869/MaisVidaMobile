@@ -43,6 +43,12 @@ class _MedicinesPageState extends State<MedicinesPage> {
   }
 
   void _onScroll() {
+    // Check if the user has scrolled to the top
+    if (_scrollController.position.pixels <= 0 && !_isLoading) {
+      _fetchMedicines(); // Refresh the medicines list
+    }
+
+    // Check if the user has scrolled to the bottom for infinite scrolling
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 50 &&
         !_isFetchingMore &&
@@ -324,7 +330,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
 
     return Expanded(
       child: RefreshIndicator(
-        onRefresh: _fetchMedicines,
+        onRefresh: _fetchMedicines, // Pull-to-refresh functionality
         child: ListView.builder(
           controller: _scrollController, // Attach the ScrollController
           padding: const EdgeInsets.all(20),

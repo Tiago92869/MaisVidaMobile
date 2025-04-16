@@ -273,19 +273,28 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Week Plan",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "Week Plan",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            if (editMode) // Show "+" button only in edit mode
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                onPressed: () => _showAddDosageDialog(),
+              ),
+          ],
         ),
         const SizedBox(height: 10),
         ListView.builder(
-          shrinkWrap:
-              true, // Ensures the ListView takes only the required space
-          physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: widget.medicine?.plans.length ?? 0,
           itemBuilder: (context, index) {
             final plan = widget.medicine!.plans[index];
@@ -299,7 +308,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Weekday and Dosage Count
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -324,45 +332,57 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     ],
                   ),
                   const SizedBox(height: 5),
-
-                  // Dosages Details
                   if (plan.dosages.isNotEmpty)
                     Column(
                       children:
                           plan.dosages.map((dosage) {
-                            return Container(
-                              margin: const EdgeInsets.only(top: 5),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Time
-                                  Text(
-                                    dosage
-                                        .time, // Assuming `time` is a property of dosage
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      color: Color.fromARGB(195, 255, 255, 255),
-                                      fontWeight: FontWeight.bold,
+                            return GestureDetector(
+                              onTap:
+                                  editMode
+                                      ? () =>
+                                          _showEditDosageDialog(plan, dosage)
+                                      : null, // Only allow tapping in edit mode
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 5),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      dosage.time,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Color.fromARGB(
+                                          195,
+                                          255,
+                                          255,
+                                          255,
+                                        ),
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                  // Quantity
-                                  Text(
-                                    "${dosage.dosage} pill", // Assuming `quantity` is a property of dosage
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      color: Color.fromARGB(195, 255, 255, 255),
+                                    Text(
+                                      "${dosage.dosage} pill",
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Color.fromARGB(
+                                          195,
+                                          255,
+                                          255,
+                                          255,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             );
                           }).toList(),
@@ -670,6 +690,371 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             ),
         ],
       ),
+    );
+  }
+
+  void _showAddDosageDialog() {
+    final List<String> selectedWeekdays = [];
+    TimeOfDay? selectedTime;
+    double selectedDosage = 0.25;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Add Dosage",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Weekday Title
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "WeekDay:",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+
+                  // Weekday Selection
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      for (var day in [
+                        "MONDAY",
+                        "TUESDAY",
+                        "WEDNESDAY",
+                        "THURSDAY",
+                        "FRIDAY",
+                        "SATURDAY",
+                        "SUNDAY",
+                      ])
+                        FilterChip(
+                          label: Text(
+                            day,
+                            style: TextStyle(
+                              color:
+                                  selectedWeekdays.contains(day)
+                                      ? Colors.white
+                                      : const Color.fromRGBO(72, 85, 204, 1),
+                            ),
+                          ),
+                          selected: selectedWeekdays.contains(day),
+                          onSelected: (isSelected) {
+                            setState(() {
+                              if (isSelected) {
+                                selectedWeekdays.add(day);
+                              } else {
+                                selectedWeekdays.remove(day);
+                              }
+                            });
+                          },
+                          selectedColor: const Color.fromRGBO(72, 85, 204, 1),
+                          backgroundColor:
+                              selectedWeekdays.contains(day)
+                                  ? const Color.fromRGBO(72, 85, 204, 1)
+                                  : Colors.white,
+                          side: BorderSide(
+                            color:
+                                selectedWeekdays.contains(day)
+                                    ? Colors.white
+                                    : Colors.transparent,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Time Row
+                  Row(
+                    children: [
+                      const Text(
+                        "Time:",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (time != null) {
+                              setState(() {
+                                selectedTime = time;
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              selectedTime != null
+                                  ? selectedTime!.format(context)
+                                  : "Select Time",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Dosage Row
+                  Row(
+                    children: [
+                      const Text(
+                        "Dosage:",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: DropdownButton<double>(
+                          value: selectedDosage,
+                          dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
+                          items:
+                              List.generate(
+                                40,
+                                (index) => (index + 1) * 0.25,
+                              ).map((value) {
+                                return DropdownMenuItem<double>(
+                                  value: value,
+                                  child: Text(
+                                    value.toStringAsFixed(2),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedDosage = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedWeekdays.isNotEmpty && selectedTime != null) {
+                      _addDosageToPlans(
+                        selectedWeekdays,
+                        selectedTime!,
+                        selectedDosage,
+                      );
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text(
+                    "Confirm",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _addDosageToPlans(List<String> weekdays, TimeOfDay time, double dosage) {
+    setState(() {
+      for (var day in weekdays) {
+        final plan = widget.medicine!.plans.firstWhere(
+          (plan) => plan.weekDay == day,
+          orElse: () => Plan(id: "", weekDay: day, dosages: []),
+        );
+        plan.dosages.add(
+          Dosage(
+            id: "",
+            time:
+                "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}",
+            dosage: dosage,
+          ),
+        );
+      }
+    });
+  }
+
+  void _showEditDosageDialog(Plan plan, Dosage dosage) {
+    TimeOfDay selectedTime = TimeOfDay(
+      hour: int.parse(dosage.time.split(":")[0]),
+      minute: int.parse(dosage.time.split(":")[1]),
+    );
+    double selectedDosage = dosage.dosage;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Edit Dosage",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Time Picker
+                  Row(
+                    children: [
+                      const Text(
+                        "Time:",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: selectedTime,
+                            );
+                            if (time != null) {
+                              setState(() {
+                                selectedTime = time;
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              selectedTime.format(context),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Dosage Quantity
+                  Row(
+                    children: [
+                      const Text(
+                        "Dosage:",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: DropdownButton<double>(
+                          value: selectedDosage,
+                          dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
+                          items:
+                              List.generate(
+                                40,
+                                (index) => (index + 1) * 0.25,
+                              ).map((value) {
+                                return DropdownMenuItem<double>(
+                                  value: value,
+                                  child: Text(
+                                    value.toStringAsFixed(2),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedDosage = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                // Delete Button
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      plan.dosages.remove(dosage); // Remove dosage locally
+                    });
+                    Navigator.pop(context); // Close the dialog
+                    this.setState(() {}); // Update the parent widget's state
+                  },
+                  child: const Text(
+                    "Delete",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+                // Cancel Button
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                // Save Button
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      dosage.time =
+                          "${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}";
+                      dosage.dosage = selectedDosage;
+                    });
+                    Navigator.pop(context);
+                    this.setState(() {}); // Update the parent widget's state
+                  },
+                  child: const Text(
+                    "Save",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
