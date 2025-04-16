@@ -356,6 +356,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
+                                    // Display time
                                     Text(
                                       dosage.time,
                                       style: const TextStyle(
@@ -369,17 +370,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(
-                                      "${dosage.dosage} pill",
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        color: Color.fromARGB(
-                                          195,
-                                          255,
-                                          255,
-                                          255,
-                                        ),
-                                      ),
+                                    // Display dosage images
+                                    Row(
+                                      children: _getDosageImages(dosage.dosage),
                                     ),
                                   ],
                                 ),
@@ -866,14 +859,42 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedWeekdays.isNotEmpty && selectedTime != null) {
-                      _addDosageToPlans(
-                        selectedWeekdays,
-                        selectedTime!,
-                        selectedDosage,
+                    if (selectedWeekdays.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select at least one weekday."),
+                          backgroundColor: Colors.red,
+                        ),
                       );
-                      Navigator.pop(context);
+                      return;
                     }
+
+                    if (selectedTime == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select a time."),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (selectedDosage <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select a valid dosage."),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    _addDosageToPlans(
+                      selectedWeekdays,
+                      selectedTime!,
+                      selectedDosage,
+                    );
+                    Navigator.pop(context);
                   },
                   child: const Text(
                     "Confirm",
@@ -1056,5 +1077,50 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         );
       },
     );
+  }
+
+  List<Widget> _getDosageImages(double dosage) {
+    List<Widget> images = [];
+
+    // Calculate the number of full units (drug1)
+    int fullUnits = dosage.floor();
+    for (int i = 0; i < fullUnits; i++) {
+      images.add(
+        Image.asset(
+          'assets/medicine/drug1.png',
+          height: 24, // Adjust height to fit the row
+          width: 24, // Adjust width to fit the row
+          fit: BoxFit.contain,
+        ),
+      );
+    }
+
+    // Calculate the remaining fractional part
+    double fractionalPart = dosage - fullUnits;
+    if (fractionalPart > 0) {
+      String fractionalImage = _getFractionalImage(fractionalPart);
+      images.add(
+        Image.asset(
+          fractionalImage,
+          height: 24, // Adjust height to fit the row
+          width: 24, // Adjust width to fit the row
+          fit: BoxFit.contain,
+        ),
+      );
+    }
+
+    return images;
+  }
+
+  String _getFractionalImage(double fractionalPart) {
+    if (fractionalPart == 0.25) {
+      return 'assets/medicine/drug25.png';
+    } else if (fractionalPart == 0.5) {
+      return 'assets/medicine/drug50.png';
+    } else if (fractionalPart == 0.75) {
+      return 'assets/medicine/drug75.png';
+    } else {
+      return 'assets/medicine/drug1.png'; // Default to full unit if unexpected value
+    }
   }
 }
