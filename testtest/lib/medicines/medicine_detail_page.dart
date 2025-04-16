@@ -296,26 +296,75 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Weekday
-                  Text(
-                    plan.weekDay,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  // Weekday and Dosage Count
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        plan.weekDay,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        plan.dosages.isEmpty
+                            ? "No dosages"
+                            : "${plan.dosages.length} dosage${plan.dosages.length > 1 ? 's' : ''}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
 
-                  // Dosages (Placeholder for now)
-                  Text(
-                    plan.dosages.isEmpty
-                        ? "No dosages"
-                        : "${plan.dosages.length} dosages",
-                    style: const TextStyle(fontSize: 14, color: Colors.white70),
-                  ),
+                  // Dosages Details
+                  if (plan.dosages.isNotEmpty)
+                    Column(
+                      children:
+                          plan.dosages.map((dosage) {
+                            return Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Time
+                                  Text(
+                                    dosage
+                                        .time, // Assuming `time` is a property of dosage
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  // Quantity
+                                  Text(
+                                    "${dosage.dosage} pill", // Assuming `quantity` is a property of dosage
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                    ),
                 ],
               ),
             );
