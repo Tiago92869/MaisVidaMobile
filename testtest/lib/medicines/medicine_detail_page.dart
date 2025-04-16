@@ -356,9 +356,9 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // Display time
+                                    // Display time and dosage text
                                     Text(
-                                      dosage.time,
+                                      "${dosage.time} | ${dosage.dosage.toStringAsFixed(2)} pills",
                                       style: const TextStyle(
                                         fontSize: 15,
                                         color: Color.fromARGB(
@@ -370,9 +370,61 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    // Display dosage images
-                                    Row(
-                                      children: _getDosageImages(dosage.dosage),
+                                    const SizedBox(
+                                      width: 60,
+                                    ), // Add spacing here
+                                    // Horizontally scrollable dosage images with indicators
+                                    Expanded(
+                                      child: Stack(
+                                        children: [
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              children: _getDosageImages(
+                                                dosage.dosage,
+                                              ),
+                                            ),
+                                          ),
+                                          // Left fade effect or arrow
+                                          Positioned(
+                                            left: 0,
+                                            child: Container(
+                                              width: 30,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.black.withOpacity(
+                                                      0.5,
+                                                    ),
+                                                    Colors.transparent,
+                                                  ],
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Right fade effect or arrow
+                                          Positioned(
+                                            right: 0,
+                                            child: Container(
+                                              width: 30,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.transparent,
+                                                    Colors.black.withOpacity(
+                                                      0.5,
+                                                    ),
+                                                  ],
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
