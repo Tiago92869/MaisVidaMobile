@@ -84,15 +84,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(
-                      123,
-                      144,
-                      255,
-                      1,
-                    ), // End color (lighter blue)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

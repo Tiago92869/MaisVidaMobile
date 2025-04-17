@@ -221,20 +221,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color.fromRGBO(
-              72,
-              85,
-              204,
-              1,
-            ), // Header background color
-            hintColor: const Color.fromRGBO(
-              123,
-              144,
-              255,
-              1,
-            ), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A), // Header background color
+            hintColor: const Color(0xFF0D1B2A), // Selected date color
             colorScheme: const ColorScheme.light(
-              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              primary: Color(0xFF0D1B2A), // Header text color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black, // Body text color
             ),
@@ -285,7 +275,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [const Color(0xFFE3F2FD), const Color(0xFFFFFFFF)],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -350,7 +340,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Color.fromARGB(221, 255, 255, 255),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -445,7 +435,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                       child: Icon(
                         editMode ? Icons.save : Icons.edit,
-                        color: const Color.fromRGBO(85, 123, 233, 1),
+                        color: const Color(0xFF0D1B2A),
                         size: 28,
                       ),
                     ),
@@ -472,7 +462,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Color.fromARGB(221, 255, 255, 255),
           ),
         ),
         const SizedBox(height: 8),
@@ -511,7 +501,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Color.fromARGB(221, 255, 255, 255),
           ),
         ),
         const SizedBox(height: 8),
@@ -557,7 +547,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Color.fromARGB(221, 255, 255, 255),
           ),
         ),
         const SizedBox(height: 8),
