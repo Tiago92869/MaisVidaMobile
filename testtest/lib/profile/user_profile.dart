@@ -284,6 +284,40 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
 
+          // Starfish Decorations
+          Positioned(
+            right: 80,
+            top: -80,
+            width: 400,
+            height: 400,
+            child: Opacity(
+              opacity: 0.1,
+              child: Transform.rotate(
+                angle: 0.7,
+                child: Image.asset(
+                  'assets/images/starfish2.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 100,
+            top: 450,
+            width: 400,
+            height: 400,
+            child: Opacity(
+              opacity: 0.1,
+              child: Transform.rotate(
+                angle: 0.5,
+                child: Image.asset(
+                  'assets/images/starfish1.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+
           // Content with RefreshIndicator
           RefreshIndicator(
             onRefresh: _refreshPage, // Trigger refresh logic

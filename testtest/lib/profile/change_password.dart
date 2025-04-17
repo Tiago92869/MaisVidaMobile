@@ -16,6 +16,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   TextEditingController confirmPasswordController = TextEditingController();
 
   final UserService _userService = UserService();
+  bool _showFirstStarfish = true;
 
   @override
   void dispose() {
@@ -84,97 +85,140 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       resizeToAvoidBottomInset:
           false, // Prevents the screen from resizing when the keyboard appears
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Back Arrow
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+      body: Stack(
+        children: [
+          // Background gradient
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-
-                const SizedBox(height: 20),
-
-                // Title
-                const Center(
-                  child: Text(
-                    "Update Password",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 60),
-
-                // Current Password Field
-                _buildPasswordField(
-                  "Current Password",
-                  currentPasswordController,
-                ),
-
-                const SizedBox(height: 30),
-
-                // New Password Field
-                _buildPasswordField("New Password", newPasswordController),
-
-                const SizedBox(height: 30),
-
-                // Confirm Password Field
-                _buildPasswordField(
-                  "Confirm Password",
-                  confirmPasswordController,
-                ),
-
-                const SizedBox(height: 100),
-
-                // Update Button
-                Center(
-                  child: ElevatedButton(
-                    onPressed: updatePassword,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white, // Button color
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      "Update Password",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D1B2A),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+
+          // Starfish Decorations
+          if (_showFirstStarfish)
+            Positioned(
+              right: 80,
+              top: 320,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.7,
+                  child: Image.asset(
+                    'assets/images/starfish2.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            )
+          else
+            Positioned(
+              left: 100,
+              top: 250,
+              width: 400,
+              height: 400,
+              child: Opacity(
+                opacity: 0.1,
+                child: Transform.rotate(
+                  angle: 0.5,
+                  child: Image.asset(
+                    'assets/images/starfish1.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+
+          // Main Content
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Back Arrow
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Title
+                  const Center(
+                    child: Text(
+                      "Update Password",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // Current Password Field
+                  _buildPasswordField(
+                    "Current Password",
+                    currentPasswordController,
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // New Password Field
+                  _buildPasswordField("New Password", newPasswordController),
+
+                  const SizedBox(height: 30),
+
+                  // Confirm Password Field
+                  _buildPasswordField(
+                    "Confirm Password",
+                    confirmPasswordController,
+                  ),
+
+                  const SizedBox(height: 100),
+
+                  // Update Button
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: updatePassword,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white, // Button color
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        "Update Password",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0D1B2A),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
