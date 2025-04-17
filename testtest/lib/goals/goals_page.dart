@@ -205,10 +205,7 @@ class _GoalsPageState extends State<GoalsPage> {
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(102, 122, 236, 1),
-              Color.fromRGBO(255, 255, 255, 1),
-            ],
+            colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -287,7 +284,7 @@ class _GoalsPageState extends State<GoalsPage> {
             decoration:
                 isSelected
                     ? BoxDecoration(
-                      color: const Color.fromRGBO(85, 123, 233, 1),
+                      color: const Color.fromARGB(255, 33, 70, 119),
                       borderRadius: BorderRadius.circular(12),
                     )
                     : null,
@@ -539,7 +536,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 ),
                 child: const Icon(
                   Icons.filter_alt,
-                  color: Colors.blue,
+                  color: Color(0xFF0D1B2A),
                   size: 28,
                 ),
               ),
@@ -552,7 +549,7 @@ class _GoalsPageState extends State<GoalsPage> {
                     height: 8,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blue, // Red color for the indicator
+                      color: Color(0xFF0D1B2A), // Red color for the indicator
                     ),
                   ),
                 ),
@@ -573,10 +570,7 @@ class _GoalsPageState extends State<GoalsPage> {
         width: 230,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [
-              Color.fromRGBO(72, 85, 204, 1),
-              Color.fromRGBO(123, 144, 255, 1),
-            ],
+            colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -650,7 +644,7 @@ class _GoalsPageState extends State<GoalsPage> {
                               borderRadius: BorderRadius.circular(12),
                               color:
                                   isSelected
-                                      ? const Color.fromRGBO(85, 123, 233, 1)
+                                      ? const Color(0xFF0D1B2A)
                                       : Colors.white,
                               boxShadow: [
                                 BoxShadow(
@@ -674,12 +668,7 @@ class _GoalsPageState extends State<GoalsPage> {
                                   color:
                                       isSelected
                                           ? Colors.white
-                                          : const Color.fromRGBO(
-                                            72,
-                                            85,
-                                            204,
-                                            1,
-                                          ),
+                                          : const Color(0xFF0D1B2A),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -762,7 +751,7 @@ class _GoalsPageState extends State<GoalsPage> {
           );
         },
         backgroundColor: Colors.white,
-        child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+        child: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
       ),
     );
   }

@@ -58,20 +58,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color.fromRGBO(
-              72,
-              85,
-              204,
-              1,
-            ), // Header background color
-            hintColor: const Color.fromRGBO(
-              123,
-              144,
-              255,
-              1,
-            ), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A), // Header background color
+            hintColor: const Color(0xFF0D1B2A), // Selected date color
             colorScheme: const ColorScheme.light(
-              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              primary: Color(0xFF0D1B2A), // Header text color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black, // Body text color
             ),
@@ -177,7 +167,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              backgroundColor: const Color(0xFF0D1B2A),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -224,20 +214,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(
-                      72,
-                      85,
-                      204,
-                      0.9,
-                    ), // Start color (darker blue)
-                    Color.fromRGBO(
-                      123,
-                      144,
-                      255,
-                      0.9,
-                    ), // End color (lighter blue)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -322,7 +299,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   if (editMode)
                     DropdownButton<GoalSubject>(
                       value: selectedSubject,
-                      dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
+                      dropdownColor: const Color(0xFF0D1B2A),
                       items:
                           GoalSubject.values.map((subject) {
                             return DropdownMenuItem(
@@ -499,11 +476,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          backgroundColor: const Color.fromRGBO(
-                            72,
-                            85,
-                            204,
-                            1,
+                          backgroundColor: const Color(
+                            0xFF0D1B2A,
                           ), // Match page background
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -581,7 +555,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 backgroundColor: Colors.white,
                 child: Icon(
                   editMode ? Icons.check : Icons.edit,
-                  color: const Color.fromRGBO(72, 85, 204, 1),
+                  color: const Color(0xFF0D1B2A),
                 ),
               ),
             ),
