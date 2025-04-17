@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:testtest/profile/change_password.dart';
 import 'package:testtest/services/user/user_repository.dart';
 import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
@@ -370,6 +371,39 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               hintText: 'Enter About Me',
                             ),
                             maxLines: null,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+
+                        // Reset Password Button
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChangePasswordPage(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white, // Button color
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              "Reset Password",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF0D1B2A),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 70),

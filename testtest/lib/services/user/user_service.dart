@@ -259,20 +259,39 @@ class UserService {
   }
 
   // Method to update the user's password
-  Future<void> updateUserPassword(
-    String userId,
-    PasswordUpdateDTO passwordUpdateDTO,
-  ) async {
-    final url = Uri.parse('$_baseUrl/users/$userId/password');
+  Future<void> updateUserPassword(PasswordUpdateDTO passwordUpdateDTO) async {
+    await _loadStoredCredentials();
+    print('Starting password update for user: $_userId');
+    final url = Uri.parse('$_baseUrl/password');
+    final requestBody = jsonEncode({
+      'oldPassword': passwordUpdateDTO.currentPassword,
+      'newPassword': passwordUpdateDTO.newPassword,
+      'newPasswordCheck':
+          passwordUpdateDTO
+              .newPassword, // Ensure newPasswordCheck matches newPassword
+    });
+
+    print('Request URL: $url');
+    print('Request Body: $requestBody');
+
     final response = await http.patch(
       url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(passwordUpdateDTO.toJson()),
+      headers: {
+        'Authorization': 'Bearer $_accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: requestBody,
     );
 
+    print('Response Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
     if (response.statusCode != 200) {
+      print('Password update failed with status code: ${response.statusCode}');
       throw Exception('Failed to update password: ${response.body}');
     }
+
+    print('Password update successful for user: $_userId');
   }
 
   Future<void> sendEmail(String email) async {

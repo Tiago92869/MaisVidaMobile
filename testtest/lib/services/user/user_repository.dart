@@ -68,11 +68,8 @@ class UserRepository {
   }
 
   // Method to update the user's password
-  Future<void> updateUserPassword(
-    String userId,
-    PasswordUpdateDTO passwordUpdateDTO,
-  ) async {
-    await userService.updateUserPassword(userId, passwordUpdateDTO);
+  Future<void> updateUserPassword(PasswordUpdateDTO passwordUpdateDTO) async {
+    await userService.updateUserPassword(passwordUpdateDTO);
   }
 
   Future<User> getSimpleUser() async {
