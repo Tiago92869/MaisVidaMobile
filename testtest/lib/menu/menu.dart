@@ -18,6 +18,7 @@ import 'package:testtest/sos/sos_details_page.dart';
 import 'package:testtest/menu/theme.dart';
 import 'package:testtest/menu/assets.dart' as app_assets;
 import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.dart
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
@@ -77,7 +78,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   late SMIBool _menuBtn;
 
   bool _showOnBoarding = false;
-  bool _isDarkMode = false;
+  bool _isDarkMode = false; // Default value for dark mode
 
   // Reference to HomeTabView
   late HomeTabView _homeTabView;
@@ -98,6 +99,9 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    // Load the saved theme mode
+    _loadThemeMode();
 
     // Initialize HomeTabView
     _homeTabView = HomeTabView(
@@ -154,6 +158,21 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     _animationController?.dispose();
     _onBoardingAnimController?.dispose();
     super.dispose();
+  }
+
+  // Load the saved theme mode from SharedPreferences
+  Future<void> _loadThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkMode =
+          prefs.getBool('isDarkMode') ?? false; // Default to light mode
+    });
+  }
+
+  // Save the theme mode to SharedPreferences
+  Future<void> _saveThemeMode(bool isDarkMode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', isDarkMode);
   }
 
   void _onMenuIconInit(Artboard artboard) {
@@ -297,6 +316,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                       onChanged: (value) {
                         setState(() {
                           _isDarkMode = value;
+                          _saveThemeMode(value); // Save the new theme mode
                           print(
                             _isDarkMode
                                 ? "Switched to Dark Mode"
