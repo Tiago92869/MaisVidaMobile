@@ -256,160 +256,276 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: Stack(
-        children: [
-          Positioned(child: Container(color: RiveAppTheme.background2)),
-          RepaintBoundary(
-            child: AnimatedBuilder(
-              animation: _sidebarAnim,
-              builder: (BuildContext context, Widget? child) {
-                return Transform(
-                  alignment: Alignment.center,
-                  transform:
-                      Matrix4.identity()
-                        ..setEntry(3, 2, 0.001)
-                        ..rotateY(
-                          ((1 - _sidebarAnim.value) * -30) * math.pi / 180,
-                        )
-                        ..translate((1 - _sidebarAnim.value) * -300),
-                  child: child,
-                );
-              },
-              child: FadeTransition(
-                opacity: _sidebarAnim,
-                child: SideMenu(
-                  onMenuPress: _updateTabBody, // Pass the callback here
-                ),
-              ),
-            ),
-          ),
-          RepaintBoundary(
-            child: AnimatedBuilder(
-              animation: _showOnBoarding ? _onBoardingAnim : _sidebarAnim,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale:
-                      1 -
-                      (_showOnBoarding
-                          ? _onBoardingAnim.value * 0.08
-                          : _sidebarAnim.value * 0.1),
-                  child: Transform.translate(
-                    offset: Offset(_sidebarAnim.value * 265, 0),
-                    child: Transform(
-                      alignment: Alignment.center,
-                      transform:
-                          Matrix4.identity()
-                            ..setEntry(3, 2, 0.001)
-                            ..rotateY(
-                              (_sidebarAnim.value * 30) * math.pi / 180,
-                            ),
-                      child: child,
-                    ),
+    return WillPopScope(
+      onWillPop: () async {
+        if (_currentTabIndex != 0) {
+          // Redirect to _homeTabView if not already there
+          setState(() {
+            _tabBody = _screens[0];
+            _currentTabIndex = 0;
+          });
+          return false; // Prevent the app from closing
+        } else {
+          // Show confirmation dialog to exit the app
+          final shouldExit = await showDialog(
+            context: context,
+            builder:
+                (context) => Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                );
-              },
-              child: Stack(
-                children: [
-                  _tabBody,
-                  // Show the DayNightSwitch only when the user is on the MenuPage (index 0)
-                  if (_currentTabIndex == 0)
-                    Positioned(
-                      top: 55,
-                      right: 20,
-                      child: DayNightSwitch(
-                        value: _isDarkMode,
-                        onChanged: (value) {
-                          setState(() {
-                            _isDarkMode = value;
-                            _saveThemeMode(value); // Save the new theme mode
-                          });
-                        },
-                        sunColor: const Color(0xFFFDB813),
-                        moonColor: const Color(0xFFf5f3ce),
-                        dayColor: const Color(0xFF87CEEB),
-                        nightColor: const Color(0xFF003366),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          RepaintBoundary(
-            child: AnimatedBuilder(
-              animation: _sidebarAnim,
-              builder: (context, child) {
-                return SafeArea(
-                  child: Row(
-                    children: [
-                      SizedBox(width: _sidebarAnim.value * 216),
-                      child!,
-                    ],
-                  ),
-                );
-              },
-              child: GestureDetector(
-                onTap: onMenuPress,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
                   child: Container(
-                    width: 44,
-                    height: 44,
-                    margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(44 / 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: RiveAppTheme.shadow.withOpacity(0.2),
-                          blurRadius: 5,
-                          offset: const Offset(0, 5),
+                      color: const Color(
+                        0xFF0D1B2A,
+                      ), // Use a darker solid color
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Center(
+                          child: Text(
+                            "Exit Application",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontFamily: "Poppins",
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        const Center(
+                          child: Text(
+                            "Are you sure you want to exit?",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: "Poppins",
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed:
+                                  () => Navigator.of(
+                                    context,
+                                  ).pop(false), // User pressed No
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color.fromRGBO(
+                                  102,
+                                  122,
+                                  236,
+                                  1,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                "No",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed:
+                                  () =>
+                                      SystemNavigator.pop(), // User pressed Yes
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromRGBO(
+                                  102,
+                                  122,
+                                  236,
+                                  1,
+                                ),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                "Yes",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    child: RiveAnimation.asset(
-                      app_assets.menuButtonRiv,
-                      stateMachines: const ["State Machine"],
-                      animations: const ["open", "close"],
-                      onInit: _onMenuIconInit,
-                    ),
+                  ),
+                ),
+          );
+          return shouldExit ?? false; // Exit if user confirms
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        body: Stack(
+          children: [
+            Positioned(child: Container(color: RiveAppTheme.background2)),
+            RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _sidebarAnim,
+                builder: (BuildContext context, Widget? child) {
+                  return Transform(
+                    alignment: Alignment.center,
+                    transform:
+                        Matrix4.identity()
+                          ..setEntry(3, 2, 0.001)
+                          ..rotateY(
+                            ((1 - _sidebarAnim.value) * -30) * math.pi / 180,
+                          )
+                          ..translate((1 - _sidebarAnim.value) * -300),
+                    child: child,
+                  );
+                },
+                child: FadeTransition(
+                  opacity: _sidebarAnim,
+                  child: SideMenu(
+                    onMenuPress: _updateTabBody, // Pass the callback here
                   ),
                 ),
               ),
             ),
-          ),
-          IgnorePointer(
-            ignoring: true,
-            child: Align(
-              alignment: Alignment.bottomCenter,
+            RepaintBoundary(
               child: AnimatedBuilder(
-                animation: !_showOnBoarding ? _sidebarAnim : _onBoardingAnim,
+                animation: _showOnBoarding ? _onBoardingAnim : _sidebarAnim,
                 builder: (context, child) {
-                  return Container(
-                    height: 150,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          RiveAppTheme.background.withOpacity(0),
-                          RiveAppTheme.background.withOpacity(
-                            0.35 -
-                                (!_showOnBoarding
-                                    ? _sidebarAnim.value * 0.3
-                                    : _onBoardingAnim.value * 0.3),
-                          ),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+                  return Transform.scale(
+                    scale:
+                        1 -
+                        (_showOnBoarding
+                            ? _onBoardingAnim.value * 0.08
+                            : _sidebarAnim.value * 0.1),
+                    child: Transform.translate(
+                      offset: Offset(_sidebarAnim.value * 265, 0),
+                      child: Transform(
+                        alignment: Alignment.center,
+                        transform:
+                            Matrix4.identity()
+                              ..setEntry(3, 2, 0.001)
+                              ..rotateY(
+                                (_sidebarAnim.value * 30) * math.pi / 180,
+                              ),
+                        child: child,
                       ),
                     ),
                   );
                 },
+                child: Stack(
+                  children: [
+                    _tabBody,
+                    // Show the DayNightSwitch only when the user is on the MenuPage (index 0)
+                    if (_currentTabIndex == 0)
+                      Positioned(
+                        top: 55,
+                        right: 20,
+                        child: DayNightSwitch(
+                          value: _isDarkMode,
+                          onChanged: (value) {
+                            setState(() {
+                              _isDarkMode = value;
+                              _saveThemeMode(value); // Save the new theme mode
+                            });
+                          },
+                          sunColor: const Color(0xFFFDB813),
+                          moonColor: const Color(0xFFf5f3ce),
+                          dayColor: const Color(0xFF87CEEB),
+                          nightColor: const Color(0xFF003366),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+            RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _sidebarAnim,
+                builder: (context, child) {
+                  return SafeArea(
+                    child: Row(
+                      children: [
+                        SizedBox(width: _sidebarAnim.value * 216),
+                        child!,
+                      ],
+                    ),
+                  );
+                },
+                child: GestureDetector(
+                  onTap: onMenuPress,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(44 / 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: RiveAppTheme.shadow.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: RiveAnimation.asset(
+                        app_assets.menuButtonRiv,
+                        stateMachines: const ["State Machine"],
+                        animations: const ["open", "close"],
+                        onInit: _onMenuIconInit,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            IgnorePointer(
+              ignoring: true,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedBuilder(
+                  animation: !_showOnBoarding ? _sidebarAnim : _onBoardingAnim,
+                  builder: (context, child) {
+                    return Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            RiveAppTheme.background.withOpacity(0),
+                            RiveAppTheme.background.withOpacity(
+                              0.35 -
+                                  (!_showOnBoarding
+                                      ? _sidebarAnim.value * 0.3
+                                      : _onBoardingAnim.value * 0.3),
+                            ),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: bottomNavigationBar(),
       ),
-      bottomNavigationBar: bottomNavigationBar(),
     );
   }
 
