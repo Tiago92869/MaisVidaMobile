@@ -96,6 +96,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   // Screens list
   late final List<Widget> _screens;
 
+  int _currentTabIndex = 0; // Track the current tab index
+
   @override
   void initState() {
     super.initState();
@@ -109,6 +111,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         setState(() {
           if (tabIndex >= 0 && tabIndex < _screens.length) {
             _tabBody = _screens[tabIndex];
+            _currentTabIndex = tabIndex;
           } else {
             print('Invalid tab index: $tabIndex');
           }
@@ -208,6 +211,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       print('Menu title is "User", setting index to 8'); // Debugging print
       setState(() {
         _tabBody = _screens[8]; // Index for "User"
+        _currentTabIndex = 8; // Update the current tab index
       });
       return;
     }
@@ -233,6 +237,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       print('Menu title found at index: $index'); // Debugging print
       setState(() {
         _tabBody = _screens[index];
+        _currentTabIndex = index; // Update the current tab index
       });
     } else {
       print('Error: Invalid menu title or index');
@@ -308,28 +313,25 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               child: Stack(
                 children: [
                   _tabBody,
-                  Positioned(
-                    top: 55,
-                    right: 20,
-                    child: DayNightSwitch(
-                      value: _isDarkMode,
-                      onChanged: (value) {
-                        setState(() {
-                          _isDarkMode = value;
-                          _saveThemeMode(value); // Save the new theme mode
-                          print(
-                            _isDarkMode
-                                ? "Switched to Dark Mode"
-                                : "Switched to Light Mode",
-                          );
-                        });
-                      },
-                      sunColor: const Color(0xFFFDB813),
-                      moonColor: const Color(0xFFf5f3ce),
-                      dayColor: const Color(0xFF87CEEB),
-                      nightColor: const Color(0xFF003366),
+                  // Show the DayNightSwitch only when the user is on the MenuPage (index 0)
+                  if (_currentTabIndex == 0)
+                    Positioned(
+                      top: 55,
+                      right: 20,
+                      child: DayNightSwitch(
+                        value: _isDarkMode,
+                        onChanged: (value) {
+                          setState(() {
+                            _isDarkMode = value;
+                            _saveThemeMode(value); // Save the new theme mode
+                          });
+                        },
+                        sunColor: const Color(0xFFFDB813),
+                        moonColor: const Color(0xFFf5f3ce),
+                        dayColor: const Color(0xFF87CEEB),
+                        nightColor: const Color(0xFF003366),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -434,18 +436,23 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 setState(() {
                   if (tabIndex == 0) {
                     _tabBody = _screens.first;
+                    _currentTabIndex = 0; // Update the current tab index
                   }
                   if (tabIndex == 1) {
                     _tabBody = _screens[1];
+                    _currentTabIndex = 1; // Update the current tab index
                   }
                   if (tabIndex == 2) {
                     _tabBody = _screens[4];
+                    _currentTabIndex = 4; // Update the current tab index
                   }
                   if (tabIndex == 3) {
                     _tabBody = _screens[2];
+                    _currentTabIndex = 2; // Update the current tab index
                   }
                   if (tabIndex == 4) {
                     _tabBody = _screens[8];
+                    _currentTabIndex = 8; // Update the current tab index
                   }
                 });
               },
