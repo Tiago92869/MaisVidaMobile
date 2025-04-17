@@ -10,6 +10,7 @@ const Duration _timeoutDuration = Duration(seconds: 10);
 
 class UserService {
   final String _baseUrl = Config.userUrl;
+  final String _emailUrl = Config.emailUrl;
   final String _tokenUrl = Config.tokenUrl;
   final _storage = const FlutterSecureStorage();
 
@@ -271,6 +272,38 @@ class UserService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update password: ${response.body}');
+    }
+  }
+
+  Future<void> sendEmail(String email) async {
+    try {
+      final String requestUrl = '$_emailUrl/$email';
+      print('Request URL for sendEmail: $requestUrl'); // Log the request URL
+
+      final response = await http
+          .post(
+            Uri.parse(requestUrl),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
+
+      print('Response Status Code: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        print('Email sent successfully.');
+      } else {
+        print('Failed to send email. Status Code: ${response.statusCode}');
+        throw Exception('Failed to send email');
+      }
+    } catch (e) {
+      print('Error sending email: $e');
+      throw Exception('Failed to send email');
     }
   }
 }

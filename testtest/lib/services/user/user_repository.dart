@@ -86,4 +86,15 @@ class UserRepository {
       rethrow;
     }
   }
+
+  Future<void> sendEmail(String email) async {
+    print('UserRepository: Sending email to $email...');
+    try {
+      await userService.sendEmail(email);
+      print('UserRepository: Successfully sent email to $email');
+    } catch (e) {
+      print('UserRepository: Error sending email to $email: $e');
+      rethrow;
+    }
+  }
 }

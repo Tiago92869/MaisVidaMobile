@@ -1,8 +1,13 @@
 // reset_password_page.dart
 import 'package:flutter/material.dart';
+import 'package:testtest/services/user/user_repository.dart';
+import 'package:testtest/services/user/user_service.dart';
 import 'login_page.dart'; // Import the Login Page
 
 class ResetPasswordPage extends StatelessWidget {
+  final TextEditingController _emailController = TextEditingController();
+  final UserService _userService = UserService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,11 +59,58 @@ class ResetPasswordPage extends StatelessWidget {
 
                   // Buttons at the bottom
                   _buildButton(context, "Create New Password", () {
-                    // Navigate to Login Page
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    // Check if email is not null
+                    if (_emailController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please enter your email address."),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Show loading animation
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return const Center(child: CircularProgressIndicator());
+                      },
                     );
+
+                    // Call sendEmail method
+                    UserRepository userRepository = UserRepository(
+                      userService: UserService(),
+                    );
+                    userRepository
+                        .sendEmail(_emailController.text)
+                        .then((_) {
+                          Navigator.pop(context); // Dismiss loading animation
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Password reset email sent successfully.",
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        })
+                        .catchError((error) {
+                          Navigator.pop(context); // Dismiss loading animation
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to send email: $error"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        });
                   }),
                   const SizedBox(height: 20),
                   _buildButton(context, "Go Back", () {
@@ -89,6 +141,7 @@ class ResetPasswordPage extends StatelessWidget {
         ],
       ),
       child: TextField(
+        controller: _emailController,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hint,

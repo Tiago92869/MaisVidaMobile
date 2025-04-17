@@ -33,6 +33,8 @@ class Config {
   static const String notificationUrl =
       'http://34.155.153.157:2221/api/starfish/notification';
   static const String userUrl = 'http://34.155.153.157:2221/api/starfish/user';
+  static const String emailUrl =
+      'http://34.155.153.157:2221/api/starfish/email';
   static const String tokenUrl =
       'http://34.155.153.157:2221/api/starfish/token';
 }
