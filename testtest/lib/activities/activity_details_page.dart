@@ -281,7 +281,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                       child: ElevatedButton(
                         onPressed: _startActivity,
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
+                          foregroundColor: const Color(0xFF0D1B2A),
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -389,7 +389,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                 ? _nextResource
                 : () => Navigator.pop(context),
         style: ElevatedButton.styleFrom(
-          foregroundColor: const Color.fromRGBO(72, 85, 204, 1),
+          foregroundColor: const Color(0xFF0D1B2A),
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

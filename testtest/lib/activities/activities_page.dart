@@ -126,7 +126,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             ),
             child: Icon(
               Icons.star,
-              color: _isStarGlowing ? Colors.blue : Colors.grey,
+              color: _isStarGlowing ? Color(0xFF0D1B2A) : Colors.grey,
               size: 28,
             ),
           ),
@@ -238,20 +238,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(
-                      102,
-                      122,
-                      236,
-                      1,
-                    ), // Start color (darker blue)
-                    Color.fromRGBO(
-                      255,
-                      255,
-                      255,
-                      1,
-                    ), // End color (lighter blue)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
