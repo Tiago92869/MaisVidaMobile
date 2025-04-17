@@ -204,13 +204,18 @@ class _DiaryPageState extends State<DiaryPage> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
                     Color.fromRGBO(
-                      123,
-                      144,
+                      102,
+                      122,
+                      236,
+                      1,
+                    ), // Start color (same as GoalsPage)
+                    Color.fromRGBO(
+                      255,
+                      255,
                       255,
                       1,
-                    ), // End color (lighter blue)
+                    ), // End color (same as GoalsPage)
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,

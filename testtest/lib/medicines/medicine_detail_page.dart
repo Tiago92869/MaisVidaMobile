@@ -54,20 +54,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color.fromRGBO(
-              72,
-              85,
-              204,
-              1,
-            ), // Header background color
-            hintColor: const Color.fromRGBO(
-              123,
-              144,
-              255,
-              1,
-            ), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A), // Header background color
+            hintColor: const Color(0xFF0D1B2A), // Selected date color
             colorScheme: const ColorScheme.light(
-              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              primary: const Color(0xFF0D1B2A), // Header text color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black, // Body text color
             ),
@@ -191,7 +181,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              backgroundColor: const Color(0xFF0D1B2A),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -233,7 +223,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+          backgroundColor: const Color(0xFF0D1B2A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -451,10 +441,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(72, 85, 204, 0.9),
-                    Color.fromRGBO(123, 144, 255, 0.9),
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -704,7 +691,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 backgroundColor: Colors.white,
                 child: Icon(
                   editMode ? Icons.check : Icons.edit,
-                  color: const Color.fromRGBO(72, 85, 204, 1),
+                  color: const Color(0xFF0D1B2A),
                 ),
               ),
             ),
@@ -749,7 +736,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              backgroundColor: const Color(0xFF0D1B2A),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -793,7 +780,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                               color:
                                   selectedWeekdays.contains(day)
                                       ? Colors.white
-                                      : const Color.fromRGBO(72, 85, 204, 1),
+                                      : const Color(0xFF0D1B2A),
                             ),
                           ),
                           selected: selectedWeekdays.contains(day),
@@ -806,10 +793,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                               }
                             });
                           },
-                          selectedColor: const Color.fromRGBO(72, 85, 204, 1),
+                          selectedColor: const Color(0xFF0D1B2A),
                           backgroundColor:
                               selectedWeekdays.contains(day)
-                                  ? const Color.fromRGBO(72, 85, 204, 1)
+                                  ? const Color(0xFF0D1B2A)
                                   : Colors.white,
                           side: BorderSide(
                             color:
@@ -876,7 +863,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       Expanded(
                         child: DropdownButton<double>(
                           value: selectedDosage,
-                          dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
+                          dropdownColor: const Color(0xFF0D1B2A),
                           items:
                               List.generate(
                                 40,
@@ -993,7 +980,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              backgroundColor: const Color(0xFF0D1B2A),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -1059,7 +1046,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       Expanded(
                         child: DropdownButton<double>(
                           value: selectedDosage,
-                          dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
+                          dropdownColor: const Color(0xFF0D1B2A),
                           items:
                               List.generate(
                                 40,

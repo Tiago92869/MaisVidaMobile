@@ -263,7 +263,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             decoration:
                 isSelected
                     ? BoxDecoration(
-                      color: const Color.fromRGBO(85, 123, 233, 1),
+                      color: const Color.fromARGB(255, 33, 70, 119),
                       borderRadius: BorderRadius.circular(12),
                     )
                     : null,
@@ -472,20 +472,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(
-                      102,
-                      122,
-                      236,
-                      1,
-                    ), // Start color (darker blue)
-                    Color.fromRGBO(
-                      255,
-                      255,
-                      255,
-                      1,
-                    ), // End color (lighter blue)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -548,7 +535,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                 backgroundColor: Colors.white,
                 child: Icon(
                   _showArchived ? Icons.folder_open : Icons.archive,
-                  color: const Color.fromRGBO(72, 85, 204, 1),
+                  color: const Color(0xFF0D1B2A),
                 ),
               ),
             ),
@@ -582,7 +569,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             });
           },
           backgroundColor: Colors.white,
-          child: const Icon(Icons.add, color: Color.fromRGBO(72, 85, 204, 1)),
+          child: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
         ),
       ),
     );
