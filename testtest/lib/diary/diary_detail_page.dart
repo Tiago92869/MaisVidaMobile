@@ -49,12 +49,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: const Color.fromRGBO(
-              72,
-              85,
-              204,
-              1,
-            ), // Match page background
+            backgroundColor: const Color(0xFF0D1B2A), // Match page background
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
@@ -139,7 +134,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: const Color.fromRGBO(72, 85, 204, 1),
+              backgroundColor: const Color(0xFF0D1B2A),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -241,20 +236,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(
-                      72,
-                      85,
-                      204,
-                      0.9,
-                    ), // Start color (darker blue)
-                    Color.fromRGBO(
-                      123,
-                      144,
-                      255,
-                      0.9,
-                    ), // End color (lighter blue)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -337,7 +319,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   if (editMode)
                     DropdownButton<DiaryType>(
                       value: selectedEmotion,
-                      dropdownColor: const Color.fromRGBO(72, 85, 204, 1),
+                      dropdownColor: const Color(0xFF0D1B2A),
                       items:
                           DiaryType.values.map((emotion) {
                             return DropdownMenuItem(
@@ -403,24 +385,15 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                                     ) {
                                       return Theme(
                                         data: ThemeData.light().copyWith(
-                                          primaryColor: const Color.fromRGBO(
-                                            72,
-                                            85,
-                                            204,
-                                            1,
+                                          primaryColor: const Color(
+                                            0xFF0D1B2A,
                                           ), // Header background color
-                                          hintColor: const Color.fromRGBO(
-                                            123,
-                                            144,
-                                            255,
-                                            1,
+                                          hintColor: const Color(
+                                            0xFF0D1B2A,
                                           ), // Selected date color
                                           colorScheme: const ColorScheme.light(
-                                            primary: Color.fromRGBO(
-                                              72,
-                                              85,
-                                              204,
-                                              1,
+                                            primary: Color(
+                                              0xFF0D1B2A,
                                             ), // Header text color
                                             onPrimary:
                                                 Colors
@@ -502,7 +475,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                 backgroundColor: Colors.white,
                 child: Icon(
                   widget.createDiary || editMode ? Icons.check : Icons.edit,
-                  color: const Color.fromRGBO(72, 85, 204, 1),
+                  color: const Color(0xFF0D1B2A),
                 ),
               ),
             ),

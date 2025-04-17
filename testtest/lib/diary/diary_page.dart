@@ -158,20 +158,10 @@ class _DiaryPageState extends State<DiaryPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color.fromRGBO(
-              72,
-              85,
-              204,
-              1,
-            ), // Header background color
-            hintColor: const Color.fromRGBO(
-              123,
-              144,
-              255,
-              1,
-            ), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A), // Header background color
+            hintColor: const Color(0xFF0D1B2A), // Selected date color
             colorScheme: const ColorScheme.light(
-              primary: Color.fromRGBO(72, 85, 204, 1), // Header text color
+              primary: Color(0xFF0D1B2A), // Header text color
               onPrimary: Colors.white, // Header text color
               onSurface: Colors.black, // Body text color
             ),
@@ -203,20 +193,7 @@ class _DiaryPageState extends State<DiaryPage> {
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(
-                      102,
-                      122,
-                      236,
-                      1,
-                    ), // Start color (same as GoalsPage)
-                    Color.fromRGBO(
-                      255,
-                      255,
-                      255,
-                      1,
-                    ), // End color (same as GoalsPage)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -334,12 +311,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                         ),
                                         trailing: Icon(
                                           _getEmotionIcon(entry.emotion),
-                                          color: const Color.fromRGBO(
-                                            123,
-                                            50,
-                                            250,
-                                            0.8,
-                                          ),
+                                          color: const Color(0xFF0D1B2A),
                                           size: 32,
                                         ),
                                         onTap: () async {
@@ -413,7 +385,7 @@ class _DiaryPageState extends State<DiaryPage> {
                       ),
                       child: const Icon(
                         Icons.filter_alt,
-                        color: Colors.blue,
+                        color: Color(0xFF0D1B2A),
                         size: 28,
                       ),
                     ),
@@ -427,7 +399,9 @@ class _DiaryPageState extends State<DiaryPage> {
                           height: 8,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.blue, // Blue color for the indicator
+                            color: Color(
+                              0xFF0D1B2A,
+                            ), // Blue color for the indicator
                           ),
                         ),
                       ),
@@ -447,15 +421,7 @@ class _DiaryPageState extends State<DiaryPage> {
               width: 230,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-                    Color.fromRGBO(
-                      123,
-                      144,
-                      255,
-                      1,
-                    ), // End color (lighter blue)
-                  ],
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -526,11 +492,8 @@ class _DiaryPageState extends State<DiaryPage> {
                                       borderRadius: BorderRadius.circular(12),
                                       color:
                                           isSelected
-                                              ? const Color.fromRGBO(
-                                                85,
-                                                123,
-                                                233,
-                                                1,
+                                              ? const Color(
+                                                0xFF0D1B2A,
                                               ) // Selected button color
                                               : Colors
                                                   .white, // Default button color
@@ -553,12 +516,13 @@ class _DiaryPageState extends State<DiaryPage> {
                                       children: [
                                         Icon(
                                           _getEmotionIcon(emotion),
-                                          color: const Color.fromRGBO(
-                                            123,
-                                            50,
-                                            250,
-                                            1,
-                                          ), // Purplish color
+                                          color:
+                                              isSelected
+                                                  ? Colors
+                                                      .white // Selected button color
+                                                  : Color(
+                                                    0xFF0D1B2A,
+                                                  ), // Default button color // Purplish color
                                           size: 28, // Increased size
                                         ),
                                         const SizedBox(width: 10),
@@ -568,12 +532,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                             color:
                                                 isSelected
                                                     ? Colors.white
-                                                    : const Color.fromRGBO(
-                                                      72,
-                                                      85,
-                                                      204,
-                                                      1,
-                                                    ),
+                                                    : const Color(0xFF0D1B2A),
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: "Poppins",
@@ -626,10 +585,7 @@ class _DiaryPageState extends State<DiaryPage> {
                   }
                 },
                 backgroundColor: Colors.white,
-                child: const Icon(
-                  Icons.add,
-                  color: Color.fromRGBO(72, 85, 204, 1),
-                ),
+                child: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
               ),
             ),
           ),
