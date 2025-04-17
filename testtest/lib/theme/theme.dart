@@ -7,6 +7,10 @@ class ThemeColors {
   static const Color darkBackgroundGradientBottom = Color(0xFF1B263B);
   static const Color darkFilterGradientTop = Color(0xFF1B1B2F);
   static const Color darkFilterGradientBottom = Color(0xFF16213E);
+  static const Color darkDetailPageBrackgroundGradientTop = Color(0xFF1B1B2F);
+  static const Color darkDetailPageBrackgroundGradientBottom = Color(
+    0xFF16213E,
+  );
   static const List<Color> darkFilterEntries = [
     Color(0xFF415A77),
     Color(0xFF778DA9),
@@ -21,6 +25,10 @@ class ThemeColors {
   static const Color lightBackgroundGradientBottom = Color(0xFFE3FDFD);
   static const Color lightFilterGradientTop = Color(0xFFFFF1E6);
   static const Color lightFilterGradientBottom = Color(0xFFFFEDD8);
+  static const Color lightDetailPageBrackgroundGradientTop = Color(0xFFFFF1E6);
+  static const Color lightDetailPageBrackgroundGradientBottom = Color(
+    0xFFFFEDD8,
+  );
   static const List<Color> lightFilterEntries = [
     Color(0xFF76C7C0),
     Color(0xFFADE8F4),

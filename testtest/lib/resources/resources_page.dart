@@ -39,6 +39,14 @@ class _ResourcesPageState extends State<ResourcesPage> {
   // Set to track if the star icon is glowing
   bool _isStarGlowing = false;
 
+  // Define resource colors (same as _activityColors)
+  final List<Color> _resourceColors = [
+    const Color(0xFF9CC5FF),
+    const Color(0xFF6E6AE8),
+    const Color(0xFF005FE7),
+    const Color(0xFFBBA6FF),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -279,6 +287,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
                         itemCount: _resources.length,
                         itemBuilder: (context, index) {
                           final resource = _resources[index];
+                          final backgroundColor =
+                              _resourceColors[index % _resourceColors.length];
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: GestureDetector(
@@ -293,7 +303,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                   ),
                                 );
                               },
-                              child: _buildHCard(resource),
+                              child: _buildHCard(resource, backgroundColor),
                             ),
                           );
                         },
@@ -526,9 +536,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  Widget _buildHCard(Resource resource) {
-    const int maxDescriptionLength =
-        30; // Maximum length for the description (fits around two lines)
+  Widget _buildHCard(Resource resource, Color backgroundColor) {
+    const int maxDescriptionLength = 30; // Maximum length for the description
 
     String truncatedDescription =
         resource.description.length > maxDescriptionLength
@@ -539,7 +548,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
       constraints: const BoxConstraints(maxHeight: 120),
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.blueAccent, // Replace with a dynamic color if needed
+        color: backgroundColor, // Use dynamic background color
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -554,24 +563,22 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   style: const TextStyle(
                     fontSize: 18,
                     fontFamily: "Poppins",
-                    fontWeight: FontWeight.bold, // Make the title bolder
+                    fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                  maxLines: 2, // Ensure the title doesn't exceed two lines
-                  overflow:
-                      TextOverflow.ellipsis, // Add ellipsis if it overflows
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   truncatedDescription,
                   style: const TextStyle(
-                    fontSize: 12, // Decrease the size of the description text
+                    fontSize: 12,
                     fontFamily: "Inter",
                     color: Colors.white,
                   ),
-                  maxLines: 2, // Ensure it doesn't exceed two lines
-                  overflow:
-                      TextOverflow.ellipsis, // Add ellipsis if it overflows
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -584,9 +591,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
             opacity: 0.9,
             child: Image.asset(
               getImageForResourceType(resource.type),
-              width: 48, // Set the width to 48
-              height: 48, // Set the height to 48
-              fit: BoxFit.contain, // Ensure the image fits within the bounds
+              width: 48,
+              height: 48,
+              fit: BoxFit.contain,
             ),
           ),
         ],
