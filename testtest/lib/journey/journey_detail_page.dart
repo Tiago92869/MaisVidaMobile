@@ -3,7 +3,7 @@ import 'package:testtest/services/journey/journey_model.dart';
 import 'dart:math';
 
 class JourneyDetailPage extends StatefulWidget {
-  final Journey journey;
+  final UserJourneyProgress journey;
 
   const JourneyDetailPage({Key? key, required this.journey}) : super(key: key);
 
@@ -12,29 +12,7 @@ class JourneyDetailPage extends StatefulWidget {
 }
 
 class _JourneyDetailPageState extends State<JourneyDetailPage> {
-  int _currentResourceIndex = 0;
-  bool _isViewingResources = false;
   bool _showFirstStarfish = Random().nextBool();
-
-  void _startJourney() {
-    print('Starting journey: ${widget.journey.title}');
-    setState(() {
-      _isViewingResources = true;
-      _currentResourceIndex = 0;
-    });
-  }
-
-  void _nextResource() {
-    print('Viewing next resource in journey: ${widget.journey.title}');
-    setState(() {
-      if (_currentResourceIndex < widget.journey.journeyResources.length - 1) {
-        _currentResourceIndex++;
-        _showFirstStarfish = Random().nextBool();
-      } else {
-        print('No more resources to view in journey: ${widget.journey.title}');
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,188 +70,143 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
             ),
           // Content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top section with back button and title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Back button
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(height: 20), // Add spacing below the back button
+                      // Title
+                      Text(
+                        "Journey ID: ${journey.journeyId}",
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Poppins",
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10), // Add spacing below the title
+                      // Description
+                      const Text(
+                        "This is a detailed description of the journey. It provides an overview of the journey's purpose and progress.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: "Inter",
+                          color: Colors.white70,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 40), // Add more spacing below the description
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  // Title
-                  Text(
-                    journey.title,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Poppins",
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Journey Resources
-                  if (!_isViewingResources)
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: journey.journeyResources.map((resource) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            "Resource ${resource.order}",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                ),
+                // Middle section with squares
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Wrap(
+                    spacing: 10, // Horizontal spacing between squares
+                    runSpacing: 10, // Vertical spacing between rows
+                    alignment: WrapAlignment.center, // Center the squares horizontally
+                    children: journey.resourceProgressList.map((resource) {
+                      return Stack(
+                        children: [
+                          // Square background
+                          Container(
+                            width: 50, // Fixed width for each square
+                            height: 50, // Fixed height for each square
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.5),
+                                width: 2,
+                              ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  const SizedBox(height: 20),
-                  // Description or Resource View
-                  Expanded(
-                    child: _isViewingResources
-                        ? _buildResourceView()
-                        : SingleChildScrollView(
-                            child: Text(
-                              journey.description,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontFamily: "Inter",
-                                color: Colors.white,
-                                height: 1.5,
+                            child: Opacity(
+                              opacity: (resource.completed || !resource.unlocked) ? 0.3 : 1.0, // Blur effect
+                              child: Text(
+                                resource.order.toString(),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
+                          // Overlay icons for completed or locked states
+                          if (resource.completed)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Icon(
+                                Icons.check_circle,
+                                color: Colors.greenAccent,
+                                size: 20,
+                              ),
+                            )
+                          else if (!resource.unlocked)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Icon(
+                                Icons.lock,
+                                color: Colors.redAccent,
+                                size: 20,
+                              ),
+                            ),
+                        ],
+                      );
+                    }).toList(),
                   ),
-                  const SizedBox(height: 20),
-                  // Created At
-                  if (!_isViewingResources)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildDateInfo("Created At", journey.createdAt),
-                        _buildDateInfo(
-                          "Resources",
-                          journey.journeyResources.length.toString(),
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 20),
-                  // Start or Next Button
-                  if (!_isViewingResources)
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: _startJourney,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: const Color(0xFF0D1B2A),
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          "Start",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                ),
+                const Spacer(), // Push the bottom section to the bottom of the page
+                // Bottom section with user ID and resource count
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // User ID
+                      Text(
+                        "User ID: ${journey.userId}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
                         ),
                       ),
-                    )
-                  else
-                    _buildNavigationButtons(),
-                ],
-              ),
+                      // Number of resources
+                      Text(
+                        "Resources: ${journey.resourceProgressList.length}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDateInfo(String label, dynamic value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value is DateTime
-              ? "${value.day.toString().padLeft(2, '0')}-${value.month.toString().padLeft(2, '0')}-${value.year}"
-              : value.toString(),
-          style: const TextStyle(fontSize: 14, color: Colors.white),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildResourceView() {
-    final resource = widget.journey.journeyResources[_currentResourceIndex];
-    print('Viewing resource ${resource.order} in journey: ${widget.journey.title}');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Resource ${resource.order}",
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          "Unlock Image ID: ${resource.unlockImageId ?? 'N/A'}",
-          style: const TextStyle(fontSize: 16, color: Colors.white),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    return Center(
-      child: ElevatedButton(
-        onPressed: _currentResourceIndex <
-                widget.journey.journeyResources.length - 1
-            ? _nextResource
-            : () => Navigator.pop(context),
-        style: ElevatedButton.styleFrom(
-          foregroundColor: const Color(0xFF0D1B2A),
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Text(
-          _currentResourceIndex <
-                  widget.journey.journeyResources.length - 1
-              ? "Next"
-              : "Finish",
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
       ),
     );
   }

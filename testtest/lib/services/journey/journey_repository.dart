@@ -4,19 +4,25 @@ import 'package:testtest/services/journey/journey_model.dart';
 class JourneyRepository {
   final JourneyService _journeyService = JourneyService();
 
-  Future<Journey> getJourneyById(String id) {
-    return _journeyService.getJourneyById(id);
+  // Fetch all journeys for the current user
+  Future<List<JourneySimpleUser>> getAllJourneys() {
+    print('JourneyRepository: Fetching all journeys');
+    return _journeyService.getAllJourneys();
   }
 
-  Future<List<Journey>> getAllJourneys(int page, int size) {
-    return _journeyService.getAllJourneys(page, size);
+  // Fetch detailed progress for a specific journey
+  Future<UserJourneyProgress> getJourneyDetails(String journeyId) {
+    print('JourneyRepository: Fetching details for journey $journeyId');
+    return _journeyService.getJourneyDetails(journeyId);
   }
 
-  Future<Journey> createJourney(Journey journey) {
-    return _journeyService.createJourney(journey);
-  }
-
-  Future<void> deleteJourney(String id) {
-    return _journeyService.deleteJourney(id);
+  // Update user journey progress
+  Future<UserJourneyProgress> editUserJourneyProgress(
+      String userJourneyResourceProgressId,
+      UserJourneyResourceProgress progress) {
+    print(
+        'JourneyRepository: Updating progress for resource $userJourneyResourceProgressId');
+    return _journeyService.editUserJourneyProgress(
+        userJourneyResourceProgressId, progress);
   }
 }

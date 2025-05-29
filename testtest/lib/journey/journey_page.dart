@@ -15,10 +15,8 @@ class _JourneyPageState extends State<JourneyPage> {
   final JourneyService _journeyService = JourneyService();
 
   // State variables
-  List<Journey> _journeys = [];
+  List<JourneySimpleUser> _journeys = [];
   bool _isLoading = false;
-  int _currentPage = 0;
-  bool _isLastPage = false;
 
   final List<Color> _journeyColors = [
     const Color(0xFF9CC5FF),
@@ -33,53 +31,62 @@ class _JourneyPageState extends State<JourneyPage> {
     _fetchJourneys();
   }
 
-  Future<void> _fetchJourneys({bool loadNextPage = false}) async {
-  if (_isLoading || (loadNextPage && _isLastPage)) return;
-
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    print('Fetching journeys: page=$_currentPage, loadNextPage=$loadNextPage');
-    final journeys = await _journeyService.getAllJourneys(
-      _currentPage,
-      10,
-    );
-
-    print('Fetched ${journeys.length} journeys');
+  Future<void> _fetchJourneys() async {
     setState(() {
-      if (loadNextPage) {
-        _journeys.addAll(journeys); // Append new journeys
-      } else {
-        _journeys = journeys; // Replace journeys
-      }
-      _isLastPage = journeys.length < 10; // Check if it's the last page
-      _currentPage++; // Increment page for next fetch
+      _isLoading = true;
     });
-  } catch (e) {
-    print('Error fetching journeys: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Failed to fetch journeys. Please try again."),
-        backgroundColor: Colors.red,
-      ),
-    );
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
-  }
-}
 
-  void _onScroll(ScrollController controller) {
-    if (controller.position.pixels >=
-        controller.position.maxScrollExtent - 200) {
-      _fetchJourneys(loadNextPage: true); // Fetch the next page
+    try {
+      print('Fetching user journeys...');
+      final journeys = await _journeyService.getAllJourneys();
+      print('Fetched ${journeys.length} journeys');
+      setState(() {
+        _journeys = journeys;
+      });
+    } catch (e) {
+      print('Error fetching journeys: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch journeys. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Widget _buildJourneyCard(Journey journey, Color backgroundColor) {
+  Future<void> _navigateToJourneyDetails(String journeyId) async {
+    try {
+      print('Fetching details for journey: $journeyId');
+      final journeyDetails = await _journeyService.getJourneyDetails(journeyId);
+      print('Fetched journey details: ${journeyDetails.currentStep}');
+
+      // Navigate to the JourneyDetailPage with the fetched details
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => JourneyDetailPage(journey: journeyDetails),
+        ),
+      );
+
+      // Refresh the journeys list when returning
+      print('Returned from JourneyDetailPage, refreshing journeys');
+      _fetchJourneys();
+    } catch (e) {
+      print('Error fetching journey details: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch journey details. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Widget _buildJourneyCard(JourneySimpleUser journey, Color backgroundColor) {
   print('Building journey card for: ${journey.title}');
   return Container(
     constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
@@ -132,17 +139,9 @@ class _JourneyPageState extends State<JourneyPage> {
         Center(
           child: ElevatedButton(
             onPressed: () async {
-              print('Navigating to JourneyDetailPage for: ${journey.title}');
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => JourneyDetailPage(journey: journey),
-                ),
-              );
-
-              // Refresh the journeys list when returning
-              print('Returned from JourneyDetailPage, refreshing journeys');
-              _fetchJourneys();
+              print(
+                  '${journey.started ? "Continuing" : "Starting"} journey: ${journey.title}');
+              await _navigateToJourneyDetails(journey.id);
             },
             style: ElevatedButton.styleFrom(
               foregroundColor: backgroundColor,
@@ -151,9 +150,9 @@ class _JourneyPageState extends State<JourneyPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              "View",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            child: Text(
+              journey.started ? "Continue" : "Start",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -164,9 +163,6 @@ class _JourneyPageState extends State<JourneyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ScrollController _scrollController = ScrollController();
-    _scrollController.addListener(() => _onScroll(_scrollController));
-
     return Scaffold(
       body: Stack(
         children: [
@@ -206,33 +202,43 @@ class _JourneyPageState extends State<JourneyPage> {
                       onRefresh: () async {
                         await _fetchJourneys(); // Refresh the list
                       },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount: _journeys.length + 1, // Add 1 for the SizedBox
-                        itemBuilder: (context, index) {
-                          if (index < _journeys.length) {
-                            final journey = _journeys[index];
-                            final backgroundColor =
-                                _journeyColors[index % _journeyColors.length];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 20,
+                      child: _journeys.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "No journeys created",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: "Poppins",
+                                  color: Colors.white,
+                                ),
                               ),
-                              child: _buildJourneyCard(
-                                journey,
-                                backgroundColor,
-                              ),
-                            );
-                          } else {
-                            return const SizedBox(
-                              height: 60,
-                            ); // Add spacing at the end
-                          }
-                        },
-                      ),
+                            )
+                          : ListView.builder(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              itemCount: _journeys.length + 1, // Add 1 for the SizedBox
+                              itemBuilder: (context, index) {
+                                if (index < _journeys.length) {
+                                  final journey = _journeys[index];
+                                  final backgroundColor =
+                                      _journeyColors[index % _journeyColors.length];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 20,
+                                    ),
+                                    child: _buildJourneyCard(
+                                      journey,
+                                      backgroundColor,
+                                    ),
+                                  );
+                                } else {
+                                  return const SizedBox(
+                                    height: 60,
+                                  ); // Add spacing at the end
+                                }
+                              },
+                            ),
                     ),
                     if (_isLoading)
                       const Center(child: CircularProgressIndicator()),

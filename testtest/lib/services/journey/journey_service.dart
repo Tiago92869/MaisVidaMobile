@@ -18,10 +18,12 @@ class JourneyService {
     _accessToken = await _storage.read(key: 'accessToken');
   }
 
-  Future<Journey> getJourneyById(String id) async {
+  // Fetch all journeys for the current user
+  Future<List<JourneySimpleUser>> getAllJourneys() async {
     await _loadStoredCredentials();
-    final String url = '$_baseUrl/$id';
+    final String url = '$_baseUrl/mine/simple';
 
+    print('Fetching user journeys from API: $url');
     final response = await http.get(
       Uri.parse(url),
       headers: {
@@ -31,68 +33,61 @@ class JourneyService {
     ).timeout(_timeoutDuration);
 
     if (response.statusCode == 200) {
-      return Journey.fromJson(jsonDecode(response.body));
+      print('API response: ${response.body}');
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => JourneySimpleUser.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to fetch journey');
+      print('Failed to fetch user journeys, status code: ${response.statusCode}');
+      throw Exception('Failed to fetch user journeys');
     }
   }
 
-  Future<List<Journey>> getAllJourneys(int page, int size) async {
-  await _loadStoredCredentials();
-  final String url = '$_baseUrl?page=$page&size=$size';
-
-  print('Fetching journeys from API: $url');
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      'Authorization': 'Bearer $_accessToken',
-      'Content-Type': 'application/json',
-    },
-  ).timeout(_timeoutDuration);
-
-  if (response.statusCode == 200) {
-    print('API response: ${response.body}');
-    final List<dynamic> jsonList = jsonDecode(response.body)['content'];
-    return jsonList.map((json) => Journey.fromJson(json)).toList();
-  } else {
-    print('Failed to fetch journeys, status code: ${response.statusCode}');
-    throw Exception('Failed to fetch journeys');
-  }
-}
-
-  Future<Journey> createJourney(Journey journey) async {
+  // Fetch journey details for a specific journey
+  Future<UserJourneyProgress> getJourneyDetails(String journeyId) async {
     await _loadStoredCredentials();
-    final String url = _baseUrl;
+    final String url = '$_baseUrl/mine/progress/$journeyId';
 
-    final response = await http.post(
+    print('Fetching journey details from API: $url');
+    final response = await http.get(
       Uri.parse(url),
       headers: {
         'Authorization': 'Bearer $_accessToken',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode(journey.toJson()),
     ).timeout(_timeoutDuration);
 
-    if (response.statusCode == 201) {
-      return Journey.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      print('API response: ${response.body}');
+      return UserJourneyProgress.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to create journey');
+      print('Failed to fetch journey details, status code: ${response.statusCode}');
+      throw Exception('Failed to fetch journey details');
     }
   }
 
-  Future<void> deleteJourney(String id) async {
+  // Update user journey progress
+  Future<UserJourneyProgress> editUserJourneyProgress(
+      String userJourneyResourceProgressId,
+      UserJourneyResourceProgress progress) async {
     await _loadStoredCredentials();
-    final String url = '$_baseUrl/$id';
+    final String url = '$_baseUrl/progress/user/$userJourneyResourceProgressId';
 
-    final response = await http.delete(
+    print('Updating user journey progress at API: $url');
+    final response = await http.patch(
       Uri.parse(url),
       headers: {
         'Authorization': 'Bearer $_accessToken',
+        'Content-Type': 'application/json',
       },
+      body: jsonEncode(progress.toJson()),
     ).timeout(_timeoutDuration);
 
-    if (response.statusCode != 204) {
-      throw Exception('Failed to delete journey');
+    if (response.statusCode == 200) {
+      print('API response: ${response.body}');
+      return UserJourneyProgress.fromJson(jsonDecode(response.body));
+    } else {
+      print('Failed to update user journey progress, status code: ${response.statusCode}');
+      throw Exception('Failed to update user journey progress');
     }
   }
 }

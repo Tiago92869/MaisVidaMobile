@@ -77,6 +77,29 @@ class JourneyResource {
   }
 }
 
+class JourneySimpleUser {
+  final String id;
+  final String title;
+  final String description;
+  final bool started;
+
+  JourneySimpleUser({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.started,
+  });
+
+  factory JourneySimpleUser.fromJson(Map<String, dynamic> json) {
+    return JourneySimpleUser(
+      id: json['id'] ?? '',
+      title: json['title'] ?? 'Untitled Journey',
+      description: json['description'] ?? 'No description available.',
+      started: json['started'] ?? false,
+    );
+  }
+}
+
 class UserJourneyProgress {
   final String id;
   final String userId;
@@ -94,13 +117,14 @@ class UserJourneyProgress {
 
   factory UserJourneyProgress.fromJson(Map<String, dynamic> json) {
     return UserJourneyProgress(
-      id: json['id'],
-      userId: json['userId'],
-      journeyId: json['journeyId'],
-      currentStep: json['currentStep'],
-      resourceProgressList: (json['resourceProgressList'] as List)
-          .map((progress) => UserJourneyResourceProgress.fromJson(progress))
-          .toList(),
+      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
+      journeyId: json['journeyId'] ?? '',
+      currentStep: json['currentStep'] ?? 0,
+      resourceProgressList: (json['resourceProgressList'] as List?)
+              ?.map((progress) => UserJourneyResourceProgress.fromJson(progress))
+              .toList() ??
+          [],
     );
   }
 }
@@ -120,11 +144,20 @@ class UserJourneyResourceProgress {
 
   factory UserJourneyResourceProgress.fromJson(Map<String, dynamic> json) {
     return UserJourneyResourceProgress(
-      id: json['id'],
-      order: json['order'],
-      completed: json['completed'],
-      unlocked: json['unlocked'],
+      id: json['id'] ?? '',
+      order: json['order'] ?? 0,
+      completed: json['completed'] ?? false,
+      unlocked: json['unlocked'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'order': order,
+      'completed': completed,
+      'unlocked': unlocked,
+    };
   }
 }
 
