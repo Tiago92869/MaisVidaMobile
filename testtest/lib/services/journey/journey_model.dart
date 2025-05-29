@@ -161,4 +161,20 @@ class UserJourneyResourceProgress {
   }
 }
 
+final mockJourney = UserJourneyProgress(
+  id: "mock-journey-id",
+  userId: "mock-user-id",
+  journeyId: "mock-journey-id",
+  currentStep: 5,
+  resourceProgressList: List.generate(
+    60,
+    (index) => UserJourneyResourceProgress(
+      id: "resource-${index + 1}",
+      order: index + 1,
+      completed: index < 10, // First 10 resources are completed
+      unlocked: index < 20, // First 20 resources are unlocked
+    ),
+  ),
+);
+
 DateTime? parseDate(String? date) => date != null ? DateTime.parse(date) : null;

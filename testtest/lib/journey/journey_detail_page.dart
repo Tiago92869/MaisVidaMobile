@@ -115,67 +115,95 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                   ),
                 ),
                 // Middle section with squares
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Wrap(
-                    spacing: 10, // Horizontal spacing between squares
-                    runSpacing: 10, // Vertical spacing between rows
-                    alignment: WrapAlignment.center, // Center the squares horizontally
-                    children: journey.resourceProgressList.map((resource) {
-                      return Stack(
-                        children: [
-                          // Square background
-                          Container(
-                            width: 50, // Fixed width for each square
-                            height: 50, // Fixed height for each square
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.5),
-                                width: 2,
-                              ),
-                            ),
-                            child: Opacity(
-                              opacity: (resource.completed || !resource.unlocked) ? 0.3 : 1.0, // Blur effect
-                              child: Text(
-                                resource.order.toString(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Scrollbar(
+                      child: SingleChildScrollView(
+                        child: Wrap(
+                          spacing: 10, // Horizontal spacing between squares
+                          runSpacing: 10, // Vertical spacing between rows
+                          alignment: WrapAlignment.center, // Center the squares horizontally
+                          children: journey.resourceProgressList.map((resource) {
+                            final isLastSquare = resource == journey.resourceProgressList.last; // Check if it's the last square
+                            return Stack(
+                              children: [
+                                // Square background
+                                GestureDetector(
+                                  onTap: resource.unlocked
+                                      ? () {
+                                          // Only allow tap if the square is unlocked
+                                          print('Square pressed for resource order: ${resource.order}');
+                                        }
+                                      : null, // Disable tap if the square is locked
+                                  child: Container(
+                                    width: 50, // Fixed width for each square
+                                    height: 50, // Fixed height for each square
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isLastSquare
+                                            ? Colors.yellow // Yellow border for the last square
+                                            : Colors.white.withOpacity(0.5),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Opacity(
+                                      opacity: (resource.completed || !resource.unlocked) ? 0.3 : 1.0, // Blur effect
+                                      child: Text(
+                                        resource.order.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          // Overlay icons for completed or locked states
-                          if (resource.completed)
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: Icon(
-                                Icons.check_circle,
-                                color: Colors.greenAccent,
-                                size: 20,
-                              ),
-                            )
-                          else if (!resource.unlocked)
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: Icon(
-                                Icons.lock,
-                                color: Colors.redAccent,
-                                size: 20,
-                              ),
-                            ),
-                        ],
-                      );
-                    }).toList(),
+                                // Overlay icons for completed or locked states
+                                if (resource.completed)
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      color: Colors.greenAccent,
+                                      size: 20,
+                                    ),
+                                  )
+                                else if (!resource.unlocked)
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Icon(
+                                      Icons.lock,
+                                      color: Colors.redAccent,
+                                      size: 20,
+                                    ),
+                                  ),
+                                // Add a star icon to the top-left corner for the last square
+                                if (isLastSquare)
+                                  const Positioned(
+                                    top: 0,
+                                    left: 0,
+                                    child: Icon(
+                                      Icons.star,
+                                      color: Colors.yellow,
+                                      size: 20,
+                                    ),
+                                  ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                const Spacer(), // Push the bottom section to the bottom of the page
+                const SizedBox(height: 80), // Add space between the scrollable section and the bottom section
                 // Bottom section with user ID and resource count
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),

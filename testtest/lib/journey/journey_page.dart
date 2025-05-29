@@ -61,7 +61,9 @@ class _JourneyPageState extends State<JourneyPage> {
   Future<void> _navigateToJourneyDetails(String journeyId) async {
     try {
       print('Fetching details for journey: $journeyId');
-      final journeyDetails = await _journeyService.getJourneyDetails(journeyId);
+      //final journeyDetails = await _journeyService.getJourneyDetails(journeyId);
+      final journeyDetails = mockJourney; // Use the mocked journey
+
       print('Fetched journey details: ${journeyDetails.currentStep}');
 
       // Navigate to the JourneyDetailPage with the fetched details
