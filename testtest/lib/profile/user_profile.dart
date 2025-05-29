@@ -4,6 +4,7 @@ import 'package:testtest/services/user/user_repository.dart';
 import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert';
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -37,6 +38,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   // Secure storage instance
   final FlutterSecureStorage _storage = FlutterSecureStorage();
+
+  String? profileImageBase64; // Variable to store the profile image as a base64 string
 
   void toggleEditMode() {
     setState(() {
@@ -75,6 +78,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to fetch user data. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> fetchUserProfileImage() async {
+    try {
+      String base64ImageWithPrefix = await userRepository.userService.getProfileImage();
+      // Remove the prefix "data:image/png;base64," or similar
+      String base64Image = base64ImageWithPrefix.split(',').last;
+      setState(() {
+        profileImageBase64 = base64Image;
+      });
+    } catch (e) {
+      print('Failed to fetch profile image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to load profile image."),
           backgroundColor: Colors.red,
         ),
       );
@@ -252,6 +274,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void initState() {
     super.initState();
     fetchUserData();
+    fetchUserProfileImage(); // Fetch the profile image on initialization
   }
 
   @override
@@ -338,9 +361,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Center(
                       child: CircleAvatar(
                         radius: 60,
-                        backgroundImage: const AssetImage(
-                          'assets/images/starfish.png',
-                        ),
+                        backgroundImage: profileImageBase64 != null
+                            ? MemoryImage(base64Decode(profileImageBase64!))
+                            : const AssetImage('assets/images/starfish.png')
+                                as ImageProvider, // Fallback to default image
                         backgroundColor: Colors.grey[300],
                       ),
                     ),

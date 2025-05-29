@@ -325,4 +325,52 @@ class UserService {
       throw Exception('Failed to send email');
     }
   }
+
+  Future<List<String>> getAllImagePreviewsBase64() async {
+    await _loadStoredCredentials();
+    final requestUrl = '$_baseUrl/previews';
+
+    final response = await http.get(
+      Uri.parse(requestUrl),
+      headers: {
+        'Authorization': 'Bearer $_accessToken',
+        'Content-Type': 'application/json',
+      },
+    ).timeout(
+      _timeoutDuration,
+      onTimeout: () {
+        throw TimeoutException('The connection has timed out, please try again later.');
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return List<String>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to fetch image previews');
+    }
+  }
+
+  Future<String> getProfileImage() async {
+    await _loadStoredCredentials();
+    final requestUrl = '$_baseUrl/profileImage';
+
+    final response = await http.get(
+      Uri.parse(requestUrl),
+      headers: {
+        'Authorization': 'Bearer $_accessToken',
+        'Content-Type': 'application/json',
+      },
+    ).timeout(
+      _timeoutDuration,
+      onTimeout: () {
+        throw TimeoutException('The connection has timed out, please try again later.');
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to fetch profile image');
+    }
+  }
 }
