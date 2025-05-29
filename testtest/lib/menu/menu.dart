@@ -41,14 +41,14 @@ Widget commonTabScene(String tabName) {
   if (tabName == "Medicine") {
     return MedicinesPage(); // Return the activities page directly
   }
+  if (tabName == "Journey") {
+    return JourneyPage(); // Return the journey page directly
+  }
   if (tabName == "Notifications") {
     return NotificationsPage(); // Return the resources page directly
   }
   if (tabName == "SOS") {
     return SosDetailsPage(); // Return the activities page directly
-  }
-  if (tabName == "Journey") {
-    return JourneyPage();
   }
   return Container(
     color: RiveAppTheme.background,
@@ -131,10 +131,10 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       commonTabScene("Medicine"),
       commonTabScene("Resources"),
       commonTabScene("Activities"),
+      commonTabScene("Journey"),
       commonTabScene("Notifications"),
       commonTabScene("SOS"),
       commonTabScene("Profile"),
-      commonTabScene("Journey"),
     ];
 
     // Set the initial tab body
@@ -215,15 +215,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     if (menuTitle == "User") {
       print('Menu title is "User", setting index to 8'); // Debugging print
       setState(() {
-        _tabBody = _screens[8]; // Index for "User"
-        _currentTabIndex = 8; // Update the current tab index
-      });
-      return;
-    }
-    if (menuTitle == "Journey") {
-      setState(() {
-        _tabBody = _screens[9]; // Index for JourneyPage
-        _currentTabIndex = 9;
+        _tabBody = _screens[9]; // Index for "User"
+        _currentTabIndex = 9; // Update the current tab index
       });
       return;
     }
@@ -579,8 +572,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     _currentTabIndex = 2; // Update the current tab index
                   }
                   if (tabIndex == 4) {
-                    _tabBody = _screens[8];
-                    _currentTabIndex = 8; // Update the current tab index
+                    _tabBody = _screens[9];
+                    _currentTabIndex = 9; // Update the current tab index
                   }
                 });
               },
