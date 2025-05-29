@@ -167,12 +167,12 @@ final mockJourney = UserJourneyProgress(
   journeyId: "mock-journey-id",
   currentStep: 5,
   resourceProgressList: List.generate(
-    60,
+    28,
     (index) => UserJourneyResourceProgress(
       id: "resource-${index + 1}",
       order: index + 1,
-      completed: index < 10, // First 10 resources are completed
-      unlocked: index < 20, // First 20 resources are unlocked
+      completed: true, // First 10 resources are completed
+      unlocked: true, // First 20 resources are unlocked
     ),
   ),
 );

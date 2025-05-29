@@ -212,7 +212,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
 
                 // Fixed footer
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
