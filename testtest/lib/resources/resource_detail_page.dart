@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
+import 'package:testtest/resources/resource_feedback_page.dart';
 
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
@@ -129,7 +130,38 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: _buildResourceDetails(),
+              child: Column(
+                children: [
+                  Expanded(child: _buildResourceDetails()),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ResourceFeedbackPage(
+                            resourceId: widget.resource.id,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: const Color(0xFF0D1B2A),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Continue',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
