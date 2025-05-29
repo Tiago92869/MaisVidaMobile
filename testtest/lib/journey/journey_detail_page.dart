@@ -17,6 +17,12 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
   @override
   Widget build(BuildContext context) {
     final journey = widget.journey;
+    final completedCount = journey.resourceProgressList
+        .where((resource) => resource.completed)
+        .length;
+    final totalCount = journey.resourceProgressList.length;
+    final progress = completedCount / totalCount;
+    final isComplete = progress == 1.0;
 
     return Scaffold(
       body: Stack(
@@ -33,184 +39,183 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
               ),
             ),
           ),
-          // Randomly show one of the starfish images
-          if (_showFirstStarfish)
-            Positioned(
-              right: 80,
-              top: 320,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.7,
-                  child: Image.asset(
-                    'assets/images/starfish2.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            )
-          else
-            Positioned(
-              left: 100,
-              top: 250,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.5,
-                  child: Image.asset(
-                    'assets/images/starfish1.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
           // Content
           SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top section with back button and title
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Back button
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(height: 20), // Add spacing below the back button
-                      // Title
-                      Text(
-                        "Journey ID: ${journey.journeyId}",
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Poppins",
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10), // Add spacing below the title
-                      // Description
-                      const Text(
-                        "This is a detailed description of the journey. It provides an overview of the journey's purpose and progress.",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: "Inter",
-                          color: Colors.white70,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 40), // Add more spacing below the description
-                    ],
-                  ),
-                ),
-                // Middle section with squares
+                // Scrollable content
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Scrollbar(
-                      child: SingleChildScrollView(
-                        child: Wrap(
-                          spacing: 10, // Horizontal spacing between squares
-                          runSpacing: 10, // Vertical spacing between rows
-                          alignment: WrapAlignment.center, // Center the squares horizontally
-                          children: journey.resourceProgressList.map((resource) {
-                            final isLastSquare = resource == journey.resourceProgressList.last; // Check if it's the last square
-                            return Stack(
-                              children: [
-                                // Square background
-                                GestureDetector(
-                                  onTap: resource.unlocked
-                                      ? () {
-                                          // Only allow tap if the square is unlocked
-                                          print('Square pressed for resource order: ${resource.order}');
-                                        }
-                                      : null, // Disable tap if the square is locked
-                                  child: Container(
-                                    width: 50, // Fixed width for each square
-                                    height: 50, // Fixed height for each square
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Back button
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Title
+                        Text(
+                          "Journey: ${journey.journeyId}",
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Poppins",
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Description
+                        const Text(
+                          "Explore your journey progress and unlock new resources as you advance.",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Inter",
+                            color: Colors.white70,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+
+                        // Progress bar with star icon
+                        Row(
+                          children: [
+                            Expanded(
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                backgroundColor: Colors.white.withOpacity(0.2),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  isComplete ? Colors.yellow : Colors.blueAccent,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: isComplete
+                                  ? () {
+                                      print("Random message: ${Random().nextInt(100)}");
+                                    }
+                                  : null,
+                              child: Icon(
+                                Icons.star,
+                                color: isComplete ? Colors.yellow : Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          "${(progress * 100).toStringAsFixed(0)}% Completed",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+
+                        // Resource progress grid
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5, // 5 squares per line
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                          itemCount: journey.resourceProgressList.length,
+                          itemBuilder: (context, index) {
+                            final resource = journey.resourceProgressList[index];
+                            final isLastSquare =
+                                resource == journey.resourceProgressList.last;
+
+                            return GestureDetector(
+                              onTap: resource.unlocked
+                                  ? () {
+                                      print(
+                                          'Square pressed for resource order: ${resource.order}');
+                                    }
+                                  : null,
+                              child: Stack(
+                                children: [
+                                  Container(
                                     alignment: Alignment.center,
                                     decoration: BoxDecoration(
                                       color: Colors.white.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
                                         color: isLastSquare
-                                            ? Colors.yellow // Yellow border for the last square
+                                            ? Colors.yellow
                                             : Colors.white.withOpacity(0.5),
                                         width: 2,
                                       ),
                                     ),
-                                    child: Opacity(
-                                      opacity: (resource.completed || !resource.unlocked) ? 0.3 : 1.0, // Blur effect
-                                      child: Text(
-                                        resource.order.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
+                                    child: Text(
+                                      resource.order.toString(),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: resource.unlocked
+                                            ? Colors.white
+                                            : Colors.white.withOpacity(0.3),
                                       ),
                                     ),
                                   ),
-                                ),
-                                // Overlay icons for completed or locked states
-                                if (resource.completed)
-                                  Positioned(
-                                    top: 0,
-                                    right: 0,
-                                    child: Icon(
-                                      Icons.check_circle,
-                                      color: Colors.greenAccent,
-                                      size: 20,
+                                  if (resource.completed)
+                                    const Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: Colors.greenAccent,
+                                        size: 20,
+                                      ),
+                                    )
+                                  else if (!resource.unlocked)
+                                    const Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: Icon(
+                                        Icons.lock,
+                                        color: Colors.redAccent,
+                                        size: 20,
+                                      ),
                                     ),
-                                  )
-                                else if (!resource.unlocked)
-                                  Positioned(
-                                    top: 0,
-                                    right: 0,
-                                    child: Icon(
-                                      Icons.lock,
-                                      color: Colors.redAccent,
-                                      size: 20,
+                                  if (isLastSquare)
+                                    const Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      child: Icon(
+                                        Icons.star,
+                                        color: Colors.yellow,
+                                        size: 20,
+                                      ),
                                     ),
-                                  ),
-                                // Add a star icon to the top-left corner for the last square
-                                if (isLastSquare)
-                                  const Positioned(
-                                    top: 0,
-                                    left: 0,
-                                    child: Icon(
-                                      Icons.star,
-                                      color: Colors.yellow,
-                                      size: 20,
-                                    ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             );
-                          }).toList(),
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 80), // Add space between the scrollable section and the bottom section
-                // Bottom section with user ID and resource count
+
+                // Fixed footer
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // User ID
                       Text(
                         "User ID: ${journey.userId}",
                         style: const TextStyle(
@@ -219,7 +224,6 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                           color: Colors.white70,
                         ),
                       ),
-                      // Number of resources
                       Text(
                         "Resources: ${journey.resourceProgressList.length}",
                         style: const TextStyle(
