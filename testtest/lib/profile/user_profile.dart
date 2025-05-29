@@ -412,23 +412,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     Center(
                       child: Column(
                         children: [
-                          Stack(
-                            alignment: Alignment.bottomRight,
-                            children: [
-                              CircleAvatar(
-                                radius: 60,
-                                backgroundImage: profileImageBase64 != null && profileImageBase64!.isNotEmpty
-                                    ? MemoryImage(base64Decode(profileImageBase64!))
-                                    : null, // Leave the circle empty if null or empty
-                                backgroundColor: Colors.grey[300],
-                              ),
-                              if (editMode)
-                                IconButton(
-                                  icon: const Icon(Icons.add_a_photo, color: Colors.blue),
-                                  onPressed: showImageSelectionPopup,
-                                ),
-                            ],
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundImage: profileImageBase64 != null && profileImageBase64!.isNotEmpty
+                                ? MemoryImage(base64Decode(profileImageBase64!))
+                                : null, // Leave the circle empty if null or empty
+                            backgroundColor: Colors.grey[300],
                           ),
+                          if (editMode)
+                            IconButton(
+                              icon: const Icon(Icons.add_a_photo, color: Colors.white, size: 30),
+                              onPressed: showImageSelectionPopup,
+                            ),
                         ],
                       ),
                     ),
