@@ -42,6 +42,10 @@ class MenuItemModel {
         artboard: "DASHBOARD",
       ),
     ),
+    MenuItemModel(
+      title: "Journey",
+      riveIcon: TabItem(stateMachine: "HOME_interactivity", artboard: "HOME"),
+    ),
   ];
 
   static List<MenuItemModel> menuItems2 = [

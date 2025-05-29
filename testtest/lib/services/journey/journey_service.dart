@@ -38,24 +38,27 @@ class JourneyService {
   }
 
   Future<List<Journey>> getAllJourneys(int page, int size) async {
-    await _loadStoredCredentials();
-    final String url = '$_baseUrl?page=$page&size=$size';
+  await _loadStoredCredentials();
+  final String url = '$_baseUrl?page=$page&size=$size';
 
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/json',
-      },
-    ).timeout(_timeoutDuration);
+  print('Fetching journeys from API: $url');
+  final response = await http.get(
+    Uri.parse(url),
+    headers: {
+      'Authorization': 'Bearer $_accessToken',
+      'Content-Type': 'application/json',
+    },
+  ).timeout(_timeoutDuration);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = jsonDecode(response.body)['content'];
-      return jsonList.map((json) => Journey.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to fetch journeys');
-    }
+  if (response.statusCode == 200) {
+    print('API response: ${response.body}');
+    final List<dynamic> jsonList = jsonDecode(response.body)['content'];
+    return jsonList.map((json) => Journey.fromJson(json)).toList();
+  } else {
+    print('Failed to fetch journeys, status code: ${response.statusCode}');
+    throw Exception('Failed to fetch journeys');
   }
+}
 
   Future<Journey> createJourney(Journey journey) async {
     await _loadStoredCredentials();

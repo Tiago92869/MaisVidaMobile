@@ -19,6 +19,7 @@ import 'package:testtest/menu/theme.dart';
 import 'package:testtest/menu/assets.dart' as app_assets;
 import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.dart
 import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:testtest/journey/journey_page.dart';
 
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
@@ -45,6 +46,9 @@ Widget commonTabScene(String tabName) {
   }
   if (tabName == "SOS") {
     return SosDetailsPage(); // Return the activities page directly
+  }
+  if (tabName == "Journey") {
+    return JourneyPage();
   }
   return Container(
     color: RiveAppTheme.background,
@@ -130,6 +134,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       commonTabScene("Notifications"),
       commonTabScene("SOS"),
       commonTabScene("Profile"),
+      commonTabScene("Journey"),
     ];
 
     // Set the initial tab body
@@ -212,6 +217,13 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       setState(() {
         _tabBody = _screens[8]; // Index for "User"
         _currentTabIndex = 8; // Update the current tab index
+      });
+      return;
+    }
+    if (menuTitle == "Journey") {
+      setState(() {
+        _tabBody = _screens[9]; // Index for JourneyPage
+        _currentTabIndex = 9;
       });
       return;
     }

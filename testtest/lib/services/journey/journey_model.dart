@@ -20,16 +20,18 @@ class Journey {
   });
 
   factory Journey.fromJson(Map<String, dynamic> json) {
+    print('Parsing Journey JSON: $json');
     return Journey(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
+      id: json['id'] ?? '',
+      title: json['title'] ?? 'Untitled Journey',
+      description: json['description'] ?? 'No description available.',
       createdAt: parseDate(json['createdAt']),
       updatedAt: parseDate(json['updatedAt']),
       completionImage: json['completionImage'],
-      journeyResources: (json['journeyResources'] as List)
-          .map((resource) => JourneyResource.fromJson(resource))
-          .toList(),
+      journeyResources: (json['journeyResources'] as List?)
+              ?.map((resource) => JourneyResource.fromJson(resource))
+              .toList() ??
+          [],
     );
   }
 
@@ -57,10 +59,11 @@ class JourneyResource {
   });
 
   factory JourneyResource.fromJson(Map<String, dynamic> json) {
+    print('Parsing JourneyResource JSON: $json');
     return JourneyResource(
-      id: json['id'],
-      resourceId: json['resourceId'],
-      order: json['order'],
+      id: json['id'] ?? '',
+      resourceId: json['resourceId'] ?? '',
+      order: json['order'] ?? 0,
       unlockImageId: json['unlockImageId'],
     );
   }

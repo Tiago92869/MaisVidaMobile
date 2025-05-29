@@ -222,7 +222,7 @@ class MenuButtonSection extends StatelessWidget {
           padding: const EdgeInsets.only(
             left: 24,
             right: 24,
-            top: 40,
+            top: 10,
             bottom: 8,
           ),
           child: Text(
