@@ -316,16 +316,24 @@ class _ResourcesPageState extends State<ResourcesPage> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
+                              onTap: () async {
+                                // Navigate to ResourceDetailPage and wait for the result
+                                await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (context) => ResourceDetailPage(
-                                          resource: resource,
-                                        ),
+                                    builder: (context) =>
+                                        ResourceDetailPage(resource: resource),
                                   ),
                                 );
+
+                                // Refresh the resources list when returning
+                                if (_isStarGlowing) {
+                                  // If the star icon is glowing, fetch favorite resources
+                                  await _fetchFavoriteResources();
+                                } else {
+                                  // Otherwise, refresh the default resources list
+                                  _onSearch(_searchText);
+                                }
                               },
                               child: _buildHCard(resource, backgroundColor),
                             ),
@@ -352,90 +360,90 @@ class _ResourcesPageState extends State<ResourcesPage> {
   }
 
   Widget _buildFilterIcon() {
-  return Positioned(
-    top: 58,
-    right: 20,
-    child: Row(
-      children: [
-        // Star Icon
-        GestureDetector(
-          onTap: () async {
-            setState(() {
-              _isStarGlowing = !_isStarGlowing; // Toggle the star's glowing state
-            });
-
-            if (_isStarGlowing) {
-              // Fetch favorite resources when the star is glowing
-              await _fetchFavoriteResources();
-            } else {
-              // Reset the resources list using the existing fetch logic
+    return Positioned(
+      top: 58,
+      right: 20,
+      child: Row(
+        children: [
+          // Star Icon
+          GestureDetector(
+            onTap: () async {
               setState(() {
-                _resources.clear();
-                _currentPage = 0;
-                _isLastPage = false;
+                _isStarGlowing = !_isStarGlowing; // Toggle the star's glowing state
               });
-              _fetchResources();
-            }
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: _isStarGlowing
-                        ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
-                        : Colors.black.withOpacity(0.2), // Default shadow when not pressed
-                    blurRadius: _isStarGlowing ? 15 : 5,
-                    spreadRadius: _isStarGlowing ? 5 : 0,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.star,
-                color: _isStarGlowing ? Colors.blue : Colors.grey,
-                size: 28,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        // Filter Icon
-        GestureDetector(
-          onTap: _toggleFilterPanel,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.filter_alt,
-                color: Colors.blue,
-                size: 28,
+
+              if (_isStarGlowing) {
+                // Fetch favorite resources when the star is glowing
+                await _fetchFavoriteResources();
+              } else {
+                // Reset the resources list using the existing fetch logic
+                setState(() {
+                  _resources.clear();
+                  _currentPage = 0;
+                  _isLastPage = false;
+                });
+                _fetchResources();
+              }
+            },
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _isStarGlowing
+                          ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
+                          : Colors.black.withOpacity(0.2), // Default shadow when not pressed
+                      blurRadius: _isStarGlowing ? 15 : 5,
+                      spreadRadius: _isStarGlowing ? 5 : 0,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.star,
+                  color: _isStarGlowing ? Colors.blue : Colors.grey,
+                  size: 28,
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(width: 10),
+          // Filter Icon
+          GestureDetector(
+            onTap: _toggleFilterPanel,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 5,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.filter_alt,
+                  color: Colors.blue,
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildFilterPanel() {
     return AnimatedPositioned(

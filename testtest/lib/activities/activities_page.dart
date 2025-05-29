@@ -236,14 +236,23 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           const Spacer(),
           Center(
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                // Navigate to ActivityDetailsPage and wait for the result
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (context) => ActivityDetailsPage(activity: activity),
+                    builder: (context) => ActivityDetailsPage(activity: activity),
                   ),
                 );
+
+                // Refresh the activities list when returning
+                if (_isStarGlowing) {
+                  // If the star icon is glowing, fetch favorite activities
+                  await _fetchFavoriteActivities();
+                } else {
+                  // Otherwise, refresh the default activities list
+                  _onSearch(_searchText);
+                }
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: backgroundColor,
