@@ -2,6 +2,7 @@ import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:testtest/services/activity/activity_service.dart';
 import 'package:testtest/services/activity/activity_model.dart';
+import 'package:testtest/services/favorite/favorite_service.dart';
 import 'activity_details_page.dart';
 
 class ActivitiesPage extends StatefulWidget {
@@ -13,6 +14,7 @@ class ActivitiesPage extends StatefulWidget {
 
 class _ActivitiesPageState extends State<ActivitiesPage> {
   final ActivityService _activityService = ActivityService();
+  final FavoriteService _favoriteService = FavoriteService(); // Add FavoriteRepository
 
   // State variables
   List<Activity> _activities = [];
@@ -75,6 +77,32 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     }
   }
 
+  Future<void> _fetchFavoriteActivities() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final favoriteActivities = await _favoriteService.fetchFavoriteActivities();
+      setState(() {
+        _activities = favoriteActivities; // Replace activities with favorites
+        _isLastPage = true; // Assume all favorite activities are loaded
+      });
+    } catch (e) {
+      print('Error fetching favorite activities: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to fetch favorite activities. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   void _onSearch(String text) {
     setState(() {
       _searchText = text;
@@ -97,10 +125,23 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       top: 58,
       right: 20,
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
           setState(() {
             _isStarGlowing = !_isStarGlowing; // Toggle the glowing state
           });
+
+          if (_isStarGlowing) {
+            // Fetch favorite activities when the star is glowing
+            await _fetchFavoriteActivities();
+          } else {
+            // Reset the activities list using the existing fetch logic
+            setState(() {
+              _activities.clear();
+              _currentPage = 0;
+              _isLastPage = false;
+            });
+            _fetchActivities();
+          }
         },
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -112,12 +153,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color:
-                      _isStarGlowing
-                          ? Colors.blue.withOpacity(
-                            0.8,
-                          ) // Glowing shadow when active
-                          : Colors.black.withOpacity(0.2), // Default shadow
+                  color: _isStarGlowing
+                      ? Colors.blue.withOpacity(0.8) // Glowing shadow when active
+                      : Colors.black.withOpacity(0.2), // Default shadow
                   blurRadius: _isStarGlowing ? 15 : 5,
                   spreadRadius: _isStarGlowing ? 5 : 0,
                   offset: const Offset(0, 5),

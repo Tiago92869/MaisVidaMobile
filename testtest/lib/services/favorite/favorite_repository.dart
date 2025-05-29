@@ -1,5 +1,7 @@
+import 'package:testtest/services/activity/activity_model.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
+import 'package:testtest/services/resource/resource_model.dart';
 
 class FavoriteRepository {
   final FavoriteService _favoriteService = FavoriteService();
@@ -46,4 +48,28 @@ class FavoriteRepository {
       rethrow;
     }
   }
+
+  Future<List<Resource>> getFavoriteResources() async {
+  try {
+    print('FavoriteRepository: Fetching favorite resources...');
+    final resources = await _favoriteService.fetchFavoriteResources();
+    print('FavoriteRepository: Successfully fetched favorite resources.');
+    return resources;
+  } catch (e) {
+    print('FavoriteRepository: Failed to fetch favorite resources. Error: $e');
+    rethrow;
+  } 
+}
+
+Future<List<Activity>> getFavoriteActivities() async {
+  try {
+    print('FavoriteRepository: Fetching favorite activities...');
+    final activities = await _favoriteService.fetchFavoriteActivities();
+    print('FavoriteRepository: Successfully fetched favorite activities.');
+    return activities;
+  } catch (e) {
+    print('FavoriteRepository: Failed to fetch favorite activities. Error: $e');
+    rethrow;
+  }
+}
 }

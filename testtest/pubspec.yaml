@@ -76,14 +76,11 @@ flutter:
   assets:
     - assets/medicine/
     - assets/starfish/
-    - assets/samples/animations/
     - assets/images/resources/
     - assets/samples/ui/rive_app/
     - assets/samples/ui/rive_app/rive/
     - assets/samples/ui/rive_app/images/
-    - assets/samples/ui/rive_app/images/backgrounds/
     - assets/samples/ui/rive_app/images/topics/
-    - assets/samples/ui/rive_app/images/avatars/
     - assets/images/
 
   # To add assets to your application, add an assets section, like this:

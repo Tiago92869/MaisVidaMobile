@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:testtest/config/config.dart';
+import 'package:testtest/services/activity/activity_model.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:testtest/services/resource/resource_model.dart';
 
 const Duration _timeoutDuration = Duration(seconds: 10);
 
@@ -169,7 +171,89 @@ class FavoriteService {
       rethrow;
     }
   }
+
+  Future<List<Resource>> fetchFavoriteResources() async {
+  await _loadStoredCredentials();
+  final String url = '$_baseUrl/resources';
+  print('Request URL for fetchFavoriteResources: $url'); // Log the request URL
+
+  try {
+    final response = await http
+        .get(
+          Uri.parse(url),
+          headers: {
+            'Authorization': 'Bearer $_accessToken',
+            'Content-Type': 'application/json',
+          },
+        )
+        .timeout(
+          _timeoutDuration,
+          onTimeout: () {
+            print('Request to $url timed out.');
+            throw TimeoutException(
+              'The connection has timed out, please try again later.',
+            );
+          },
+        );
+
+    print('Response Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => Resource.fromJson(json)).toList();
+    } else {
+      print('Failed to fetch favorite resources. Status Code: ${response.statusCode}');
+      throw Exception('Failed to fetch favorite resources');
+    }
+  } catch (e) {
+    print('Error fetching favorite resources: $e');
+    rethrow;
+  }
 }
+
+Future<List<Activity>> fetchFavoriteActivities() async {
+  await _loadStoredCredentials();
+  final String url = '$_baseUrl/activities';
+  print('Request URL for fetchFavoriteActivities: $url'); // Log the request URL
+
+  try {
+    final response = await http
+        .get(
+          Uri.parse(url),
+          headers: {
+            'Authorization': 'Bearer $_accessToken',
+            'Content-Type': 'application/json',
+          },
+        )
+        .timeout(
+          _timeoutDuration,
+          onTimeout: () {
+            print('Request to $url timed out.');
+            throw TimeoutException(
+              'The connection has timed out, please try again later.',
+            );
+          },
+        );
+
+    print('Response Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      return jsonList.map((json) => Activity.fromJson(json)).toList();
+    } else {
+      print('Failed to fetch favorite activities. Status Code: ${response.statusCode}');
+      throw Exception('Failed to fetch favorite activities');
+    }
+  } catch (e) {
+    print('Error fetching favorite activities: $e');
+    rethrow;
+  }
+}
+}
+
+
 
 class BadRequestException extends HttpException {
   BadRequestException(String message) : super(message);
