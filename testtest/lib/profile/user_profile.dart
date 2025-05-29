@@ -103,6 +103,57 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  Future<void> showImageSelectionPopup() async {
+    try {
+      List<String> imagePreviews = await userRepository.userService.getAllImagePreviewsBase64();
+      // Remove the prefix "data:image/png;base64," from each image
+      List<String> base64Images = imagePreviews.map((image) => image.split(',').last).toList();
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Select an Image"),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemCount: base64Images.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        profileImageBase64 = base64Images[index];
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    child: Image.memory(
+                      base64Decode(base64Images[index]),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print('Failed to fetch image previews: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to load image previews."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> saveChanges() async {
     try {
       // Validate First Name (must not be empty and only one word)
@@ -195,7 +246,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Update the last saved values
       setState(() {
         lastSavedFirstName = firstNameController.text;
-        lastSavedFamilyName = familyNameController.text;
+        lastSavedFamilyName = firstNameController.text;
         lastSavedCity = cityController.text;
         lastSavedBirthday = birthdayController.text;
         lastSavedAboutMe = aboutMeController.text;
@@ -357,15 +408,28 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   children: [
                     const SizedBox(height: 40),
 
-                    // Profile Image
+                    // Profile Image with Add Image Icon
                     Center(
-                      child: CircleAvatar(
-                        radius: 60,
-                        backgroundImage: profileImageBase64 != null
-                            ? MemoryImage(base64Decode(profileImageBase64!))
-                            : const AssetImage('assets/images/starfish.png')
-                                as ImageProvider, // Fallback to default image
-                        backgroundColor: Colors.grey[300],
+                      child: Column(
+                        children: [
+                          Stack(
+                            alignment: Alignment.bottomRight,
+                            children: [
+                              CircleAvatar(
+                                radius: 60,
+                                backgroundImage: profileImageBase64 != null && profileImageBase64!.isNotEmpty
+                                    ? MemoryImage(base64Decode(profileImageBase64!))
+                                    : null, // Leave the circle empty if null or empty
+                                backgroundColor: Colors.grey[300],
+                              ),
+                              if (editMode)
+                                IconButton(
+                                  icon: const Icon(Icons.add_a_photo, color: Colors.blue),
+                                  onPressed: showImageSelectionPopup,
+                                ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
 
