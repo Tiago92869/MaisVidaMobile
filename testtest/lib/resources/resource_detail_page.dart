@@ -81,93 +81,118 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background gradient
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
               ),
-            ),
-          ),
-          // Randomly show one of the starfish images
-          if (_showFirstStarfish)
-            Positioned(
-              right: 80,
-              top: 320,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.7,
-                  child: Image.asset(
-                    'assets/images/starfish2.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            )
-          else
-            Positioned(
-              left: 100,
-              top: 250,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.5,
-                  child: Image.asset(
-                    'assets/images/starfish1.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                children: [
-                  Expanded(child: _buildResourceDetails()),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ResourceFeedbackPage(
-                            resourceId: widget.resource.id,
+              child: IntrinsicHeight(
+                child: Stack(
+                  children: [
+                    // Background gradient
+                    Positioned.fill(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: const Color(0xFF0D1B2A),
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    // Randomly show one of the starfish images
+                    if (_showFirstStarfish)
+                      Positioned(
+                        right: 80,
+                        top: 320,
+                        width: 400,
+                        height: 400,
+                        child: Opacity(
+                          opacity: 0.1,
+                          child: Transform.rotate(
+                            angle: 0.7,
+                            child: Image.asset(
+                              'assets/images/starfish2.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Positioned(
+                        left: 100,
+                        top: 250,
+                        width: 400,
+                        height: 400,
+                        child: Opacity(
+                          opacity: 0.1,
+                          child: Transform.rotate(
+                            angle: 0.5,
+                            child: Image.asset(
+                              'assets/images/starfish1.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                    SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildResourceDetails(),
+                            const Spacer(), // Push the following widgets to the bottom
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildDateInfo("Created At", widget.resource.createdAt),
+                                _buildDateInfo("Updated At", widget.resource.updatedAt),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ResourceFeedbackPage(
+                                        resourceId: widget.resource.id,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: const Color(0xFF0D1B2A),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -247,28 +272,38 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         const SizedBox(height: 40),
 
         // Description
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  resource.description.isNotEmpty
-                      ? resource.description
-                      : "No description available.", // Fallback if description is empty
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Inter",
-                    color: Colors.white,
-                    height: 1.5,
-                  ),
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                resource.description.isNotEmpty
+                    ? resource.description
+                    : "No description available.", // Fallback if description is empty
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: "Inter",
+                  color: Colors.white,
+                  height: 1.5,
                 ),
-                const SizedBox(height: 40), // Increased distance before first content
+              ),
+              const SizedBox(height: 40), // Increased distance before first content
 
-                // Display contents
-                for (final content in sortedContents) ...[
-                  if (content.type.toLowerCase() == 'text') ...[
-                    Text(
+              // Separator Line
+              Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.7, // 70% of the screen width
+                  height: 1, // Line height
+                  color: Colors.white, // Line color
+                ),
+              ),
+              const SizedBox(height: 40), // Space after the line
+
+              // Display contents
+              for (final content in sortedContents) ...[
+                if (content.type.toLowerCase() == 'text') ...[
+                  Center(
+                    child: Text(
                       content.contentValue,
                       style: const TextStyle(
                         fontSize: 16,
@@ -276,60 +311,52 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                         color: Colors.white,
                         height: 1.5,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                  ] else if (content.type.toLowerCase() == 'image') ...[
-                    FutureBuilder(
-                      future: _imageService.getImageBase64(content.contentId),
-                      builder: (context, snapshot) {
-                        print('Fetching Base64 image with ID: ${content.contentId}');
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          print('Base64 image fetch in progress...');
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          print('Error fetching Base64 image: ${snapshot.error}');
-                          return const Text(
-                            'Failed to load image',
-                            style: TextStyle(color: Colors.red),
-                          );
-                        } else if (snapshot.hasData) {
-                          final base64Image = snapshot.data as String;
-                          print('Base64 image fetched successfully.');
-                          return Center(
-                            child: SizedBox(
-                              width: 150,
-                              height: 150,
-                              child: Image.memory(
-                                base64Decode(base64Image),
-                                fit: BoxFit.contain,
-                              ),
+                  ),
+                ] else if (content.type.toLowerCase() == 'image') ...[
+                  FutureBuilder(
+                    future: _imageService.getImageBase64(content.contentId),
+                    builder: (context, snapshot) {
+                      print('Fetching Base64 image with ID: ${content.contentId}');
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        print('Base64 image fetch in progress...');
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        print('Error fetching Base64 image: ${snapshot.error}');
+                        return const Text(
+                          'Failed to load image',
+                          style: TextStyle(color: Colors.red),
+                        );
+                      } else if (snapshot.hasData) {
+                        final base64Image = snapshot.data as String;
+                        print('Base64 image fetched successfully.');
+                        return Center(
+                          child: SizedBox(
+                            width: 150,
+                            height: 150,
+                            child: Image.memory(
+                              base64Decode(base64Image),
+                              fit: BoxFit.contain,
                             ),
-                          );
-                        } else {
-                          print('Unexpected state: No data and no error.');
-                          return const Text(
-                            'Failed to load image',
-                            style: TextStyle(color: Colors.red),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                  const SizedBox(height: 30), // Increased distance between contents
+                          ),
+                        );
+                      } else {
+                        print('Unexpected state: No data and no error.');
+                        return const Text(
+                          'Failed to load image',
+                          style: TextStyle(color: Colors.red),
+                        );
+                      }
+                    },
+                  ),
                 ],
+                const SizedBox(height: 30), // Increased distance between contents
               ],
-            ),
+            ],
           ),
         ),
         const SizedBox(height: 20),
-
-        // Created and Updated Dates
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildDateInfo("Created At", resource.createdAt),
-            _buildDateInfo("Updated At", resource.updatedAt),
-          ],
-        ),
       ],
     );
   }
