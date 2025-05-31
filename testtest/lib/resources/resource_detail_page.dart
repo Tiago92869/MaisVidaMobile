@@ -196,6 +196,41 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                         ),
                       ),
                     ),
+                    // Random starfish image
+                    if (_showFirstStarfish)
+                      Positioned(
+                        right: 80,
+                        top: 320,
+                        width: 400,
+                        height: 400,
+                        child: Opacity(
+                          opacity: 0.1,
+                          child: Transform.rotate(
+                            angle: 0.7,
+                            child: Image.asset(
+                              'assets/images/starfish2.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Positioned(
+                        left: 100,
+                        top: 250,
+                        width: 400,
+                        height: 400,
+                        child: Opacity(
+                          opacity: 0.1,
+                          child: Transform.rotate(
+                            angle: 0.5,
+                            child: Image.asset(
+                              'assets/images/starfish1.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
                     SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
