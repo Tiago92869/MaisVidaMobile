@@ -355,7 +355,26 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             ),
           ),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 20),
+
+        // Resource Description
+        Text(
+          resource.description,
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: "Inter",
+            color: Colors.white70,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Divider Line
+        const Divider(
+          color: Colors.white24,
+          thickness: 1,
+        ),
+        const SizedBox(height: 20),
 
         // Render contents in order
         for (final content in sortedContents) ...[
