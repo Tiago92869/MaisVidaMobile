@@ -43,4 +43,6 @@ class Config {
       'http://34.155.153.157:2221/api/starfish/feedback/resource';
   static const String imageUrl =
       'http://34.155.153.157:2221/api/starfish/image';
+  static const String videoUrl =
+      'http://34.155.153.157:2221/api/starfish/video';
 }

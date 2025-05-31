@@ -20,11 +20,15 @@ class ResourceDetailPage extends StatefulWidget {
 
 class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final FavoriteService _favoriteService = FavoriteService();
+  final ImageService _imageService = ImageService();
 
   bool _isFavorite = false;
   bool _initialFavoriteStatus = false; // Track the initial favorite status
   bool _showFirstStarfish =
       Random().nextBool(); // Randomly decide which starfish to show
+
+  // Cache for Base64 images
+  final Map<String, String> _imageCache = {};
 
   @override
   void initState() {
@@ -76,6 +80,18 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         _isFavorite = !_isFavorite;
       });
     }
+  }
+
+  Future<String> _getCachedImageBase64(String contentId) async {
+    if (_imageCache.containsKey(contentId)) {
+      // Return cached image if available
+      return _imageCache[contentId]!;
+    }
+
+    // Fetch the image and cache it
+    final base64Image = await _imageService.getImageBase64(contentId);
+    _imageCache[contentId] = base64Image;
+    return base64Image;
   }
 
   @override
@@ -199,7 +215,6 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
   Widget _buildResourceDetails() {
     final resource = widget.resource;
-    final ImageService _imageService = ImageService();
 
     // Sort contents by ascending order
     final sortedContents = List.of(resource.contents)
@@ -316,7 +331,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                   ),
                 ] else if (content.type.toLowerCase() == 'image') ...[
                   FutureBuilder(
-                    future: _imageService.getImageBase64(content.contentId),
+                    future: _getCachedImageBase64(content.contentId),
                     builder: (context, snapshot) {
                       print('Fetching Base64 image with ID: ${content.contentId}');
                       if (snapshot.connectionState == ConnectionState.waiting) {
