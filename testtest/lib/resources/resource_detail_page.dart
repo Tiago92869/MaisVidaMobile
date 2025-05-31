@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:testtest/resources/fullscreen_video_page.dart';
 import 'package:video_player/video_player.dart';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
@@ -187,41 +188,6 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                         ),
                       ),
                     ),
-                    // Randomly show one of the starfish images
-                    if (_showFirstStarfish)
-                      Positioned(
-                        right: 80,
-                        top: 320,
-                        width: 400,
-                        height: 400,
-                        child: Opacity(
-                          opacity: 0.1,
-                          child: Transform.rotate(
-                            angle: 0.7,
-                            child: Image.asset(
-                              'assets/images/starfish2.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      Positioned(
-                        left: 100,
-                        top: 250,
-                        width: 400,
-                        height: 400,
-                        child: Opacity(
-                          opacity: 0.1,
-                          child: Transform.rotate(
-                            angle: 0.5,
-                            child: Image.asset(
-                              'assets/images/starfish1.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
                     SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -229,7 +195,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildResourceDetails(),
-                            const Spacer(), // Push the following widgets to the bottom
+                            const Spacer(),
                             const SizedBox(height: 20),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -435,11 +401,60 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                   ),
                 ] else if (content.type.toLowerCase() == 'video') ...[
                   if (_isVideoInitialized && _videoController != null)
-                    AspectRatio(
-                      aspectRatio: _videoController!.value.aspectRatio,
-                      child: VideoPlayer(_videoController!),
-                    ),
-                  if (!_isVideoInitialized)
+                    Column(
+                      children: [
+                        AspectRatio(
+                          aspectRatio: _videoController!.value.aspectRatio,
+                          child: VideoPlayer(_videoController!),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                _videoController!.value.isPlaying
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  if (_videoController!.value.isPlaying) {
+                                    _videoController!.pause();
+                                  } else {
+                                    _videoController!.play();
+                                  }
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.volume_up, color: Colors.white),
+                              onPressed: () {
+                                setState(() {
+                                  _videoController!.setVolume(
+                                    _videoController!.value.volume > 0 ? 0 : 1,
+                                  );
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.fullscreen, color: Colors.white),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FullscreenVideoPage(
+                                      videoController: _videoController!,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  else if (!_isVideoInitialized)
                     const Center(child: CircularProgressIndicator()),
                 ],
                 const SizedBox(height: 30), // Increased distance between contents
