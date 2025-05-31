@@ -11,33 +11,22 @@ class ResourceRepository {
     String search,
   ) async {
     try {
-      print(
-        'ResourceRepository: Fetching resources with types: $resourceTypes, page: $page, size: $size, search: $search',
-      );
       final ResourcePage resourcePage = await _resourceService.fetchResources(
         resourceTypes,
         page: page, // Pass page as a named parameter
         size: size, // Pass size as a named parameter
         search: search,
       );
-      print('ResourceRepository: Successfully fetched resources.');
       return resourcePage.content;
     } catch (e) {
-      print('ResourceRepository: Failed to fetch resources. Error: $e');
       rethrow;
     }
   }
 
   Future<Resource> getResourceById(String id) async {
     try {
-      print('ResourceRepository: Fetching resource by ID: $id');
-      final Resource resource = await _resourceService.fetchResourceById(id);
-      print('ResourceRepository: Successfully fetched resource.');
-      return resource;
+      return await _resourceService.fetchResourceById(id);
     } catch (e) {
-      print(
-        'ResourceRepository: Failed to fetch resource by ID: $id. Error: $e',
-      );
       rethrow;
     }
   }

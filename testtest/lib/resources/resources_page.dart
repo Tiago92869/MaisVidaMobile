@@ -581,18 +581,17 @@ class _ResourcesPageState extends State<ResourcesPage> {
   }
 
   Widget _buildHCard(Resource resource, Color backgroundColor) {
-    const int maxDescriptionLength = 30; // Maximum length for the description
+    const int maxDescriptionLength = 30;
 
-    String truncatedDescription =
-        resource.description.length > maxDescriptionLength
-            ? '${resource.description.substring(0, maxDescriptionLength)}...'
-            : resource.description;
+    String truncatedDescription = resource.description.length > maxDescriptionLength
+        ? '${resource.description.substring(0, maxDescriptionLength)}...'
+        : resource.description;
 
     return Container(
       constraints: const BoxConstraints(maxHeight: 120),
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       decoration: BoxDecoration(
-        color: backgroundColor, // Use dynamic background color
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -644,6 +643,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
       ),
     );
   }
+
 }
 
 Widget _buildBlurEffect() {

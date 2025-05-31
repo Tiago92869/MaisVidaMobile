@@ -42,6 +42,7 @@ class ResourceService {
     await _loadStoredCredentials();
     try {
       print('Fetching resources...');
+      print('Resource Types: $resourceTypes, Page: $page, Size: $size, Search: $search');
 
       // Convert resourceTypes to a comma-separated string
       final String resourceTypesParam = resourceTypes

@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:testtest/resources/resource_feedback_page.dart';
+import 'package:testtest/services/image/image_service.dart';
 
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
@@ -171,6 +174,11 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
   Widget _buildResourceDetails() {
     final resource = widget.resource;
+    final ImageService _imageService = ImageService();
+
+    // Sort contents by ascending order
+    final sortedContents = List.of(resource.contents)
+      ..sort((a, b) => a.order.compareTo(b.order));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,16 +249,74 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         // Description
         Expanded(
           child: SingleChildScrollView(
-            child: Text(
-              resource.description.isNotEmpty
-                  ? resource.description
-                  : "No description available.", // Fallback if description is empty
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: "Inter",
-                color: Colors.white,
-                height: 1.5,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  resource.description.isNotEmpty
+                      ? resource.description
+                      : "No description available.", // Fallback if description is empty
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Inter",
+                    color: Colors.white,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 40), // Increased distance before first content
+
+                // Display contents
+                for (final content in sortedContents) ...[
+                  if (content.type.toLowerCase() == 'text') ...[
+                    Text(
+                      content.contentValue,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: "Inter",
+                        color: Colors.white,
+                        height: 1.5,
+                      ),
+                    ),
+                  ] else if (content.type.toLowerCase() == 'image') ...[
+                    FutureBuilder(
+                      future: _imageService.getImageBase64(content.contentId),
+                      builder: (context, snapshot) {
+                        print('Fetching Base64 image with ID: ${content.contentId}');
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          print('Base64 image fetch in progress...');
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          print('Error fetching Base64 image: ${snapshot.error}');
+                          return const Text(
+                            'Failed to load image',
+                            style: TextStyle(color: Colors.red),
+                          );
+                        } else if (snapshot.hasData) {
+                          final base64Image = snapshot.data as String;
+                          print('Base64 image fetched successfully.');
+                          return Center(
+                            child: SizedBox(
+                              width: 150,
+                              height: 150,
+                              child: Image.memory(
+                                base64Decode(base64Image),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          );
+                        } else {
+                          print('Unexpected state: No data and no error.');
+                          return const Text(
+                            'Failed to load image',
+                            style: TextStyle(color: Colors.red),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                  const SizedBox(height: 30), // Increased distance between contents
+                ],
+              ],
             ),
           ),
         ),

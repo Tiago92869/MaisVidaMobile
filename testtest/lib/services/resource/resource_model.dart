@@ -42,6 +42,42 @@ extension ResourceTypeExtension on ResourceType {
   }
 }
 
+class Content {
+  final String id;
+  final String contentValue;
+  final String contentId;
+  final String type;
+  final int order;
+
+  const Content({
+    required this.id,
+    required this.contentValue,
+    required this.contentId,
+    required this.type,
+    required this.order,
+  });
+
+  factory Content.fromJson(Map<String, dynamic> json) {
+    return Content(
+      id: json['id'],
+      contentValue: json['contentValue'],
+      contentId: json['contentId'],
+      type: json['type'],
+      order: json['order'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'contentValue': contentValue,
+      'contentId': contentId,
+      'type': type,
+      'order': order,
+    };
+  }
+}
+
 class Resource {
   final String id;
   final String title;
@@ -49,6 +85,7 @@ class Resource {
   final ResourceType type;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<Content> contents;
 
   const Resource({
     required this.id,
@@ -57,9 +94,15 @@ class Resource {
     required this.type,
     this.createdAt,
     this.updatedAt,
+    required this.contents,
   });
 
   factory Resource.fromJsonGetAll(Map<String, dynamic> json) {
+    var contentsJson = json['contents'] as List?; // Handle null case
+    List<Content> contentsList = contentsJson != null
+        ? contentsJson.map((i) => Content.fromJson(i)).toList()
+        : []; // Default to an empty list if null
+
     return Resource(
       id: json['id'],
       title: json['title'],
@@ -67,6 +110,7 @@ class Resource {
       type: ResourceTypeExtension.fromString(json['type']),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      contents: contentsList,
     );
   }
 
@@ -78,17 +122,28 @@ class Resource {
       type: ResourceTypeExtension.fromString(simple.type),
       createdAt: null,
       updatedAt: null,
+      contents: [],
     );
   }
 
   factory Resource.fromJson(Map<String, dynamic> json) {
+    var contentsJson = json['contents'] as List?; // Handle null case
+    List<Content> contentsList = contentsJson != null
+        ? contentsJson.map((i) => Content.fromJson(i)).toList()
+        : []; // Default to an empty list if null
+
     return Resource(
       id: json['id'],
       title: json['title'],
       description: json['description'],
       type: ResourceTypeExtension.fromString(json['type']),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : null,
+      contents: contentsList,
     );
   }
 
@@ -100,6 +155,7 @@ class Resource {
       'type': type.toString().split('.').last.toUpperCase(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'contents': contents.map((content) => content.toJson()).toList(),
     };
   }
 }
