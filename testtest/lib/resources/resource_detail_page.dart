@@ -32,7 +32,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   bool _initialFavoriteStatus = false;
   bool _showFirstStarfish = Random().nextBool();
 
-  final Map<String, String> _imageCache = {};
+  final Map<String, String> _imageCache = {}; // Cache for all images
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
 
@@ -41,6 +41,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     super.initState();
     _checkIfFavorite();
     _initializeVideoPlayer();
+    _initializeImages(); // Prefetch all images
   }
 
   Future<void> _checkIfFavorite() async {
@@ -114,20 +115,27 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     }
   }
 
+  Future<void> _initializeImages() async {
+    print('ResourceDetailPage: Initializing images...');
+    final imageContents = widget.resource.contents
+        .where((content) => content.type.toLowerCase() == 'image')
+        .toList();
+
+    for (final content in imageContents) {
+      try {
+        final base64Image = await _imageService.getImageBase64(content.contentId);
+        _imageCache[content.contentId] = base64Image; // Cache the image
+        print('ResourceDetailPage: Image cached for content ID: ${content.contentId}');
+      } catch (e) {
+        print('ResourceDetailPage: Error fetching image for content ID: ${content.contentId}: $e');
+      }
+    }
+  }
+
   @override
   void dispose() {
     _videoController?.dispose();
     super.dispose();
-  }
-
-  Future<String> _getCachedImageBase64(String contentId) async {
-    if (_imageCache.containsKey(contentId)) {
-      return _imageCache[contentId]!;
-    }
-
-    final base64Image = await _imageService.getImageBase64(contentId);
-    _imageCache[contentId] = base64Image;
-    return base64Image;
   }
 
   Future<void> _toggleFavoriteStatus() async {
@@ -282,9 +290,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             GestureDetector(
               onTap: _toggleFavoriteStatus, // Toggle the favorite status
               child: AnimatedContainer(
-                duration: const Duration(
-                  milliseconds: 300,
-                ), // Smooth transition for color change
+                duration: const Duration(milliseconds: 300), // Smooth transition for color change
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -320,183 +326,137 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         ),
         const SizedBox(height: 40),
 
-        // Description
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                resource.description.isNotEmpty
-                    ? resource.description
-                    : "No description available.", // Fallback if description is empty
+        // Render contents in order
+        for (final content in sortedContents) ...[
+          if (content.type.toLowerCase() == 'text') ...[
+            Center(
+              child: Text(
+                content.contentValue,
                 style: const TextStyle(
                   fontSize: 16,
                   fontFamily: "Inter",
                   color: Colors.white,
                   height: 1.5,
                 ),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 40), // Increased distance before first content
-
-              // Separator Line
-              Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.7, // 70% of the screen width
-                  height: 1, // Line height
-                  color: Colors.white, // Line color
-                ),
-              ),
-              const SizedBox(height: 40), // Space after the line
-
-              // Display contents
-              for (final content in sortedContents) ...[
-                if (content.type.toLowerCase() == 'text') ...[
-                  Center(
-                    child: Text(
-                      content.contentValue,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Inter",
-                        color: Colors.white,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.center,
+            ),
+          ] else if (content.type.toLowerCase() == 'image') ...[
+            _buildCachedImage(content.contentId),
+          ] else if (content.type.toLowerCase() == 'video') ...[
+            if (_isVideoInitialized && _videoController != null)
+              Column(
+                children: [
+                  AspectRatio(
+                    aspectRatio: _videoController!.value.aspectRatio,
+                    child: VideoPlayer(_videoController!),
+                  ),
+                  const SizedBox(height: 12),
+                  VideoProgressIndicator(
+                    _videoController!,
+                    allowScrubbing: true,
+                    colors: const VideoProgressColors(
+                      playedColor: Colors.redAccent,
+                      bufferedColor: Colors.grey,
+                      backgroundColor: Colors.white30,
                     ),
                   ),
-                ] else if (content.type.toLowerCase() == 'image') ...[
-                  FutureBuilder(
-                    future: _getCachedImageBase64(content.contentId),
-                    builder: (context, snapshot) {
-                      print('Fetching Base64 image with ID: ${content.contentId}');
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        print('Base64 image fetch in progress...');
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        print('Error fetching Base64 image: ${snapshot.error}');
-                        return const Text(
-                          'Failed to load image',
-                          style: TextStyle(color: Colors.red),
-                        );
-                      } else if (snapshot.hasData) {
-                        final base64Image = snapshot.data as String;
-                        print('Base64 image fetched successfully.');
-                        return Center(
-                          child: SizedBox(
-                            width: 150,
-                            height: 150,
-                            child: Image.memory(
-                              base64Decode(base64Image),
-                              fit: BoxFit.contain,
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.replay_5, color: Colors.white),
+                        onPressed: () {
+                          final currentPosition = _videoController!.value.position;
+                          Duration newPosition = currentPosition - const Duration(seconds: 5);
+                          if (newPosition < Duration.zero) newPosition = Duration.zero;
+                          _videoController!.seekTo(newPosition);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          _videoController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 36,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            if (_videoController!.value.isPlaying) {
+                              _videoController!.pause();
+                            } else {
+                              _videoController!.play();
+                            }
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.forward_5, color: Colors.white),
+                        onPressed: () {
+                          final currentPosition = _videoController!.value.position;
+                          final maxPosition = _videoController!.value.duration;
+                          Duration newPosition = currentPosition + const Duration(seconds: 5);
+                          if (newPosition > maxPosition) newPosition = maxPosition;
+                          _videoController!.seekTo(newPosition);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          _videoController!.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _videoController!.setVolume(
+                              _videoController!.value.volume > 0 ? 0 : 1,
+                            );
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.fullscreen, color: Colors.white),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FullscreenVideoPage(
+                                videoController: _videoController!,
+                              ),
                             ),
-                          ),
-                        );
-                      } else {
-                        print('Unexpected state: No data and no error.');
-                        return const Text(
-                          'Failed to load image',
-                          style: TextStyle(color: Colors.red),
-                        );
-                      }
-                    },
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ] else if (content.type.toLowerCase() == 'video') ...[
-                  if (_isVideoInitialized && _videoController != null)
-                    Column(
-  children: [
-    AspectRatio(
-      aspectRatio: _videoController!.value.aspectRatio,
-      child: VideoPlayer(_videoController!),
-    ),
-    SizedBox(height: 12),
-    VideoProgressIndicator(
-      _videoController!,
-      allowScrubbing: true,
-      colors: VideoProgressColors(
-        playedColor: Colors.redAccent,
-        bufferedColor: Colors.grey,
-        backgroundColor: Colors.white30,
-      ),
-    ),
-    SizedBox(height: 12),
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          icon: Icon(Icons.replay_5, color: Colors.white),
-          onPressed: () {
-            final currentPosition = _videoController!.value.position;
-            Duration newPosition = currentPosition - Duration(seconds: 5);
-            if (newPosition < Duration.zero) newPosition = Duration.zero;
-            _videoController!.seekTo(newPosition);
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            _videoController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
-            color: Colors.white,
-            size: 36,
-          ),
-          onPressed: () {
-            setState(() {
-              if (_videoController!.value.isPlaying) {
-                _videoController!.pause();
-              } else {
-                _videoController!.play();
-              }
-            });
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.forward_5, color: Colors.white),
-          onPressed: () {
-            final currentPosition = _videoController!.value.position;
-            final maxPosition = _videoController!.value.duration;
-            Duration newPosition = currentPosition + Duration(seconds: 5);
-            if (newPosition > maxPosition) newPosition = maxPosition;
-            _videoController!.seekTo(newPosition);
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            _videoController!.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            setState(() {
-              _videoController!.setVolume(
-                _videoController!.value.volume > 0 ? 0 : 1,
-              );
-            });
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.fullscreen, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FullscreenVideoPage(
-                  videoController: _videoController!,
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  ],
-)
-                  else if (!_isVideoInitialized)
-                    const Center(child: CircularProgressIndicator()),
                 ],
-                const SizedBox(height: 30), // Increased distance between contents
-              ],
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
+              )
+            else if (!_isVideoInitialized)
+              const Center(child: CircularProgressIndicator()),
+          ],
+          const SizedBox(height: 30), // Space between contents
+        ],
       ],
     );
+  }
+
+  Widget _buildCachedImage(String contentId) {
+    if (_imageCache.containsKey(contentId)) {
+      final base64Image = _imageCache[contentId]!;
+      return Center(
+        child: SizedBox(
+          width: 150,
+          height: 150,
+          child: Image.memory(
+            base64Decode(base64Image),
+            fit: BoxFit.contain,
+          ),
+        ),
+      );
+    } else {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 
   Widget _buildDateInfo(String label, DateTime? date) {
