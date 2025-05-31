@@ -402,58 +402,90 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                 ] else if (content.type.toLowerCase() == 'video') ...[
                   if (_isVideoInitialized && _videoController != null)
                     Column(
-                      children: [
-                        AspectRatio(
-                          aspectRatio: _videoController!.value.aspectRatio,
-                          child: VideoPlayer(_videoController!),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                _videoController!.value.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  if (_videoController!.value.isPlaying) {
-                                    _videoController!.pause();
-                                  } else {
-                                    _videoController!.play();
-                                  }
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.volume_up, color: Colors.white),
-                              onPressed: () {
-                                setState(() {
-                                  _videoController!.setVolume(
-                                    _videoController!.value.volume > 0 ? 0 : 1,
-                                  );
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.fullscreen, color: Colors.white),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FullscreenVideoPage(
-                                      videoController: _videoController!,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
+  children: [
+    AspectRatio(
+      aspectRatio: _videoController!.value.aspectRatio,
+      child: VideoPlayer(_videoController!),
+    ),
+    SizedBox(height: 12),
+    VideoProgressIndicator(
+      _videoController!,
+      allowScrubbing: true,
+      colors: VideoProgressColors(
+        playedColor: Colors.redAccent,
+        bufferedColor: Colors.grey,
+        backgroundColor: Colors.white30,
+      ),
+    ),
+    SizedBox(height: 12),
+    Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: Icon(Icons.replay_5, color: Colors.white),
+          onPressed: () {
+            final currentPosition = _videoController!.value.position;
+            Duration newPosition = currentPosition - Duration(seconds: 5);
+            if (newPosition < Duration.zero) newPosition = Duration.zero;
+            _videoController!.seekTo(newPosition);
+          },
+        ),
+        IconButton(
+          icon: Icon(
+            _videoController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+            color: Colors.white,
+            size: 36,
+          ),
+          onPressed: () {
+            setState(() {
+              if (_videoController!.value.isPlaying) {
+                _videoController!.pause();
+              } else {
+                _videoController!.play();
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.forward_5, color: Colors.white),
+          onPressed: () {
+            final currentPosition = _videoController!.value.position;
+            final maxPosition = _videoController!.value.duration;
+            Duration newPosition = currentPosition + Duration(seconds: 5);
+            if (newPosition > maxPosition) newPosition = maxPosition;
+            _videoController!.seekTo(newPosition);
+          },
+        ),
+        IconButton(
+          icon: Icon(
+            _videoController!.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            setState(() {
+              _videoController!.setVolume(
+                _videoController!.value.volume > 0 ? 0 : 1,
+              );
+            });
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.fullscreen, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FullscreenVideoPage(
+                  videoController: _videoController!,
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+  ],
+)
                   else if (!_isVideoInitialized)
                     const Center(child: CircularProgressIndicator()),
                 ],
