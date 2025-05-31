@@ -40,10 +40,9 @@ class NotificationService {
   }) async {
     await _loadStoredCredentials();
     try {
-      final requestUrl = '$_baseUrl?userId=$_userId&page=$page&size=$size';
-      print(
-        'Request URL for fetchNotifications: $requestUrl',
-      ); // Log the request URL
+      final requestUrl =
+          '$_baseUrl?userId=$_userId&page=$page&size=$size&sort=read,DESC'; // Added sort parameter
+      print('Request URL for fetchNotifications: $requestUrl'); // Log the request URL
 
       final response = await http
           .get(
@@ -130,6 +129,49 @@ class NotificationService {
     } catch (e) {
       print('Error deleting notification: $e');
       throw Exception('Failed to delete notification');
+    }
+  }
+
+  Future<NotificationModel> markAsRead(String id) async {
+    await _loadStoredCredentials();
+    try {
+      final String requestUrl = '$_baseUrl/read/$id';
+      print('Request URL for markAsRead: $requestUrl');
+
+      final response = await http
+          .patch(
+            Uri.parse(requestUrl),
+            headers: {
+              'Authorization': 'Bearer $_accessToken',
+              'Content-Type': 'application/json',
+            },
+          )
+          .timeout(
+            _timeoutDuration,
+            onTimeout: () {
+              print('Request to $requestUrl timed out.');
+              throw TimeoutException(
+                'The connection has timed out, please try again later.',
+              );
+            },
+          );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> json = jsonDecode(response.body);
+        print('Notification marked as read successfully.');
+        return NotificationModel.fromJson(json);
+      } else {
+        print(
+          'Failed to mark notification as read. Status Code: ${response.statusCode}',
+        );
+        throw Exception('Failed to mark notification as read');
+      }
+    } catch (e) {
+      print('Error marking notification as read: $e');
+      throw Exception('Failed to mark notification as read');
     }
   }
 }

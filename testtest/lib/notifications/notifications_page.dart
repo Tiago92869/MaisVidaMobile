@@ -85,15 +85,30 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent &&
-        !_isFetchingNextPage &&
-        !_isLoading &&
-        _hasMore) {
-      _fetchNotifications(
-        isNextPage: true,
-      ); // Fetch the next page when reaching the bottom
+    if (_scrollController.position.atEdge) {
+      if (_scrollController.position.pixels == 0 &&
+          !_isFetchingNextPage &&
+          !_isLoading) {
+        // Scrolled to the top
+        _refreshNotifications();
+      } else if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          !_isFetchingNextPage &&
+          !_isLoading &&
+          _hasMore) {
+        // Scrolled to the bottom
+        _fetchNotifications(isNextPage: true);
+      }
     }
+  }
+
+  void _refreshNotifications() {
+    setState(() {
+      _currentPage = 0; // Reset to the first page
+      _hasMore = true; // Allow fetching more pages
+      _notifications.clear(); // Clear current notifications
+    });
+    _fetchNotifications(isNextPage: false); // Refresh notifications
   }
 
   void _navigateToNotificationDetail(
@@ -107,6 +122,30 @@ class _NotificationsPageState extends State<NotificationsPage> {
             (context) => NotificationDetailsPage(notification: notification),
       ),
     );
+  }
+
+  void _onNotificationTap(NotificationModel notification) async {
+    if (!notification.read) {
+      try {
+        final updatedNotification =
+            await _notificationService.markAsRead(notification.id);
+        setState(() {
+          final index = _notifications.indexWhere((n) => n.id == notification.id);
+          if (index != -1) {
+            _notifications[index] = updatedNotification;
+          }
+        });
+      } catch (e) {
+        print("Error marking notification as read: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to mark notification as read."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+    _navigateToNotificationDetail(context, notification);
   }
 
   @override
@@ -186,20 +225,16 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
                                   final notification = _notifications[index];
                                   return GestureDetector(
-                                    onTap:
-                                        () => _navigateToNotificationDetail(
-                                          context,
-                                          notification,
-                                        ),
+                                    onTap: () => _onNotificationTap(notification),
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
                                         vertical: 10,
                                       ),
                                       padding: const EdgeInsets.all(15),
                                       decoration: BoxDecoration(
-                                        color: const Color(
-                                          0xFF2C3E50,
-                                        ), // Darker blue for cards
+                                        color: notification.read
+                                            ? const Color(0xFF2C3E50) // Darker blue for read
+                                            : const Color(0xFF34495E), // Slightly lighter for unread
                                         borderRadius: BorderRadius.circular(15),
                                         boxShadow: [
                                           BoxShadow(
@@ -216,28 +251,37 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           // Title with one line
-                                          Text(
-                                            notification.title,
-                                            maxLines:
-                                                1, // Limit the title to one line
-                                            overflow:
-                                                TextOverflow
-                                                    .ellipsis, // Add ellipsis if it overflows
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  notification.title,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (!notification.read)
+                                                const Icon(
+                                                  Icons.circle,
+                                                  color: Color.fromRGBO(
+                                                      123, 144, 255, 1), // Match background color
+                                                  size: 14, // Slightly larger size
+                                                ), // Identifier for unread
+                                            ],
                                           ),
                                           const SizedBox(height: 5),
                                           // Description with one line
                                           Text(
                                             notification.description,
-                                            maxLines:
-                                                1, // Limit the description to one line
-                                            overflow:
-                                                TextOverflow
-                                                    .ellipsis, // Add ellipsis if it overflows
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.white70,
