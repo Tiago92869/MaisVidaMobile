@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testtest/services/journey/journey_model.dart';
 import 'dart:math';
+import 'package:testtest/journey/journey_feeling.dart'; // Import JourneyFeelingPage
 
 class JourneyDetailPage extends StatefulWidget {
   final UserJourneyProgress journey;
@@ -144,8 +145,13 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                             return GestureDetector(
                               onTap: resource.unlocked
                                   ? () {
-                                      print(
-                                          'Square pressed for resource order: ${resource.order}');
+                                      print('Navigating to JourneyFeelingPage for resource order: ${resource.order}');
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => JourneyFeelingPage(), // Pass the resource if needed
+                                        ),
+                                      );
                                     }
                                   : null,
                               child: Stack(
