@@ -173,119 +173,115 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   Widget build(BuildContext context) {
     print('ResourceDetailPage: Building UI...');
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          print('ResourceDetailPage: LayoutBuilder constraints: $constraints');
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
-              child: IntrinsicHeight(
-                child: Stack(
-                  children: [
-                    // Background gradient
-                    Positioned.fill(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Random starfish image
-                    if (_showFirstStarfish)
-                      Positioned(
-                        right: 80,
-                        top: 320,
-                        width: 400,
-                        height: 400,
-                        child: Opacity(
-                          opacity: 0.1,
-                          child: Transform.rotate(
-                            angle: 0.7,
-                            child: Image.asset(
-                              'assets/images/starfish2.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      Positioned(
-                        left: 100,
-                        top: 250,
-                        width: 400,
-                        height: 400,
-                        child: Opacity(
-                          opacity: 0.1,
-                          child: Transform.rotate(
-                            angle: 0.5,
-                            child: Image.asset(
-                              'assets/images/starfish1.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
-                    SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildResourceDetails(),
-                            const Spacer(),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _buildDateInfo("Created At", widget.resource.createdAt),
-                                _buildDateInfo("Updated At", widget.resource.updatedAt),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ResourceFeedbackPage(
-                                        resourceId: widget.resource.id,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: const Color(0xFF0D1B2A),
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Continue',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+      body: Stack(
+        children: [
+          // Background gradient
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
             ),
-          );
-        },
+          ),
+          // Add both starfish images
+          Positioned(
+            right: 80,
+            top: -80,
+            width: 400,
+            height: 400,
+            child: Opacity(
+              opacity: 0.1,
+              child: Transform.rotate(
+                angle: 0.7,
+                child: Image.asset(
+                  'assets/images/starfish2.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 100,
+            top: 450,
+            width: 400,
+            height: 400,
+            child: Opacity(
+              opacity: 0.1,
+              child: Transform.rotate(
+                angle: 0.5,
+                child: Image.asset(
+                  'assets/images/starfish1.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+          // Scrollable content
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildResourceDetails(),
+                          const SizedBox(height: 20),
+                          Spacer(), // Push the following content to the bottom if there's extra space
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildDateInfo("Created At", widget.resource.createdAt),
+                              _buildDateInfo("Updated At", widget.resource.updatedAt),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ResourceFeedbackPage(
+                                      resourceId: widget.resource.id,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: const Color(0xFF0D1B2A),
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'Continue',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
