@@ -17,10 +17,14 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
   @override
   Widget build(BuildContext context) {
     final journey = widget.journey;
-    final completedCount = journey.resourceProgressList
-        .where((resource) => resource.completed)
-        .length;
-    final totalCount = journey.resourceProgressList.length;
+    final journeyDetails = journey.journey;
+
+    // Sort resources by order in ascending order
+    final sortedResources = journey.resourceProgressList
+      ..sort((a, b) => a.order.compareTo(b.order));
+
+    final completedCount = sortedResources.where((resource) => resource.completed).length;
+    final totalCount = sortedResources.length;
     final progress = completedCount / totalCount;
     final isComplete = progress == 1.0;
 
@@ -63,7 +67,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
 
                         // Title
                         Text(
-                          "Journey: ${journey.journeyId}",
+                          journeyDetails.title,
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -74,17 +78,16 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                         const SizedBox(height: 10),
 
                         // Description
-                        const Text(
-                          "Explore your journey progress and unlock new resources as you advance.",
-                          style: TextStyle(
+                        Text(
+                          journeyDetails.description,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontFamily: "Inter",
                             color: Colors.white70,
                             height: 1.5,
                           ),
                         ),
-                        const SizedBox(height: 30),
-
+                        const SizedBox(height: 10),
                         // Progress bar with star icon
                         Row(
                           children: [
@@ -132,11 +135,11 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                           ),
-                          itemCount: journey.resourceProgressList.length,
+                          itemCount: sortedResources.length,
                           itemBuilder: (context, index) {
-                            final resource = journey.resourceProgressList[index];
+                            final resource = sortedResources[index];
                             final isLastSquare =
-                                resource == journey.resourceProgressList.last;
+                                resource == sortedResources.last;
 
                             return GestureDetector(
                               onTap: resource.unlocked
@@ -217,7 +220,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "User ID: ${journey.userId}",
+                        "Created At: ${journeyDetails.createdAt?.toLocal().toString().split(' ')[0] ?? 'N/A'}",
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -225,7 +228,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                         ),
                       ),
                       Text(
-                        "Resources: ${journey.resourceProgressList.length}",
+                        "Resources: ${journeyDetails.resourceQuantity}",
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

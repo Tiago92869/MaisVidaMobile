@@ -82,12 +82,20 @@ class JourneySimpleUser {
   final String title;
   final String description;
   final bool started;
+  final String? rewardImage;
+  final DateTime? createdAt;
+  final int resourceQuantity;
+  final int completedQuantity;
 
   JourneySimpleUser({
     required this.id,
     required this.title,
     required this.description,
     required this.started,
+    this.rewardImage,
+    this.createdAt,
+    required this.resourceQuantity,
+    required this.completedQuantity,
   });
 
   factory JourneySimpleUser.fromJson(Map<String, dynamic> json) {
@@ -96,21 +104,36 @@ class JourneySimpleUser {
       title: json['title'] ?? 'Untitled Journey',
       description: json['description'] ?? 'No description available.',
       started: json['started'] ?? false,
+      rewardImage: json['rewardImage'],
+      createdAt: parseDate(json['createdAt']),
+      resourceQuantity: json['resourceQuantity'] ?? 0,
+      completedQuantity: json['completedQuantity'] ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'started': started,
+      'rewardImage': rewardImage,
+      'createdAt': createdAt?.toIso8601String(),
+      'resourceQuantity': resourceQuantity,
+      'completedQuantity': completedQuantity,
+    };
   }
 }
 
 class UserJourneyProgress {
   final String id;
-  final String userId;
-  final String journeyId;
+  final JourneySimpleUser journey;
   final int currentStep;
   final List<UserJourneyResourceProgress> resourceProgressList;
 
   UserJourneyProgress({
     required this.id,
-    required this.userId,
-    required this.journeyId,
+    required this.journey,
     required this.currentStep,
     required this.resourceProgressList,
   });
@@ -118,14 +141,22 @@ class UserJourneyProgress {
   factory UserJourneyProgress.fromJson(Map<String, dynamic> json) {
     return UserJourneyProgress(
       id: json['id'] ?? '',
-      userId: json['userId'] ?? '',
-      journeyId: json['journeyId'] ?? '',
+      journey: JourneySimpleUser.fromJson(json['journey']),
       currentStep: json['currentStep'] ?? 0,
       resourceProgressList: (json['resourceProgressList'] as List?)
               ?.map((progress) => UserJourneyResourceProgress.fromJson(progress))
               .toList() ??
           [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'journey': journey.toJson(),
+      'currentStep': currentStep,
+      'resourceProgressList': resourceProgressList.map((e) => e.toJson()).toList(),
+    };
   }
 }
 
@@ -134,12 +165,14 @@ class UserJourneyResourceProgress {
   final int order;
   final bool completed;
   final bool unlocked;
+  final String? feeling;
 
   UserJourneyResourceProgress({
     required this.id,
     required this.order,
     required this.completed,
     required this.unlocked,
+    this.feeling,
   });
 
   factory UserJourneyResourceProgress.fromJson(Map<String, dynamic> json) {
@@ -148,6 +181,7 @@ class UserJourneyResourceProgress {
       order: json['order'] ?? 0,
       completed: json['completed'] ?? false,
       unlocked: json['unlocked'] ?? false,
+      feeling: json['feeling'],
     );
   }
 
@@ -157,14 +191,23 @@ class UserJourneyResourceProgress {
       'order': order,
       'completed': completed,
       'unlocked': unlocked,
+      'feeling': feeling,
     };
   }
 }
 
 final mockJourney = UserJourneyProgress(
   id: "mock-journey-id",
-  userId: "mock-user-id",
-  journeyId: "mock-journey-id",
+  journey: JourneySimpleUser(
+    id: "mock-journey-id",
+    title: "Mock Journey",
+    description: "This is a mock journey",
+    started: true,
+    rewardImage: null,
+    createdAt: DateTime.now(),
+    resourceQuantity: 28,
+    completedQuantity: 10,
+  ),
   currentStep: 5,
   resourceProgressList: List.generate(
     28,
@@ -173,6 +216,7 @@ final mockJourney = UserJourneyProgress(
       order: index + 1,
       completed: true, // First 10 resources are completed
       unlocked: true, // First 20 resources are unlocked
+      feeling: null,
     ),
   ),
 );
