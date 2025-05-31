@@ -32,4 +32,13 @@ class VideoRepository {
       rethrow;
     }
   }
+
+  Future<File?> downloadVideoFile(String id) async {
+    try {
+      return await _videoService.downloadVideoFile(id);
+    } catch (e) {
+      print('VideoRepository: Failed to download video file. Error: $e');
+      return null;
+    }
+  }
 }

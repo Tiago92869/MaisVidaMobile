@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  path_provider: ^2.0.11
+  video_player: ^2.5.0
   animate_do: ^4.2.0
   cupertino_icons: ^1.0.8
   rive: ^0.13.20
@@ -42,6 +44,7 @@ dependencies:
   permission_handler: ^11.4.0
   shared_preferences: ^2.5.3
   flutter_launcher_icons: ^0.14.3
+  flutter_cache_manager: ^3.3.0
 
 dev_dependencies:
   flutter_test:

@@ -1,18 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math'; // Import for Random
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:testtest/resources/resource_feedback_page.dart';
 import 'package:testtest/services/image/image_service.dart';
+import 'package:testtest/services/video/video_repository.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
 
   const ResourceDetailPage({Key? key, required this.resource})
-    : super(key: key);
+      : super(key: key);
 
   @override
   _ResourceDetailPageState createState() => _ResourceDetailPageState();
@@ -21,19 +25,21 @@ class ResourceDetailPage extends StatefulWidget {
 class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final FavoriteService _favoriteService = FavoriteService();
   final ImageService _imageService = ImageService();
+  final VideoRepository _videoRepository = VideoRepository();
 
   bool _isFavorite = false;
-  bool _initialFavoriteStatus = false; // Track the initial favorite status
-  bool _showFirstStarfish =
-      Random().nextBool(); // Randomly decide which starfish to show
+  bool _initialFavoriteStatus = false;
+  bool _showFirstStarfish = Random().nextBool();
 
-  // Cache for Base64 images
   final Map<String, String> _imageCache = {};
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _checkIfFavorite(); // Check if the resource is a favorite when the page loads
+    _checkIfFavorite();
+    _initializeVideoPlayer();
   }
 
   Future<void> _checkIfFavorite() async {
@@ -43,12 +49,84 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       );
       setState(() {
         _isFavorite = isFavorite;
-        _initialFavoriteStatus =
-            isFavorite; // Store the initial favorite status
+        _initialFavoriteStatus = isFavorite;
       });
     } catch (e) {
       print('Error checking favorite status: $e');
     }
+  }
+
+  Future<void> _initializeVideoPlayer() async {
+    print('ResourceDetailPage: Initializing video player...');
+    final Content? videoContent = widget.resource.contents.cast<Content?>().firstWhere(
+      (content) => content?.type.toLowerCase() == 'video',
+      orElse: () => null,
+    );
+
+    if (videoContent == null) {
+      print('ResourceDetailPage: No video content found.');
+      setState(() {
+        _isVideoInitialized = false;
+      });
+      return;
+    }
+
+    print('ResourceDetailPage: Video content found. ID: ${videoContent.contentId}');
+
+    try {
+      print('ResourceDetailPage: Attempting to download video file...');
+      final file = await _videoRepository.downloadVideoFile(videoContent.contentId);
+
+      if (file != null) {
+        print('ResourceDetailPage: Video file downloaded successfully. File path: ${file.path}');
+        if (await file.exists()) {
+          print('ResourceDetailPage: Video file exists and is readable.');
+          _videoController = VideoPlayerController.file(file)
+            ..initialize().then((_) {
+              print('ResourceDetailPage: Video player initialized successfully.');
+              setState(() {
+                _isVideoInitialized = true;
+              });
+            }).catchError((error) {
+              print('ResourceDetailPage: Error during video player initialization: $error');
+              setState(() {
+                _isVideoInitialized = false;
+              });
+            });
+        } else {
+          print('ResourceDetailPage: Video file does not exist or is not readable.');
+          setState(() {
+            _isVideoInitialized = false;
+          });
+        }
+      } else {
+        print('ResourceDetailPage: Error: Video file could not be downloaded.');
+        setState(() {
+          _isVideoInitialized = false;
+        });
+      }
+    } catch (e) {
+      print('ResourceDetailPage: Error initializing video player: $e');
+      setState(() {
+        _isVideoInitialized = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
+
+  Future<String> _getCachedImageBase64(String contentId) async {
+    if (_imageCache.containsKey(contentId)) {
+      return _imageCache[contentId]!;
+    }
+
+    final base64Image = await _imageService.getImageBase64(contentId);
+    _imageCache[contentId] = base64Image;
+    return base64Image;
   }
 
   Future<void> _toggleFavoriteStatus() async {
@@ -82,23 +160,13 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     }
   }
 
-  Future<String> _getCachedImageBase64(String contentId) async {
-    if (_imageCache.containsKey(contentId)) {
-      // Return cached image if available
-      return _imageCache[contentId]!;
-    }
-
-    // Fetch the image and cache it
-    final base64Image = await _imageService.getImageBase64(contentId);
-    _imageCache[contentId] = base64Image;
-    return base64Image;
-  }
-
   @override
   Widget build(BuildContext context) {
+    print('ResourceDetailPage: Building UI...');
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
+          print('ResourceDetailPage: LayoutBuilder constraints: $constraints');
           return SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -365,6 +433,14 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                       }
                     },
                   ),
+                ] else if (content.type.toLowerCase() == 'video') ...[
+                  if (_isVideoInitialized && _videoController != null)
+                    AspectRatio(
+                      aspectRatio: _videoController!.value.aspectRatio,
+                      child: VideoPlayer(_videoController!),
+                    ),
+                  if (!_isVideoInitialized)
+                    const Center(child: CircularProgressIndicator()),
                 ],
                 const SizedBox(height: 30), // Increased distance between contents
               ],

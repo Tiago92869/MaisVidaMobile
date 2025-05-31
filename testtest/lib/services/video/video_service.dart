@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testtest/services/video/video_model.dart';
-import 'package:testtest/config/config.dart';
+import 'package:testtest/config/config.dart' as configg;
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path_provider/path_provider.dart';
 
 const Duration _timeoutDuration = Duration(seconds: 10);
 
 class VideoService {
-  final String _baseUrl = Config.videoUrl;
+  final String _baseUrl = configg.Config.videoUrl; // Use configg alias
   final _storage = const FlutterSecureStorage();
 
   String? _accessToken;
@@ -111,6 +113,43 @@ class VideoService {
     } catch (e) {
       print('VideoService: Error during streamVideo: $e');
       rethrow;
+    }
+  }
+
+  Future<File?> downloadVideoFile(String id) async {
+    await _loadStoredCredentials();
+    final requestUrl = '$_baseUrl/download/$id';
+    print('VideoService: Starting downloadVideoFile...');
+    print('VideoService: Request URL: $requestUrl');
+
+    try {
+      final headers = {
+        'Authorization': 'Bearer $_accessToken',
+      };
+      print('VideoService: Headers: $headers');
+
+      final fileInfo = await DefaultCacheManager().downloadFile(
+        requestUrl,
+        authHeaders: headers,
+      );
+
+      if (fileInfo.file.existsSync()) {
+        print('VideoService: Video file downloaded successfully. File path: ${fileInfo.file.path}');
+
+        // Save the file to the app's documents directory
+        final appDocDir = await getApplicationDocumentsDirectory();
+        final savedFilePath = '${appDocDir.path}/${fileInfo.file.uri.pathSegments.last}';
+        final savedFile = await fileInfo.file.copy(savedFilePath);
+
+        print('VideoService: Video file saved to permanent storage. Path: $savedFilePath');
+        return savedFile;
+      } else {
+        print('VideoService: Video file does not exist after download.');
+        return null;
+      }
+    } catch (e) {
+      print('VideoService: Error downloading video file: $e');
+      return null;
     }
   }
 }
