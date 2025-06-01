@@ -40,6 +40,18 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     }
   }
 
+  void _showInfoMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          "This day has been completed. You can view it again, but changes will not be saved.",
+        ),
+        duration: const Duration(seconds: 5), // Automatically close after 5 seconds
+        backgroundColor: Colors.blueAccent,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size; // Get the screen size
@@ -104,10 +116,20 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start, // Align the back arrow to the left
                     children: [
-                      // Go Back Icon
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                      // Top Row with Back Icon and Info Icon
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                          ),
+                          if (widget.resourceProgress.completed)
+                            GestureDetector(
+                              onTap: _showInfoMessage, // Show the info message when tapped
+                              child: const Icon(Icons.info, color: Colors.white, size: 28),
+                            ),
+                        ],
                       ),
                       Expanded(
                         child: Center( // Center the rest of the content
@@ -145,7 +167,26 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                               ),
                               const SizedBox(height: 40),
                               ElevatedButton(
-                                onPressed: _handleContinue, // Call the new method
+                                onPressed: () async {
+                                  if (widget.resourceProgress.completed) {
+                                    // Skip updating progress if already completed
+                                    /*
+                                    final resource = await _resourceService.fetchResourceById(
+                                      widget.resourceProgress.resourceId!,
+                                    );
+                                    */
+                                    
+      final resource = await _resourceService.fetchResourceById("dd2c5a72-f4aa-487b-a93d-6c2697c280d9");
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ResourceDetailPage(resource: resource),
+                                      ),
+                                    );
+                                  } else {
+                                    await _handleContinue(); // Call the update method if not completed
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: const Color(0xFF0D1B2A),
                                   backgroundColor: Colors.white,
@@ -229,7 +270,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
 
     try {
       // Fetch the resource by its ID
-      //final resource = await _resourceService.fetchResourceById(widget.resourceProgress.resourceId);
+      //final resource = await _resourceService.fetchResourceById(widget.resourceProgress.resourceId!);
       final resource = await _resourceService.fetchResourceById("dd2c5a72-f4aa-487b-a93d-6c2697c280d9");
 
       // Navigate to the ResourceDetailPage
