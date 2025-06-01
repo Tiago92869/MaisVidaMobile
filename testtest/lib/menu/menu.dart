@@ -275,23 +275,43 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF1B263B), // Use the specified background color
               borderRadius: BorderRadius.circular(20),
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: images.map((imageInfo) {
-                  final base64Image = imageInfo.data.split(',').last;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Image.memory(
-                      base64Decode(base64Image),
-                      fit: BoxFit.cover,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Prizes",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Display two images side by side
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemCount: images.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final base64Image = images[index].data.split(',').last;
+                        return Image.memory(
+                          base64Decode(base64Image),
+                          fit: BoxFit.cover,
+                        );
+                      },
                     ),
-                  );
-                }).toList(),
-              ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
