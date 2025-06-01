@@ -86,9 +86,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> fetchUserProfileImage() async {
     try {
-      String base64ImageWithPrefix = await userRepository.userService.getProfileImage();
-      // Remove the prefix "data:image/png;base64," or similar
-      String base64Image = base64ImageWithPrefix.split(',').last;
+      final profileImage = await userRepository.userService.getProfileImage();
+      final base64Image = profileImage.data.split(',').last; // Extract base64 content
       setState(() {
         profileImageBase64 = base64Image;
       });
@@ -105,9 +104,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> showImageSelectionPopup() async {
     try {
-      List<String> imagePreviews = await userRepository.userService.getAllImagePreviewsBase64();
-      // Remove the prefix "data:image/png;base64," from each image
-      List<String> base64Images = imagePreviews.map((image) => image.split(',').last).toList();
+      final images = await userRepository.userService.getAllImagePreviewsBase64();
 
       showDialog(
         context: context,
@@ -123,17 +120,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
-                itemCount: base64Images.length,
+                itemCount: images.length,
                 itemBuilder: (BuildContext context, int index) {
+                  final base64Image = images[index].data.split(',').last;
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        profileImageBase64 = base64Images[index];
+                        profileImageBase64 = base64Image;
                       });
                       Navigator.of(context).pop();
                     },
                     child: Image.memory(
-                      base64Decode(base64Images[index]),
+                      base64Decode(base64Image),
                       fit: BoxFit.cover,
                     ),
                   );

@@ -326,51 +326,85 @@ class UserService {
     }
   }
 
-  Future<List<String>> getAllImagePreviewsBase64() async {
-    await _loadStoredCredentials();
-    final requestUrl = '$_baseUrl/previews';
+  Future<List<ImageInfoDTO>> getAllImagePreviewsBase64() async {
+    print('Starting getAllImagePreviewsBase64...');
+    await _loadStoredCredentials(); // Load stored credentials (access token and user ID).
+    final requestUrl = '$_baseUrl/previews'; // Construct the request URL.
+    print('Request URL: $requestUrl');
 
-    final response = await http.get(
-      Uri.parse(requestUrl),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/json',
-      },
-    ).timeout(
-      _timeoutDuration,
-      onTimeout: () {
-        throw TimeoutException('The connection has timed out, please try again later.');
-      },
-    );
+    try {
+      // Send the GET request to the server.
+      final response = await http.get(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken', // Include the access token in the headers.
+          'Content-Type': 'application/json', // Specify the content type.
+        },
+      ).timeout(
+        _timeoutDuration, // Set a timeout for the request.
+        onTimeout: () {
+          print('Request timed out for getAllImagePreviewsBase64');
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return List<String>.from(json.decode(response.body));
-    } else {
-      throw Exception('Failed to fetch image previews');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      // Check the response status code.
+      if (response.statusCode == 200) {
+        // Parse the response body into a list of `ImageInfoDTO` objects.
+        final List<dynamic> responseData = json.decode(response.body);
+        print('Successfully fetched ${responseData.length} image previews.');
+        return responseData.map((item) => ImageInfoDTO.fromJson(item)).toList();
+      } else {
+        print('Failed to fetch image previews. Status code: ${response.statusCode}');
+        throw Exception('Failed to fetch image previews');
+      }
+    } catch (e) {
+      print('Error in getAllImagePreviewsBase64: $e');
+      rethrow;
     }
   }
 
-  Future<String> getProfileImage() async {
-    await _loadStoredCredentials();
-    final requestUrl = '$_baseUrl/profileImage';
+  Future<ImageInfoDTO> getProfileImage() async {
+    print('Starting getProfileImage...');
+    await _loadStoredCredentials(); // Load stored credentials (access token and user ID).
+    final requestUrl = '$_baseUrl/profileImage'; // Construct the request URL.
+    print('Request URL: $requestUrl');
 
-    final response = await http.get(
-      Uri.parse(requestUrl),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/json',
-      },
-    ).timeout(
-      _timeoutDuration,
-      onTimeout: () {
-        throw TimeoutException('The connection has timed out, please try again later.');
-      },
-    );
+    try {
+      // Send the GET request to the server.
+      final response = await http.get(
+        Uri.parse(requestUrl),
+        headers: {
+          'Authorization': 'Bearer $_accessToken', // Include the access token in the headers.
+          'Content-Type': 'application/json', // Specify the content type.
+        },
+      ).timeout(
+        _timeoutDuration, // Set a timeout for the request.
+        onTimeout: () {
+          print('Request timed out for getProfileImage');
+          throw TimeoutException('The connection has timed out, please try again later.');
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      throw Exception('Failed to fetch profile image');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      // Check the response status code.
+      if (response.statusCode == 200) {
+        // Parse the response body into an `ImageInfoDTO` object.
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        print('Successfully fetched profile image with ID: ${responseData['id']}');
+        return ImageInfoDTO.fromJson(responseData);
+      } else {
+        print('Failed to fetch profile image. Status code: ${response.statusCode}');
+        throw Exception('Failed to fetch profile image');
+      }
+    } catch (e) {
+      print('Error in getProfileImage: $e');
+      rethrow;
     }
   }
 }

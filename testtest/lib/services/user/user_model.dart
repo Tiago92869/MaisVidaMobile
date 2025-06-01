@@ -121,4 +121,25 @@ class CreateUser {
   }
 }
 
+class ImageInfoDTO {
+  final String id;
+  final String data;
+
+  ImageInfoDTO({required this.id, required this.data});
+
+  factory ImageInfoDTO.fromJson(Map<String, dynamic> json) {
+    return ImageInfoDTO(
+      id: json['id'] as String,
+      data: json['data'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'data': data,
+    };
+  }
+}
+
 DateTime? parseDate(String? date) => date != null ? DateTime.parse(date) : null;

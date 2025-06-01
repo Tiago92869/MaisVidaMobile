@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
-import 'package:rive/rive.dart' hide LinearGradient;
+import 'package:rive/rive.dart' as rive hide LinearGradient;
 import 'package:testtest/activities/activities_page.dart';
 import 'package:testtest/diary/diary_page.dart';
 import 'package:testtest/goals/goals_page.dart';
@@ -20,6 +22,8 @@ import 'package:testtest/menu/assets.dart' as app_assets;
 import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.dart
 import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import 'package:testtest/journey/journey_page.dart';
+import 'package:testtest/services/user/user_service.dart'; // Import UserService
+import 'package:testtest/services/user/user_model.dart'; // Import UserModel
 
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
@@ -74,12 +78,13 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
+  final UserService _userService = UserService(); // Initialize UserService
   late AnimationController? _animationController;
   late AnimationController? _onBoardingAnimController;
   late Animation<double> _onBoardingAnim;
   late Animation<double> _sidebarAnim;
 
-  late SMIBool _menuBtn;
+  late rive.SMIBool _menuBtn;
 
   bool _showOnBoarding = false;
   bool _isDarkMode = false; // Default value for dark mode
@@ -183,13 +188,13 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     await prefs.setBool('isDarkMode', isDarkMode);
   }
 
-  void _onMenuIconInit(Artboard artboard) {
-    final controller = StateMachineController.fromArtboard(
+  void _onMenuIconInit(rive.Artboard artboard) {
+    final controller = rive.StateMachineController.fromArtboard(
       artboard,
       "State Machine",
     );
     artboard.addController(controller!);
-    _menuBtn = controller.findInput<bool>("isOpen") as SMIBool;
+    _menuBtn = controller.findInput<bool>("isOpen") as rive.SMIBool;
     _menuBtn.value = true;
   }
 
@@ -256,6 +261,53 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
           ),
         );
       });
+    }
+  }
+
+  void _showImagePreviews(List<ImageInfoDTO> images) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: images.map((imageInfo) {
+                  final base64Image = imageInfo.data.split(',').last;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Image.memory(
+                      base64Decode(base64Image),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onTrophyIconPressed() async {
+    try {
+      final images = await _userService.getAllImagePreviewsBase64();
+      _showImagePreviews(images);
+    } catch (e) {
+      print('Error fetching image previews: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load images')),
+      );
     }
   }
 
@@ -436,20 +488,12 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     // Show the DayNightSwitch only when the user is on the MenuPage (index 0)
                     if (_currentTabIndex == 0)
                       Positioned(
-                        top: 55,
+                        top: 50,
                         right: 20,
-                        child: DayNightSwitch(
-                          value: _isDarkMode,
-                          onChanged: (value) {
-                            setState(() {
-                              _isDarkMode = value;
-                              _saveThemeMode(value); // Save the new theme mode
-                            });
-                          },
-                          sunColor: const Color(0xFFFDB813),
-                          moonColor: const Color(0xFFf5f3ce),
-                          dayColor: const Color(0xFF87CEEB),
-                          nightColor: const Color(0xFF003366),
+                        child: IconButton(
+                          iconSize: 36, // Make the icon slightly larger
+                          icon: const Icon(Icons.emoji_events, color: Colors.white),
+                          onPressed: _onTrophyIconPressed,
                         ),
                       ),
                   ],
@@ -487,11 +531,23 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      child: RiveAnimation.asset(
-                        app_assets.menuButtonRiv,
-                        stateMachines: const ["State Machine"],
-                        animations: const ["open", "close"],
-                        onInit: _onMenuIconInit,
+                      child: Stack(
+                        children: [
+                          rive.RiveAnimation.asset(
+                            app_assets.menuButtonRiv,
+                            stateMachines: const ["State Machine"],
+                            animations: const ["open", "close"],
+                            onInit: _onMenuIconInit,
+                          ),
+                          Positioned(
+                            top: 55,
+                            right: 20,
+                            child: IconButton(
+                              icon: const Icon(Icons.emoji_events, color: Colors.white),
+                              onPressed: _onTrophyIconPressed,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
