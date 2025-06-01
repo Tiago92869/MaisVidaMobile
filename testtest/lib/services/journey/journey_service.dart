@@ -68,26 +68,41 @@ class JourneyService {
   // Update user journey progress
   Future<UserJourneyProgress> editUserJourneyProgress(
       String userJourneyResourceProgressId,
-      UserJourneyResourceProgress progress) async {
+      UpdateUserJourneyResourceProgress progress) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl/progress/user/$userJourneyResourceProgressId';
 
-    print('Updating user journey progress at API: $url');
-    final response = await http.patch(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $_accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(progress.toJson()),
-    ).timeout(_timeoutDuration);
+    print('--- editUserJourneyProgress START ---');
+    print('API URL: $url');
+    print('Access Token: $_accessToken');
+    print('Request Payload: ${jsonEncode(progress.toJson())}');
 
-    if (response.statusCode == 200) {
-      print('API response: ${response.body}');
-      return UserJourneyProgress.fromJson(jsonDecode(response.body));
-    } else {
-      print('Failed to update user journey progress, status code: ${response.statusCode}');
-      throw Exception('Failed to update user journey progress');
+    try {
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $_accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(progress.toJson()),
+      ).timeout(_timeoutDuration);
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('Successfully updated user journey progress.');
+        return UserJourneyProgress.fromJson(jsonDecode(response.body));
+      } else {
+        print('Failed to update user journey progress. Status Code: ${response.statusCode}');
+        print('Error Response Body: ${response.body}');
+        throw Exception('Failed to update user journey progress');
+      }
+    } catch (e) {
+      print('Exception occurred in editUserJourneyProgress: $e');
+      rethrow;
+    } finally {
+      print('--- editUserJourneyProgress END ---');
     }
   }
 

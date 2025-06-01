@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // Import for Random
 import 'package:testtest/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
+import 'package:testtest/resources/resource_detail_page.dart';
+import 'package:testtest/services/resource/resource_service.dart';
+import 'package:testtest/services/journey/journey_service.dart';
 
 class JourneyFeelingPage extends StatefulWidget {
   final UserJourneyResourceProgress resourceProgress;
@@ -12,8 +15,30 @@ class JourneyFeelingPage extends StatefulWidget {
 }
 
 class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
+  final ResourceService _resourceService = ResourceService();
+  final JourneyService _journeyService = JourneyService();
+
   bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
   String? _selectedFeeling; // Track the selected feeling
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSelectedFeeling(); // Initialize the selected feeling
+  }
+
+  void _initializeSelectedFeeling() {
+    if (widget.resourceProgress.feeling != null) {
+      final String feeling = widget.resourceProgress.feeling!.toLowerCase();
+      if (feeling == 'good') {
+        _selectedFeeling = 'Good';
+      } else if (feeling == 'normal') {
+        _selectedFeeling = 'Normal';
+      } else if (feeling == 'bad') {
+        _selectedFeeling = 'Bad';
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,9 +145,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                               ),
                               const SizedBox(height: 40),
                               ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // Navigate back
-                                },
+                                onPressed: _handleContinue, // Call the new method
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: const Color(0xFF0D1B2A),
                                   backgroundColor: Colors.white,
@@ -192,5 +215,55 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _handleContinue() async {
+    if (_selectedFeeling == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a feeling before continuing.')),
+        );
+      }
+      return;
+    }
+
+    try {
+      // Fetch the resource by its ID
+      //final resource = await _resourceService.fetchResourceById(widget.resourceProgress.resourceId);
+      final resource = await _resourceService.fetchResourceById("dd2c5a72-f4aa-487b-a93d-6c2697c280d9");
+
+      // Navigate to the ResourceDetailPage
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResourceDetailPage(resource: resource),
+        ),
+      );
+
+      // After feedback submission, update the journey progress
+      final updateProgress = UpdateUserJourneyResourceProgress(
+        order: widget.resourceProgress.order,
+        feeling: _selectedFeeling?.toUpperCase(), // Pass the selected feeling
+        completed: true,
+        unlocked: true,
+      );
+
+      await _journeyService.editUserJourneyProgress(
+        widget.resourceProgress.id,
+        updateProgress,
+      );
+
+      // Close all pages until the JourneyDetailPage
+      if (mounted) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } catch (e) {
+      print('Error handling continue: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to proceed. Please try again.')),
+        );
+      }
+    }
   }
 }

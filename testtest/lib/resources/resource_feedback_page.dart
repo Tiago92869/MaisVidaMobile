@@ -3,6 +3,7 @@ import 'dart:math'; // Import for Random
 import 'package:testtest/services/feedback/feedback_model.dart' as feedback_model;
 import 'package:testtest/services/feedback/feedback_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:testtest/services/journey/journey_service.dart';
 
 class ResourceFeedbackPage extends StatefulWidget {
   final String resourceId;
@@ -22,6 +23,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
   String? _feedbackId;
   String? _userId;
   bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
+  final JourneyService _journeyService = JourneyService();
 
   @override
   void initState() {
@@ -79,9 +81,8 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
         await _feedbackService.updateFeedback(feedback);
       }
 
-      // Navigate back two pages
-      Navigator.pop(context); // Close ResourceFeedbackPage
-      Navigator.pop(context); // Close ResourceDetailPage
+      // Close all pages until the JourneyDetailPage
+      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to submit feedback.')),

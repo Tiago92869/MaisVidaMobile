@@ -162,6 +162,7 @@ class UserJourneyProgress {
 
 class UserJourneyResourceProgress {
   final String id;
+  final String? resourceId; // Add this field
   final int order;
   final bool completed;
   final bool unlocked;
@@ -169,6 +170,7 @@ class UserJourneyResourceProgress {
 
   UserJourneyResourceProgress({
     required this.id,
+    this.resourceId, // Initialize this field
     required this.order,
     required this.completed,
     required this.unlocked,
@@ -178,6 +180,7 @@ class UserJourneyResourceProgress {
   factory UserJourneyResourceProgress.fromJson(Map<String, dynamic> json) {
     return UserJourneyResourceProgress(
       id: json['id'] ?? '',
+      resourceId: json['resourceId'] ?? '', // Parse this field
       order: json['order'] ?? 0,
       completed: json['completed'] ?? false,
       unlocked: json['unlocked'] ?? false,
@@ -188,10 +191,34 @@ class UserJourneyResourceProgress {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'resourceId': resourceId, // Include this field
       'order': order,
       'completed': completed,
       'unlocked': unlocked,
       'feeling': feeling,
+    };
+  }
+}
+
+class UpdateUserJourneyResourceProgress {
+  final int order;
+  final String? feeling;
+  final bool completed;
+  final bool unlocked;
+
+  UpdateUserJourneyResourceProgress({
+    required this.order,
+    this.feeling,
+    required this.completed,
+    required this.unlocked,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'order': order,
+      'feeling': feeling,
+      'completed': true,
+      'unlocked': true,
     };
   }
 }
@@ -213,6 +240,7 @@ final mockJourney = UserJourneyProgress(
     28,
     (index) => UserJourneyResourceProgress(
       id: "resource-${index + 1}",
+      resourceId: "resource-${index + 1}", // Add this field
       order: index + 1,
       completed: true, // First 10 resources are completed
       unlocked: true, // First 20 resources are unlocked

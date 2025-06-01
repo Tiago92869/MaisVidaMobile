@@ -19,7 +19,7 @@ class JourneyRepository {
   // Update user journey progress
   Future<UserJourneyProgress> editUserJourneyProgress(
       String userJourneyResourceProgressId,
-      UserJourneyResourceProgress progress) {
+      UpdateUserJourneyResourceProgress progress) {
     print(
         'JourneyRepository: Updating progress for resource $userJourneyResourceProgressId');
     return _journeyService.editUserJourneyProgress(
