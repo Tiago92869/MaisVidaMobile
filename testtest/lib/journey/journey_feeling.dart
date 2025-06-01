@@ -13,6 +13,7 @@ class JourneyFeelingPage extends StatefulWidget {
 
 class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
+  String? _selectedFeeling; // Track the selected feeling
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +77,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align the back arrow to the left
                     children: [
                       // Go Back Icon
                       GestureDetector(
@@ -84,39 +85,61 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                         child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
                       ),
                       Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'How do you feel today?',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        child: Center( // Center the rest of the content
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center, // Vertically center elements
+                            children: [
+                              const Text(
+                                'How do you feel today?',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 40),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildFeelingOption(
-                                  emoji: '😊',
-                                  label: 'Good',
+                              const SizedBox(height: 40),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _buildFeelingOption(
+                                    emoji: '😊',
+                                    label: 'Good',
+                                  ),
+                                  const SizedBox(height: 20),
+                                  _buildFeelingOption(
+                                    emoji: '😐',
+                                    label: 'Normal',
+                                  ),
+                                  const SizedBox(height: 20),
+                                  _buildFeelingOption(
+                                    emoji: '😔',
+                                    label: 'Bad',
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 40),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Navigate back
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: const Color(0xFF0D1B2A),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                const SizedBox(height: 20),
-                                _buildFeelingOption(
-                                  emoji: '😐',
-                                  label: 'Normal',
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                const SizedBox(height: 20),
-                                _buildFeelingOption(
-                                  emoji: '😔',
-                                  label: 'Bad',
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -131,29 +154,43 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   }
 
   Widget _buildFeelingOption({required String emoji, required String label}) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(30), // Increase padding for larger icons
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.2),
+    final bool isSelected = _selectedFeeling == label;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedFeeling = label; // Update the selected feeling
+        });
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(30), // Increase padding for larger icons
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected
+                  ? Colors.white.withOpacity(0.8) // 30% transparent when selected
+                  : Colors.white.withOpacity(0.2),
+            ),
+            child: Text(
+              emoji,
+              style: TextStyle(
+                fontSize: 50, // Emoji size
+                color: isSelected ? Colors.black : Colors.white,
+              ),
+            ),
           ),
-          child: Text(
-            emoji,
-            style: const TextStyle(fontSize: 50), // Emoji size
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18, // Slightly larger font size
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.white : Colors.white.withOpacity(0.7),
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 18, // Slightly larger font size
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
