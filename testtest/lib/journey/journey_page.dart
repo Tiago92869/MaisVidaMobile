@@ -59,7 +59,41 @@ class _JourneyPageState extends State<JourneyPage> {
     }
   }
 
-  Future<void> _navigateToJourneyDetails(String journeyId) async {
+  Future<void> _startJourneyAndNavigate(String journeyId) async {
+    try {
+      print('Starting journey: $journeyId');
+      final journeyDetails = await _journeyService.startJourneyForUser(journeyId);
+
+      print('Started journey and fetched details: ${journeyDetails.currentStep}');
+
+      // Navigate to the JourneyDetailPage with the fetched details
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => JourneyDetailPage(journey: journeyDetails),
+        ),
+      );
+
+      // Refresh the journeys list when returning
+      print('Returned from JourneyDetailPage, refreshing journeys');
+      _fetchJourneys();
+    } catch (e) {
+      print('Error starting journey: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to start journey. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _navigateToJourneyDetails(String journeyId, {bool isStarting = false}) async {
+    if (isStarting) {
+      await _startJourneyAndNavigate(journeyId);
+      return;
+    }
+
     try {
       print('Fetching details for journey: $journeyId');
       final journeyDetails = await _journeyService.getJourneyDetails(journeyId);
@@ -182,7 +216,7 @@ class _JourneyPageState extends State<JourneyPage> {
               onPressed: () async {
                 print(
                     '${journey.started ? "Continuing" : "Starting"} journey: ${journey.title}');
-                await _navigateToJourneyDetails(journey.id);
+                await _navigateToJourneyDetails(journey.id, isStarting: !journey.started);
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: backgroundColor,

@@ -90,4 +90,27 @@ class JourneyService {
       throw Exception('Failed to update user journey progress');
     }
   }
+
+  // Start a journey for the current user
+  Future<UserJourneyProgress> startJourneyForUser(String journeyId) async {
+    await _loadStoredCredentials();
+    final String url = '$_baseUrl/start/$journeyId';
+
+    print('Starting journey for user at API: $url');
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $_accessToken',
+        'Content-Type': 'application/json',
+      },
+    ).timeout(_timeoutDuration);
+
+    if (response.statusCode == 200) {
+      print('API response: ${response.body}');
+      return UserJourneyProgress.fromJson(jsonDecode(response.body));
+    } else {
+      print('Failed to start journey, status code: ${response.statusCode}');
+      throw Exception('Failed to start journey');
+    }
+  }
 }

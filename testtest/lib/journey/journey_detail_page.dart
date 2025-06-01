@@ -149,7 +149,9 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => JourneyFeelingPage(), // Pass the resource if needed
+                                          builder: (context) => JourneyFeelingPage(
+                                            resourceProgress: resource, // Pass the resource progress
+                                          ),
                                         ),
                                       );
                                     }

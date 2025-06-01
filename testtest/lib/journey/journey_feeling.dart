@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // Import for Random
+import 'package:testtest/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
 
 class JourneyFeelingPage extends StatefulWidget {
-  const JourneyFeelingPage({Key? key}) : super(key: key);
+  final UserJourneyResourceProgress resourceProgress;
+
+  const JourneyFeelingPage({Key? key, required this.resourceProgress}) : super(key: key);
 
   @override
   _JourneyFeelingPageState createState() => _JourneyFeelingPageState();

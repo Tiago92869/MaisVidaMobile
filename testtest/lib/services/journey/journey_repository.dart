@@ -25,4 +25,10 @@ class JourneyRepository {
     return _journeyService.editUserJourneyProgress(
         userJourneyResourceProgressId, progress);
   }
+
+  // Start a journey for the current user
+  Future<UserJourneyProgress> startJourneyForUser(String journeyId) {
+    print('JourneyRepository: Starting journey for user with ID $journeyId');
+    return _journeyService.startJourneyForUser(journeyId);
+  }
 }
