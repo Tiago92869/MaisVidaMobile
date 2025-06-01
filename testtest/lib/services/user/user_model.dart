@@ -34,6 +34,7 @@ class User {
   final String aboutMe;
   final DateTime dateOfBirth;
   final String emergencyContact; // Added emergencyContact field
+  final String? profileImage; // New nullable profileImage field
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -46,6 +47,7 @@ class User {
     required this.aboutMe,
     required this.dateOfBirth,
     required this.emergencyContact, // Added emergencyContact to constructor
+    this.profileImage, // Add profileImage to the constructor
     this.createdAt,
     this.updatedAt,
   });
@@ -61,6 +63,7 @@ class User {
       dateOfBirth: DateTime.parse(json['dateOfBirth']),
       emergencyContact:
           json['emergencyContact'] ?? '', // Parse emergencyContact
+      profileImage: json['profileImage'], // Parse profileImage
       createdAt: parseDate(json['createdAt']),
       updatedAt: parseDate(json['updatedAt']),
     );
@@ -76,6 +79,7 @@ class User {
       'aboutMe': aboutMe,
       'dateOfBirth': dateOfBirth.toIso8601String(),
       'emergencyContact': emergencyContact, // Include emergencyContact in JSON
+      'profileImage': profileImage, // Include profileImage in JSON
     };
   }
 

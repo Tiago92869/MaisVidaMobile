@@ -5,6 +5,7 @@ import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+import 'package:testtest/menu/theme.dart'; // Ensure RiveAppTheme is imported
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -40,6 +41,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   String? profileImageBase64; // Variable to store the profile image as a base64 string
+  User? currentUser; // Store the current user object
 
   void toggleEditMode() {
     setState(() {
@@ -73,6 +75,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         lastSavedBirthday = birthdayController.text;
         lastSavedAboutMe = aboutMeController.text;
         lastSavedEmergencyContact = emergencyContactController.text;
+        currentUser = user; // Store the fetched user object
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -109,33 +112,77 @@ class _UserProfilePageState extends State<UserProfilePage> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Select an Image"),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: images.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final base64Image = images[index].data.split(',').last;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        profileImageBase64 = base64Image;
-                      });
-                      Navigator.of(context).pop();
-                    },
-                    child: Image.memory(
-                      base64Decode(base64Image),
-                      fit: BoxFit.cover,
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B263B), // Use the specified background color
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Select an Image",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Display two images side by side
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: images.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final base64Image = images[index].data.split(',').last;
+                          return GestureDetector(
+                            onTap: () async {
+                              setState(() {
+                                profileImageBase64 = base64Image;
+                              });
+
+                              // Update the user's profileImage with the selected image's ID
+                              if (currentUser != null) {
+                                currentUser = User(
+                                  id: currentUser!.id,
+                                  firstName: currentUser!.firstName,
+                                  secondName: currentUser!.secondName,
+                                  email: currentUser!.email,
+                                  city: currentUser!.city,
+                                  aboutMe: currentUser!.aboutMe,
+                                  dateOfBirth: currentUser!.dateOfBirth,
+                                  emergencyContact: currentUser!.emergencyContact,
+                                  profileImage: images[index].id, // Set the selected image ID
+                                );
+
+                                // Save the updated user data
+                                await userRepository.updateUser(currentUser!);
+                              }
+
+                              Navigator.of(context).pop();
+                            },
+                            child: Image.memory(
+                              base64Decode(base64Image),
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
