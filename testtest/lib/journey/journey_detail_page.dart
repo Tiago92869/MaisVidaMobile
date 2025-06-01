@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:testtest/services/journey/journey_model.dart';
 import 'dart:math';
 import 'package:testtest/journey/journey_feeling.dart'; // Import JourneyFeelingPage
+import 'package:testtest/services/image/image_service.dart';
+import 'dart:convert';
 
 class JourneyDetailPage extends StatefulWidget {
   final UserJourneyProgress journey;
@@ -14,6 +16,49 @@ class JourneyDetailPage extends StatefulWidget {
 
 class _JourneyDetailPageState extends State<JourneyDetailPage> {
   bool _showFirstStarfish = Random().nextBool();
+  final ImageService _imageService = ImageService();
+
+  Future<void> _showPrizeImage(String imageId) async {
+    try {
+      final base64Image = await _imageService.getImageBase64(imageId);
+      showDialog(
+        context: context,
+        barrierColor: const Color(0xFF0D1B2A).withOpacity(0.7), // Semi-transparent background
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.transparent, // Transparent background for the dialog
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Prize After Completion",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // White title color
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: Image.memory(
+                    base64Decode(base64Image),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print('Error fetching prize image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load prize image.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +93,24 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
           SafeArea(
             child: Column(
               children: [
+                // Top bar with prize icon
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                      ),
+                      if (widget.journey.journey.rewardImage != null)
+                        GestureDetector(
+                          onTap: () => _showPrizeImage(widget.journey.journey.rewardImage!),
+                          child: const Icon(Icons.emoji_events, color: Colors.white, size: 28), // Trophy icon
+                        ),
+                    ],
+                  ),
+                ),
                 // Scrollable content
                 Expanded(
                   child: SingleChildScrollView(
@@ -55,17 +118,6 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Back button
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
                         // Title
                         Text(
                           journeyDetails.title,
