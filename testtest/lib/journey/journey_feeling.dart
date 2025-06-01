@@ -4,6 +4,8 @@ import 'package:testtest/services/journey/journey_model.dart'; // Import for Use
 import 'package:testtest/resources/resource_detail_page.dart';
 import 'package:testtest/services/resource/resource_service.dart';
 import 'package:testtest/services/journey/journey_service.dart';
+import 'package:testtest/services/image/image_service.dart'; // Import for ImageService
+import 'dart:convert'; // Import for base64Decode
 
 class JourneyFeelingPage extends StatefulWidget {
   final UserJourneyResourceProgress resourceProgress;
@@ -17,14 +19,17 @@ class JourneyFeelingPage extends StatefulWidget {
 class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   final ResourceService _resourceService = ResourceService();
   final JourneyService _journeyService = JourneyService();
+  final ImageService _imageService = ImageService();
 
   bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
   String? _selectedFeeling; // Track the selected feeling
+  String? _rewardImageBase64; // Cache for the reward image
 
   @override
   void initState() {
     super.initState();
     _initializeSelectedFeeling(); // Initialize the selected feeling
+    _fetchRewardImage(); // Fetch the reward image
   }
 
   void _initializeSelectedFeeling() {
@@ -37,6 +42,58 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       } else if (feeling == 'bad') {
         _selectedFeeling = 'Bad';
       }
+    }
+  }
+
+  Future<void> _fetchRewardImage() async {
+    if (widget.resourceProgress.rewardId == null) {
+      try {
+        //final base64Image = await _imageService.getImageBase64(widget.resourceProgress.rewardId!);
+        final base64Image = await _imageService.getImageBase64("e9c1060a-69da-45aa-b399-6d474ffb0935");
+        setState(() {
+          _rewardImageBase64 = base64Image;
+        });
+      } catch (e) {
+        print('Error fetching reward image: $e');
+      }
+    }
+  }
+
+  void _showRewardPopup() {
+    if (_rewardImageBase64 != null) {
+      showDialog(
+        context: context,
+        barrierColor: const Color(0xFF0D1B2A).withOpacity(0.7), // Semi-transparent background
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.transparent, // Transparent background for the dialog
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Center(
+                  child: Text(
+                    "Prize After Completing This Day",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // White title color
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: Image.memory(
+                    base64Decode(_rewardImageBase64!),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
   }
 
@@ -116,7 +173,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start, // Align the back arrow to the left
                     children: [
-                      // Top Row with Back Icon and Info Icon
+                      // Top Row with Back Icon, Info Icon, and Trophy Icon
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -124,11 +181,21 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                             onTap: () => Navigator.pop(context),
                             child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
                           ),
-                          if (widget.resourceProgress.completed)
-                            GestureDetector(
-                              onTap: _showInfoMessage, // Show the info message when tapped
-                              child: const Icon(Icons.info, color: Colors.white, size: 28),
-                            ),
+                          Row(
+                            children: [
+                              if (_rewardImageBase64 != null && widget.resourceProgress.completed != true)
+                                GestureDetector(
+                                  onTap: _showRewardPopup, // Show the reward popup when tapped
+                                  child: const Icon(Icons.emoji_events, color: Colors.white, size: 28), // Trophy icon
+                                ),
+                              const SizedBox(width: 10),
+                              if (widget.resourceProgress.completed)
+                                GestureDetector(
+                                  onTap: _showInfoMessage, // Show the info message when tapped
+                                  child: const Icon(Icons.info, color: Colors.white, size: 28),
+                                ),
+                            ],
+                          ),
                         ],
                       ),
                       Expanded(
@@ -273,7 +340,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       //final resource = await _resourceService.fetchResourceById(widget.resourceProgress.resourceId!);
       final resource = await _resourceService.fetchResourceById("dd2c5a72-f4aa-487b-a93d-6c2697c280d9");
 
-      // Navigate to the ResourceDetailPage
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -281,10 +347,9 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         ),
       );
 
-      // After feedback submission, update the journey progress
       final updateProgress = UpdateUserJourneyResourceProgress(
         order: widget.resourceProgress.order,
-        feeling: _selectedFeeling?.toUpperCase(), // Pass the selected feeling
+        feeling: _selectedFeeling?.toUpperCase(),
         completed: true,
         unlocked: true,
       );
@@ -294,7 +359,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         updateProgress,
       );
 
-      // Close all pages until the JourneyDetailPage
       if (mounted) {
         Navigator.popUntil(context, (route) => route.isFirst);
       }

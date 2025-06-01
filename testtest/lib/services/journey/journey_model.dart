@@ -162,40 +162,44 @@ class UserJourneyProgress {
 
 class UserJourneyResourceProgress {
   final String id;
-  final String? resourceId; // Add this field
+  final String? resourceId; // Existing field
   final int order;
   final bool completed;
   final bool unlocked;
   final String? feeling;
+  final String? rewardId; // New field
 
   UserJourneyResourceProgress({
     required this.id,
-    this.resourceId, // Initialize this field
+    this.resourceId,
     required this.order,
     required this.completed,
     required this.unlocked,
     this.feeling,
+    this.rewardId, // Initialize the new field
   });
 
   factory UserJourneyResourceProgress.fromJson(Map<String, dynamic> json) {
     return UserJourneyResourceProgress(
       id: json['id'] ?? '',
-      resourceId: json['resourceId'] ?? '', // Parse this field
+      resourceId: json['resourceId'],
       order: json['order'] ?? 0,
       completed: json['completed'] ?? false,
       unlocked: json['unlocked'] ?? false,
       feeling: json['feeling'],
+      rewardId: json['rewardId'], // Parse the new field
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'resourceId': resourceId, // Include this field
+      'resourceId': resourceId,
       'order': order,
       'completed': completed,
       'unlocked': unlocked,
       'feeling': feeling,
+      'rewardId': rewardId, // Include the new field
     };
   }
 }
