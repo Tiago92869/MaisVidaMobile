@@ -48,8 +48,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   Future<void> _fetchRewardImage() async {
     if (widget.resourceProgress.rewardId == null) {
       try {
-        //final base64Image = await _imageService.getImageBase64(widget.resourceProgress.rewardId!);
-        final base64Image = await _imageService.getImageBase64("e9c1060a-69da-45aa-b399-6d474ffb0935");
+        final base64Image = await _imageService.getImageBase64(widget.resourceProgress.rewardId!);
         setState(() {
           _rewardImageBase64 = base64Image;
         });
@@ -237,13 +236,9 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                                 onPressed: () async {
                                   if (widget.resourceProgress.completed) {
                                     // Skip updating progress if already completed
-                                    /*
                                     final resource = await _resourceService.fetchResourceById(
                                       widget.resourceProgress.resourceId!,
                                     );
-                                    */
-                                    
-      final resource = await _resourceService.fetchResourceById("dd2c5a72-f4aa-487b-a93d-6c2697c280d9");
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -337,8 +332,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
 
     try {
       // Fetch the resource by its ID
-      //final resource = await _resourceService.fetchResourceById(widget.resourceProgress.resourceId!);
-      final resource = await _resourceService.fetchResourceById("dd2c5a72-f4aa-487b-a93d-6c2697c280d9");
+      final resource = await _resourceService.fetchResourceById(widget.resourceProgress.resourceId!);
 
       await Navigator.push(
         context,
