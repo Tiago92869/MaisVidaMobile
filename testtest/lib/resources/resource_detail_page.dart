@@ -861,48 +861,65 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         const SizedBox(height: 16),
         isLoading
             ? const CircularProgressIndicator()
-            : ElevatedButton(
-                onPressed: () async {
-                  if (audioUrl == null) {
-                    setState(() {
-                      _audioLoadingStates[content.id] = true;
-                    });
-                    try {
-                      final audioFile = await _audioRepository.downloadAudioFile(content.contentId!);
-                      if (audioFile != null) {
-                        _audioUrls[content.id] = audioFile.path;
-                        await audioPlayer.setSourceDeviceFile(audioFile.path);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to load audio.')),
-                        );
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Error loading audio.')),
-                      );
-                    } finally {
+            : audioUrl == null
+                ? ElevatedButton(
+                    onPressed: () async {
                       setState(() {
-                        _audioLoadingStates[content.id] = false;
+                        _audioLoadingStates[content.id] = true;
                       });
-                    }
-                  } else {
-                    if (audioPlayer.state == PlayerState.playing) {
-                      await audioPlayer.pause();
-                    } else {
-                      await audioPlayer.resume();
-                    }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text(
-                  audioPlayer.state == PlayerState.playing ? 'Pause' : 'Play',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
+                      try {
+                        final audioFile = await _audioRepository.downloadAudioFile(content.contentId!);
+                        if (audioFile != null) {
+                          _audioUrls[content.id] = audioFile.path;
+                          await audioPlayer.setSourceDeviceFile(audioFile.path);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Failed to load audio.')),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error loading audio.')),
+                        );
+                      } finally {
+                        setState(() {
+                          _audioLoadingStates[content.id] = false;
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text(
+                      'Load Audio',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          audioPlayer.state == PlayerState.playing ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          if (audioPlayer.state == PlayerState.playing) {
+                            await audioPlayer.pause();
+                          } else {
+                            await audioPlayer.resume();
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.stop, color: Colors.white),
+                        onPressed: () async {
+                          await audioPlayer.stop();
+                        },
+                      ),
+                    ],
+                  ),
         const SizedBox(height: 16),
         StreamBuilder<Duration>(
           stream: audioPlayer.onPositionChanged,
