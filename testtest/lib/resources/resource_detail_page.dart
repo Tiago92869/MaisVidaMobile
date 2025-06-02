@@ -32,6 +32,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final Map<String, String> _imageCache = {}; // Cache for all images
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
+  String? _selectedYesNo; // Track the selected option for YESNO content
 
   @override
   void initState() {
@@ -470,6 +471,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               const Center(child: CircularProgressIndicator()),
           ] else if (content.type.toLowerCase() == 'phrase' && content.contentValue != null) ...[
             _buildPhraseContent(content.contentValue!),
+          ] else if (content.type.toLowerCase() == 'yesno') ...[
+            _buildYesNoContent(content),
           ],
           const SizedBox(height: 30), // Space between contents
         ],
@@ -552,6 +555,106 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildYesNoContent(Content content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          content.contentValue ?? '',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedYesNo = _selectedYesNo == 'yes' ? null : 'yes'; // Allow deselect
+                });
+              },
+              child: Container(
+                width: 80, // Make it square
+                height: 80, // Make it square
+                decoration: BoxDecoration(
+                  color: _selectedYesNo == 'yes'
+                      ? Colors.green
+                      : Colors.transparent, // Same as background
+                  border: Border.all(
+                    color: Colors.white, // White border
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8), // Slightly rounded corners
+                ),
+                child: Center(
+                  child: const Text(
+                    'Sim', // Change label to "Sim"
+                    style: TextStyle(
+                      color: Colors.white, // White text
+                      fontWeight: FontWeight.bold, // Bold font
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedYesNo = _selectedYesNo == 'no' ? null : 'no'; // Allow deselect
+                });
+              },
+              child: Container(
+                width: 80, // Make it square
+                height: 80, // Make it square
+                decoration: BoxDecoration(
+                  color: _selectedYesNo == 'no'
+                      ? Colors.red
+                      : Colors.transparent, // Same as background
+                  border: Border.all(
+                    color: Colors.white, // White border
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8), // Slightly rounded corners
+                ),
+                child: Center(
+                  child: const Text(
+                    'Não', // Change label to "Não"
+                    style: TextStyle(
+                      color: Colors.white, // White text
+                      fontWeight: FontWeight.bold, // Bold font
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        AnimatedOpacity(
+          opacity: _selectedYesNo == null ? 0.0 : 1.0, // Make text invisible when deselected
+          duration: const Duration(milliseconds: 300),
+          child: Text(
+            _selectedYesNo == 'yes'
+                ? (content.answerYes ?? '')
+                : _selectedYesNo == 'no'
+                    ? (content.answerNo ?? '')
+                    : '',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
     );
   }
 }
