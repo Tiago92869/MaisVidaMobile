@@ -30,6 +30,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final Map<String, AudioPlayer> _audioPlayers = {}; // Map to store audio players for each content
   final Map<String, bool> _audioLoadingStates = {}; // Map to track loading states for each content
   final Map<String, String?> _audioUrls = {}; // Map to store audio URLs for each content
+  final Map<String, String?> _selectedOptionsByContent = {}; // Track selected options per content
 
   bool _isFavorite = false;
   bool _initialFavoriteStatus = false;
@@ -703,57 +704,62 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         ? textSizes.map((size) => size.height).reduce((a, b) => a > b ? a : b)
         : 0.0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          content.contentValue ?? '',
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.white,
+    return Center( // Center the entire content
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+        children: [
+          Text(
+            content.contentValue ?? '',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          alignment: WrapAlignment.center,
-          children: content.multipleValue?.map((option) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedOption = _selectedOption == option ? null : option; // Allow deselect
-                    });
-                  },
-                  child: Container(
-                    width: maxWidth + 40, // Add padding to the width
-                    height: maxHeight + 40, // Add padding to the height
-                    decoration: BoxDecoration(
-                      color: _selectedOption == option
-                          ? Colors.blue
-                          : Colors.transparent, // Highlight selected option
-                      border: Border.all(
-                        color: Colors.white, // White border
-                        width: 2,
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: content.multipleValue?.map((option) {
+                  final isSelected = _selectedOptionsByContent[content.id] == option;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedOptionsByContent[content.id] =
+                            isSelected ? null : option; // Allow deselect
+                      });
+                    },
+                    child: Container(
+                      width: maxWidth + 40, // Add padding to the width
+                      height: maxHeight + 40, // Add padding to the height
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.blue
+                            : Colors.transparent, // Highlight selected option
+                        border: Border.all(
+                          color: Colors.white, // White border
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8), // Rounded corners
                       ),
-                      borderRadius: BorderRadius.circular(8), // Rounded corners
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      option,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      alignment: Alignment.center,
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                );
-              }).toList() ??
-              [],
-        ),
-      ],
+                  );
+                }).toList() ??
+                [],
+          ),
+        ],
+      ),
     );
   }
 
