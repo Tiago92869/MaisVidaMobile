@@ -28,6 +28,9 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   @override
   void initState() {
     super.initState();
+    debugPrint('Full resourceProgress object: ${widget.resourceProgress}'); // Log the entire resourceProgress object
+    debugPrint('rewardId: ${widget.resourceProgress.rewardId}'); // Log rewardId specifically
+    debugPrint('completed: ${widget.resourceProgress.completed}'); // Log completed specifically
     _initializeSelectedFeeling(); // Initialize the selected feeling
     _fetchRewardImage(); // Fetch the reward image
   }
@@ -46,7 +49,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   }
 
   Future<void> _fetchRewardImage() async {
-    if (widget.resourceProgress.rewardId == null) {
+    if (widget.resourceProgress.rewardId != null) { // Fix the condition to check if rewardId is not null
       try {
         final base64Image = await _imageService.getImageBase64(widget.resourceProgress.rewardId!);
         setState(() {
@@ -100,7 +103,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
-          "This day has been completed. You can view it again, but changes will not be saved.",
+          "This day has been completed. But you can view it again.",
         ),
         duration: const Duration(seconds: 5), // Automatically close after 5 seconds
         backgroundColor: Colors.blueAccent,
@@ -182,17 +185,30 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                           ),
                           Row(
                             children: [
-                              if (_rewardImageBase64 != null && widget.resourceProgress.completed != true)
+                              if (widget.resourceProgress.rewardId != null && !widget.resourceProgress.completed) ...[
+                                // Log the values for debugging
+                                () {
+                                  print('Debug: rewardId = ${widget.resourceProgress.rewardId}');
+                                  print('Debug: completed = ${widget.resourceProgress.completed}');
+                                  return const SizedBox.shrink(); // Return an empty widget to avoid breaking the layout
+                                }(),
                                 GestureDetector(
                                   onTap: _showRewardPopup, // Show the reward popup when tapped
                                   child: const Icon(Icons.emoji_events, color: Colors.white, size: 28), // Trophy icon
                                 ),
+                              ],
                               const SizedBox(width: 10),
-                              if (widget.resourceProgress.completed)
+                              if (widget.resourceProgress.completed) ...[
+                                // Log the values for debugging
+                                () {
+                                  print('Debug: completed = ${widget.resourceProgress.completed}');
+                                  return const SizedBox.shrink(); // Return an empty widget to avoid breaking the layout
+                                }(),
                                 GestureDetector(
                                   onTap: _showInfoMessage, // Show the info message when tapped
                                   child: const Icon(Icons.info, color: Colors.white, size: 28),
                                 ),
+                              ],
                             ],
                           ),
                         ],
