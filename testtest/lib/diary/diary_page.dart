@@ -23,10 +23,6 @@ class _DiaryPageState extends State<DiaryPage> {
   Set<DiaryType> _selectedEmotions = {}; // Selected filter emotions
   bool _isFilterPanelVisible = false; // Filter panel visibility
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  DiaryType? _selectedEmotion;
-
   List<Diary> _diaryEntries =
       []; // Initialize _diaryEntries as an empty list of Diary
 
@@ -121,7 +117,7 @@ class _DiaryPageState extends State<DiaryPage> {
       // Show error message using SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch diaries. Please try again."),
+          content: Text("Falha ao procurar os diários. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -183,7 +179,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final entriesForSelectedDate = _getEntriesForSelectedDate();
+    _getEntriesForSelectedDate();
 
     return Scaffold(
       body: Stack(
@@ -209,7 +205,7 @@ class _DiaryPageState extends State<DiaryPage> {
                   // Title
                   const Center(
                     child: Text(
-                      "Diary",
+                      "Diário",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -272,7 +268,7 @@ class _DiaryPageState extends State<DiaryPage> {
                             _hasError
                                 ? const Center(
                                   child: Text(
-                                    "Failed to load entries. Please try again.",
+                                    "Falha ao carregar os diários. Tente novamente.",
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.white70,
@@ -282,7 +278,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                 : _diaryEntries.isEmpty
                                 ? const Center(
                                   child: Text(
-                                    "No entries for this day.",
+                                    "Não há diários para este dia.",
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.white70,
@@ -452,7 +448,7 @@ class _DiaryPageState extends State<DiaryPage> {
                         ),
                         const SizedBox(width: 30),
                         const Text(
-                          "Filter by Emotion",
+                          "Filtrar por emoção",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -613,7 +609,5 @@ IconData _getEmotionIcon(DiaryType emotion) {
       return Icons.mood_bad;
     case DiaryType.Sick:
       return Icons.sick;
-    default:
-      return Icons.sentiment_neutral;
   }
 }

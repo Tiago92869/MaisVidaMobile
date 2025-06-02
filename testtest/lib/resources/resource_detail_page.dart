@@ -33,17 +33,13 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final Map<String, String?> _selectedOptionsByContent = {}; // Track selected options per content
 
   bool _isFavorite = false;
-  bool _initialFavoriteStatus = false;
-  bool _showFirstStarfish = Random().nextBool();
 
   final Map<String, String> _imageCache = {}; // Cache for all images
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   String? _selectedYesNo; // Track the selected option for YESNO content
-  String? _selectedOption; // Track the selected option for SELECTONE content
+// Track the selected option for SELECTONE content
   Set<String> _selectedOptions = {}; // Track the selected options for SELECTMULTI content
-  bool _isAudioLoading = false;
-  String? _currentAudioUrl;
 
   @override
   void initState() {
@@ -60,7 +56,6 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       );
       setState(() {
         _isFavorite = isFavorite;
-        _initialFavoriteStatus = isFavorite;
       });
     } catch (e) {
       print('Error checking favorite status: $e');
@@ -155,13 +150,13 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
       print(
         _isFavorite
-            ? 'Resource added to favorites.'
-            : 'Resource removed from favorites.',
+            ? 'Recurso adicionado aos favoritos.'
+            : 'Recurso removido dos favoritos.',
       );
     } catch (e) {
       print('Error updating favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update favorite status.')),
+        const SnackBar(content: Text('Falha ao atualizar o estado favorito.')),
       );
 
       // Revert the favorite status if the request fails
@@ -242,8 +237,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildDateInfo("Created At", widget.resource.createdAt),
-                              _buildDateInfo("Updated At", widget.resource.updatedAt),
+                              _buildDateInfo("Criado em", widget.resource.createdAt),
+                              _buildDateInfo("Atualizado em", widget.resource.updatedAt),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -267,7 +262,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                                 ),
                               ),
                               child: const Text(
-                                'Continue',
+                                'Continuar',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -937,12 +932,12 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                           await audioPlayer.setSourceDeviceFile(audioFile.path);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Failed to load audio.')),
+                            const SnackBar(content: Text('Falha ao carregar o áudio.')),
                           );
                         }
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Error loading audio.')),
+                          const SnackBar(content: Text('Erro ao carregar o áudio.')),
                         );
                       } finally {
                         setState(() {
@@ -955,7 +950,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                       foregroundColor: Colors.white,
                     ),
                     child: const Text(
-                      'Load Audio',
+                      'Carregar áudio',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   )

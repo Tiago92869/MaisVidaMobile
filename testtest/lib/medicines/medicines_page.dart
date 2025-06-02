@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:testtest/services/medicine/medicine_repository.dart';
 import 'package:testtest/services/medicine/medicine_model.dart';
 
@@ -85,7 +84,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
       print('Error fetching medicines: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch medicines. Please try again."),
+          content: Text("Falha ao procurar medicamentos. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -122,7 +121,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
       print('Error fetching medicines for the day: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch medicines for the selected day."),
+          content: Text("Falha ao procurar medicamentos para o dia selecionado."),
           backgroundColor: Colors.red,
         ),
       );
@@ -161,7 +160,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
       print('Error fetching more medicines: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch more medicines. Please try again."),
+          content: Text("Falha ao procurar mais medicamentos. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -199,12 +198,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
 
   List<DateTime> _getWeekDays(DateTime start) {
     return List.generate(7, (index) => start.add(Duration(days: index)));
-  }
-
-  void _toggleFilterPanel() {
-    setState(() {
-      _isFilterPanelVisible = !_isFilterPanelVisible;
-    });
   }
 
   void _closeFilterPanel() {
@@ -254,7 +247,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
       child: Column(
         children: [
           Text(
-            ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][day.weekday - 1],
+            ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"][day.weekday - 1],
             style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           const SizedBox(height: 4),
@@ -280,17 +273,17 @@ class _MedicinesPageState extends State<MedicinesPage> {
           Text(
             [
               "Jan",
-              "Feb",
+              "Fev",
               "Mar",
-              "Apr",
-              "May",
+              "Abr",
+              "Mai",
               "Jun",
               "Jul",
-              "Aug",
-              "Sep",
-              "Oct",
+              "Ago",
+              "Set",
+              "Out",
               "Nov",
-              "Dec",
+              "Des",
             ][day.month - 1],
             style: const TextStyle(fontSize: 12, color: Colors.white),
           ),
@@ -315,7 +308,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             mainAxisSize: MainAxisSize.min,
             children: const [
               Text(
-                "No Medicines Found",
+                "Nenhum medicamento encontrado",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -418,7 +411,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                   TextSpan(
                     children: [
                       const TextSpan(
-                        text: "Starts: ",
+                        text: "Começa: ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -438,7 +431,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                   TextSpan(
                     children: [
                       const TextSpan(
-                        text: "Ends: ",
+                        text: "Termina: ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -496,7 +489,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                       // Title
                       Center(
                         child: Text(
-                          _showArchived ? "Archived Medicines" : "Medicines",
+                          _showArchived ? "Medicamentos arquivados" : "Medicamentos",
                           style: TextStyle(
                             fontSize:
                                 _showArchived

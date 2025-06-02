@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
-import 'package:testtest/profile/user_profile.dart';
 import 'package:testtest/login/login_page.dart';
 
 class ChangePasswordPage extends StatefulWidget {
@@ -32,7 +31,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("All fields must be filled."),
+          content: Text("Todos os campos devem ser preenchidos."),
           backgroundColor: Colors.red,
         ),
       );
@@ -42,7 +41,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     if (newPasswordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("New password and confirm password do not match."),
+          content: Text("A nova palavra-passe e a confirmação da palavra-passe não correspondem."),
           backgroundColor: Colors.red,
         ),
       );
@@ -66,14 +65,14 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Password updated successfully! Please log in again."),
+          content: Text("Palavra-passe atualizada com sucesso! Faça login novamente."),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Failed to update password: $e"),
+          content: Text("Falha ao atualizar a palavra-passe: $e"),
           backgroundColor: Colors.red,
         ),
       );
@@ -158,7 +157,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   // Title
                   const Center(
                     child: Text(
-                      "Update Password",
+                      "Atualizar palavra-passe",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -171,20 +170,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
                   // Current Password Field
                   _buildPasswordField(
-                    "Current Password",
+                    "Palavra-passe atual",
                     currentPasswordController,
                   ),
 
                   const SizedBox(height: 30),
 
                   // New Password Field
-                  _buildPasswordField("New Password", newPasswordController),
+                  _buildPasswordField("Nova palavra-passe", newPasswordController),
 
                   const SizedBox(height: 30),
 
                   // Confirm Password Field
                   _buildPasswordField(
-                    "Confirm Password",
+                    "Confirmar palavra-passe",
                     confirmPasswordController,
                   ),
 
@@ -205,7 +204,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         ),
                       ),
                       child: const Text(
-                        "Update Password",
+                        "Atualizar palavra-passe",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -263,7 +262,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       obscureText: _isObscured,
                       style: TextStyle(fontSize: 16, color: Colors.grey[800]),
                       decoration: InputDecoration.collapsed(
-                        hintText: 'Enter $label',
+                        hintText: 'Introduza $label',
                       ),
                     ),
                   ),

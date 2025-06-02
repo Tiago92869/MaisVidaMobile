@@ -74,7 +74,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
               children: [
                 const Center(
                   child: Text(
-                    "Prize After Completing This Day",
+                    "Prémio após completar este dia",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -103,7 +103,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
-          "This day has been completed. But you can view it again.",
+          "Este dia já foi concluído. Mas pode visualizá-lo novamente.",
         ),
         duration: const Duration(seconds: 5), // Automatically close after 5 seconds
         backgroundColor: Colors.blueAccent,
@@ -219,7 +219,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                             mainAxisAlignment: MainAxisAlignment.center, // Vertically center elements
                             children: [
                               const Text(
-                                'How do you feel today?',
+                                'Como te sentes hoje?',
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                                 children: [
                                   _buildFeelingOption(
                                     emoji: '😊',
-                                    label: 'Good',
+                                    label: 'Bem',
                                   ),
                                   const SizedBox(height: 20),
                                   _buildFeelingOption(
@@ -243,7 +243,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                                   const SizedBox(height: 20),
                                   _buildFeelingOption(
                                     emoji: '😔',
-                                    label: 'Bad',
+                                    label: 'Mal',
                                   ),
                                 ],
                               ),
@@ -273,7 +273,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                                   ),
                                 ),
                                 child: const Text(
-                                  'Continue',
+                                  'Continuar',
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -340,7 +340,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     if (_selectedFeeling == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a feeling before continuing.')),
+          const SnackBar(content: Text('Selecione um sentimento antes de continuar.')),
         );
       }
       return;
@@ -376,7 +376,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       print('Error handling continue: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to proceed. Please try again.')),
+          const SnackBar(content: Text('Falha ao prosseguir. Tente novamente.')),
         );
       }
     }

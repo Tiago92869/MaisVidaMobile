@@ -41,7 +41,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
       print('Error checking favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to check favorite status. Please try again."),
+          content: Text("Falha ao verificar o estado dos favoritos. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -65,7 +65,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     } catch (e) {
       print('Error updating favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update favorite status.')),
+        const SnackBar(content: Text('Falha ao atualizar o estado favorito.')),
       );
     }
   }
@@ -73,19 +73,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Future<void> _updateFavoriteStatus() async {
-    try {
-      final favoriteInput = FavoriteInput(
-        activities: [widget.activity.id],
-        resources: [],
-      );
-
-      await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
-    } catch (e) {
-      print('Error updating favorite status on dispose: $e');
-    }
   }
 
   void _startActivity() async {
@@ -267,9 +254,9 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildDateInfo("Created At", activity.createdAt),
+                        _buildDateInfo("Criado em", activity.createdAt),
                         _buildDateInfo(
-                          "Resources",
+                          "Recursos",
                           activity.resources?.length.toString() ?? "0",
                         ),
                       ],
@@ -288,7 +275,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                           ),
                         ),
                         child: const Text(
-                          "Start",
+                          "Iniciar",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -336,7 +323,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     return resource == null
         ? const Center(
           child: Text(
-            "No resources available",
+            "Nenhum recurso disponível",
             style: TextStyle(color: Colors.white),
           ),
         )
@@ -397,8 +384,8 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         ),
         child: Text(
           _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
-              ? "Next"
-              : "Finish",
+              ? "Próximo"
+              : "Terminar",
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),

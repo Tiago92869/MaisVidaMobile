@@ -85,7 +85,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
       print('Error fetching resources: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch resources. Please try again."),
+          content: Text("Falha ao procurar recursos. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -148,33 +148,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
       setState(() {
         _isFilterPanelVisible = false;
       });
-    }
-  }
-
-  // Function to toggle the star glow
-  void _toggleStarGlow() {
-    setState(() {
-      _isStarGlowing = !_isStarGlowing;
-    });
-  }
-
-  // Function to handle the toggle of the favorite icon
-  void _toggleFavoriteFilter() {
-    setState(() {
-      _isFavoriteFilterEnabled = !_isFavoriteFilterEnabled;
-    });
-
-    if (_isFavoriteFilterEnabled) {
-      // Fetch favorite resources when the favorite filter is enabled
-      _fetchFavoriteResources();
-    } else {
-      // Reset the resources list using the existing fetch logic
-      setState(() {
-        _resources.clear();
-        _currentPage = 0;
-        _isLastPage = false;
-      });
-      _fetchResources();
     }
   }
 
@@ -248,7 +221,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   const SizedBox(height: 60),
                   const Center(
                     child: Text(
-                      "Resources",
+                      "Recursos",
                       style: TextStyle(
                         fontSize: 28,
                         fontFamily: "Poppins",
@@ -263,7 +236,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                     child: TextField(
                       onChanged: _onSearch,
                       decoration: InputDecoration(
-                        labelText: "Search Resources",
+                        labelText: "Procurar recursos",
                         labelStyle: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -487,7 +460,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   ),
                   const SizedBox(width: 30),
                   const Text(
-                    "Filter by Type",
+                    "Filtra por tipo",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

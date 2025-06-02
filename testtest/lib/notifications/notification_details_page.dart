@@ -120,8 +120,8 @@ class _NotificationDetailsPageState extends State<NotificationDetailsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildDateInfo("Created At", widget.notification.createdAt),
-                        _buildDateInfo("Last Updated At", widget.notification.updatedAt),
+                        _buildDateInfo("Criado em", widget.notification.createdAt),
+                        _buildDateInfo("Última atualização em", widget.notification.updatedAt),
                       ],
                     ),
                   ],

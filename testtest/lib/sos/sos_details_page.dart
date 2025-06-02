@@ -66,7 +66,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = "Failed to fetch SOS resources.";
+        _errorMessage = "Falha ao procurar recursos do SOS.";
       });
     } finally {
       setState(() {
@@ -99,7 +99,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Error",
+                    "Erro",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "Emergency Contact not set.",
+                    "Contacto de emergência não definido.",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16, color: Colors.white70),
                   ),
@@ -155,7 +155,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
       if (!result.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Phone call permission is required."),
+            content: Text("É necessária permissão para chamada telefónica."),
             backgroundColor: Colors.red,
           ),
         );
@@ -168,7 +168,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Unable to launch phone dialer."),
+          content: Text("Não é possível redirecionar para as chamadas"),
           backgroundColor: Colors.red,
         ),
       );
@@ -208,7 +208,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                 children: [
                   const SizedBox(height: 20),
                   const Text(
-                    "SOS Details",
+                    "Detalhes SOS",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -220,9 +220,9 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
-                        onTap: () => _makePhoneCall("+351910774893"),
+                        onTap: () => _makePhoneCall("+351808242424"),
                         child: _buildEmergencyBox(
-                          "Medical Emergency",
+                          "Emergência médica",
                           Colors.redAccent,
                         ),
                       ),
@@ -233,7 +233,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                           _makePhoneCall(emergencyContact);
                         },
                         child: _buildEmergencyBox(
-                          "Emergency Contact",
+                          "Contacto de emergência",
                           Colors.orangeAccent,
                         ),
                       ),
@@ -243,7 +243,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Emergency Resources",
+                      "Recursos de emergência",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -320,7 +320,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
                                             const SizedBox(width: 15),
                                             Expanded(
                                               child: Text(
-                                                resource.title ?? "Untitled",
+                                                resource.title ?? "Sem título",
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(

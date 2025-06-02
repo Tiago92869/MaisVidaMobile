@@ -64,7 +64,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         _activities = activities.content;
       });
     } catch (e) {
-      _showErrorSnackBar("Failed to fetch activities.");
+      _showErrorSnackBar("Falha ao procurar atividades.");
     } finally {
       setState(() {
         _isLoadingActivities = false;
@@ -114,7 +114,7 @@ class _HomeTabViewState extends State<HomeTabView> {
       });
     } catch (e) {
       print('Error fetching medications: $e');
-      _showErrorSnackBar("Failed to fetch medications.");
+      _showErrorSnackBar("Falha ao procurar medicamentos.");
     } finally {
       setState(() {
         _isLoadingMedications = false; // Stop loading
@@ -136,7 +136,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         _goals = pagezGoals.goals; // Extract goals from the PagezGoalsDTO
       });
     } catch (e) {
-      _showErrorSnackBar("Failed to fetch goals.");
+      _showErrorSnackBar("Falha ao procurar metas.");
     } finally {
       setState(() {
         _isLoadingGoals = false;
@@ -155,7 +155,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         _diaries = diaries[0].diaries.take(3).toList();
       });
     } catch (e) {
-      _showErrorSnackBar("Failed to fetch diaries.");
+      _showErrorSnackBar("Falha ao procurar diários.");
     } finally {
       setState(() {
         _isLoadingDiaries = false;
@@ -197,7 +197,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   widget.onTabChange(tabIndex); // Pass the tab index
                 },
                 child: const Text(
-                  "See More",
+                  "Ver mais",
                   style: TextStyle(color: Colors.blue, fontSize: 16),
                 ),
               ),
@@ -214,9 +214,9 @@ class _HomeTabViewState extends State<HomeTabView> {
                 children: [
                   const SizedBox(height: 40), // Add spacing at the top
                   Text(
-                    title == "Resources"
-                        ? "No Resources Created"
-                        : "No Data Available",
+                    title == "Recursos"
+                        ? "Nenhum recurso criado"
+                        : "Nenhum dado disponível",
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 18, // Increased text size
@@ -237,7 +237,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                         ),
                       ),
                       child: Text(
-                        "Add New $title",
+                        "Adicionar $title",
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18, // Increased button text size
@@ -287,7 +287,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   widget.onTabChange(tabIndex); // Pass the tab index
                 },
                 child: const Text(
-                  "See More",
+                  "Ver mais",
                   style: TextStyle(color: Colors.blue, fontSize: 16),
                 ),
               ),
@@ -302,7 +302,7 @@ class _HomeTabViewState extends State<HomeTabView> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 50),
                 child: Text(
-                  "No Activities Available",
+                  "Nenhuma atividade disponível",
                   style: const TextStyle(color: Colors.grey, fontSize: 18),
                 ),
               ),
@@ -469,13 +469,13 @@ class _HomeTabViewState extends State<HomeTabView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildActivitiesSection(
-                  "Activities",
+                  "Atividades",
                   _activities,
                   _isLoadingActivities,
                   5, // Tab index for "Activities"
                 ),
                 _buildSection(
-                  "Resources",
+                  "Recursos",
                   _resources,
                   _isLoadingResources,
                   (resource) {
@@ -499,7 +499,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   4, // Tab index for "Resources"
                 ),
                 _buildSection(
-                  "Medication",
+                  "Medicamentos",
                   _medications,
                   _isLoadingMedications,
                   (medicine) {
@@ -551,14 +551,14 @@ class _HomeTabViewState extends State<HomeTabView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Starts: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
+                                  "Começa: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.white70, // Subtle white text
                                   ),
                                 ),
                                 Text(
-                                  "Ends: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
+                                  "Termina: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.white70, // Subtle white text
@@ -574,7 +574,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   3, // Tab index for "Medication"
                 ),
                 _buildSection(
-                  "Goals",
+                  "Metas",
                   _goals,
                   _isLoadingGoals,
                   (goal) {
@@ -649,8 +649,8 @@ class _HomeTabViewState extends State<HomeTabView> {
                                   children: [
                                     Text(
                                       goal.completed
-                                          ? "Completed"
-                                          : "Not Completed",
+                                          ? "Completadas"
+                                          : "Por Completar",
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -676,7 +676,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   2, // Tab index for "Goals"
                 ),
                 _buildSection(
-                  "Diary",
+                  "Diário",
                   _diaries,
                   _isLoadingDiaries,
                   (diary) {
@@ -731,7 +731,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    "Created: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
+                                    "Criado: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color:
@@ -873,7 +873,5 @@ IconData _getEmotionIcon(DiaryType emotion) {
       return Icons.mood_bad;
     case DiaryType.Sick:
       return Icons.sick;
-    default:
-      return Icons.sentiment_neutral;
   }
 }

@@ -68,7 +68,7 @@ class _GoalsPageState extends State<GoalsPage> {
         _totalPages = pagezGoals.totalPages;
       });
     } catch (e) {
-      _showErrorSnackbar("Failed to fetch goals. Please try again.");
+      _showErrorSnackbar("Falha ao procurar metas. Tente novamente.");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -95,7 +95,7 @@ class _GoalsPageState extends State<GoalsPage> {
         _totalPages = pagezGoals.totalPages;
       });
     } catch (e) {
-      _showErrorSnackbar("Failed to fetch goals. Please try again.");
+      _showErrorSnackbar("Falha ao procurar metas. Tente novamente.");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -120,7 +120,7 @@ class _GoalsPageState extends State<GoalsPage> {
         _totalPages = pagezGoals.totalPages;
       });
     } catch (e) {
-      _showErrorSnackbar("Failed to fetch more goals. Please try again.");
+      _showErrorSnackbar("Falha ao procurar metas. Tente novamente.");
     } finally {
       setState(() => _isFetchingMore = false);
     }
@@ -217,7 +217,7 @@ class _GoalsPageState extends State<GoalsPage> {
   Widget _buildTitle() {
     return const Center(
       child: Text(
-        "Goals",
+        "Metas",
         style: TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.bold,
@@ -275,7 +275,7 @@ class _GoalsPageState extends State<GoalsPage> {
       child: Column(
         children: [
           Text(
-            ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][day.weekday - 1],
+            ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"][day.weekday - 1],
             style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           const SizedBox(height: 4),
@@ -303,15 +303,15 @@ class _GoalsPageState extends State<GoalsPage> {
               "Jan",
               "Feb",
               "Mar",
-              "Apr",
-              "May",
+              "Abr",
+              "Mai",
               "Jun",
               "Jul",
               "Aug",
-              "Sep",
-              "Oct",
+              "Set",
+              "Out",
               "Nov",
-              "Dec",
+              "Dez",
             ][day.month - 1],
             style: const TextStyle(fontSize: 12, color: Colors.white),
           ),
@@ -336,7 +336,7 @@ class _GoalsPageState extends State<GoalsPage> {
             mainAxisSize: MainAxisSize.min,
             children: const [
               Text(
-                "No Goals Found",
+                "Nenhuma meta encontrada",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -481,7 +481,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 Row(
                   children: [
                     Text(
-                      goal.completed ? "Completed" : "Not Completed",
+                      goal.completed ? "Completadas" : "Por Completar",
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -599,7 +599,7 @@ class _GoalsPageState extends State<GoalsPage> {
                   ),
                   const SizedBox(width: 30),
                   const Text(
-                    "Filter by Subject",
+                    "Filtrar por tema",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -681,40 +681,41 @@ class _GoalsPageState extends State<GoalsPage> {
                       const SizedBox(height: 20),
 
                       // Completed Filter Switch
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Show Completed",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Switch(
-                            value: _isCompleted,
-                            onChanged: (value) {
-                              setState(() {
-                                _isCompleted = value;
-                              });
-                              if (_selectedDay != null) {
-                                _fetchGoalsForDay(
-                                  _selectedDay!,
-                                ); // Fetch goals for the selected day
-                              } else {
-                                _fetchGoalsForWeek(); // Fetch goals for the entire week
-                              }
-                            },
-                            activeColor: const Color.fromARGB(
-                              255,
-                              255,
-                              255,
-                              255,
-                            ),
-                          ),
-                        ],
-                      ),
+                      Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    const Text(
+      "Mostrar completadas",
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    ),
+    const SizedBox(height: 10), // Add spacing between the text and the switch
+    Switch(
+      value: _isCompleted,
+      onChanged: (value) {
+        setState(() {
+          _isCompleted = value;
+        });
+        if (_selectedDay != null) {
+          _fetchGoalsForDay(
+            _selectedDay!,
+          ); // Fetch goals for the selected day
+        } else {
+          _fetchGoalsForWeek(); // Fetch goals for the entire week
+        }
+      },
+      activeColor: const Color.fromARGB(
+        255,
+        255,
+        255,
+        255,
+      ),
+    ),
+  ],
+),
                     ],
                   ),
                 ),

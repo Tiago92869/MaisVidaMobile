@@ -101,7 +101,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       // Validation: Check if start date is earlier than or equal to end date
       if (startDate!.isAfter(endDate!)) {
         _showErrorSnackBar(
-          "End Date can only be equal or bigger then Start Date",
+          "A data final só pode ser igual ou superior à data inicial",
         );
         return;
       }
@@ -140,7 +140,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       }
     } catch (e) {
       print("Error saving medicine: $e");
-      _showErrorSnackBar("Failed to save medicine. Please try again.");
+      _showErrorSnackBar("Falha ao guardar o medicamento. Tente novamente.");
     } finally {
       setState(() {
         isSaving = false; // Hide loading indicator
@@ -165,7 +165,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
       print('Error deleting medicine: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to delete medicine. Please try again."),
+          content: Text("Falha ao eliminar o medicamento. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -186,28 +186,28 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               title: const Text(
-                "Delete Medicine",
+                "Eliminar medicamento",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               content: const Text(
-                "Are you sure you want to delete this medicine? This action cannot be undone.",
+                "Tem a certeza que pretende eliminar este medicamento? Esta ação não pode ser anulada.",
                 style: TextStyle(color: Colors.white70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: const Text(
-                    "Cancel",
+                    "Cancelar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: const Text(
-                    "Delete",
+                    "Eliminar",
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -228,11 +228,11 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text(
-            "Missing Fields",
+            "Campos ausentes",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            "Please fill in all the fields (Name, Description, Start Date, and End Date) before saving.",
+            "Preencha todos os campos (Nome, Descrição, Data de início e Data de fim) antes de guardar.",
             style: TextStyle(color: Colors.white70),
           ),
           actions: [
@@ -267,7 +267,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              "Week Plan",
+              "Plano semanal",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -311,8 +311,8 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       ),
                       Text(
                         plan.dosages.isEmpty
-                            ? "No dosages"
-                            : "${plan.dosages.length} dosage${plan.dosages.length > 1 ? 's' : ''}",
+                            ? "Zero dosagens"
+                            : "${plan.dosages.length} dosage${plan.dosages.length > 1 ? 'ns' : 'm'}",
                         style: const TextStyle(
                           fontSize: 15,
                           color: Color.fromARGB(220, 255, 255, 255),
@@ -348,7 +348,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                                   children: [
                                     // Display time and dosage text
                                     Text(
-                                      "${dosage.time} | ${dosage.dosage.toStringAsFixed(2)} pills",
+                                      "${dosage.time} | ${dosage.dosage.toStringAsFixed(2)} quant",
                                       style: const TextStyle(
                                         fontSize: 15,
                                         color: Color.fromARGB(
@@ -522,7 +522,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         color: Colors.white,
                       ),
                       decoration: const InputDecoration(
-                        hintText: "Enter Medicine Name",
+                        hintText: "Introduza o nome do medicamento",
                         hintStyle: TextStyle(color: Colors.white70),
                         border: InputBorder.none,
                       ),
@@ -536,7 +536,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       maxLines: null,
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                       decoration: const InputDecoration(
-                        hintText: "Enter Medicine Description",
+                        hintText: "Introduza a descrição do medicamento",
                         hintStyle: TextStyle(color: Colors.white70),
                         border: InputBorder.none,
                       ),
@@ -545,7 +545,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
                     // Start Date
                     const Text(
-                      "Start Date",
+                      "Data de inicio",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -568,7 +568,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         child: Text(
                           startDate != null
                               ? "${startDate!.day.toString().padLeft(2, '0')}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.year}"
-                              : "Select a start date",
+                              : "Seleciona uma data de inicio",
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -580,7 +580,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
                     // End Date
                     const Text(
-                      "End Date",
+                      "Data de fim",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -603,7 +603,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         child: Text(
                           endDate != null
                               ? "${endDate!.day.toString().padLeft(2, '0')}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.year}"
-                              : "Select an end date",
+                              : "Seleciona uma data de fim",
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -622,7 +622,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Notifications",
+                          "Notificações",
                           style: TextStyle(
                             fontSize: 16, // Match font size with "Start Date"
                             fontWeight: FontWeight.bold, // Keep bold style
@@ -650,7 +650,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            "Archived",
+                            "Arquivado",
                             style: TextStyle(
                               fontSize: 16, // Match font size with "Start Date"
                               fontWeight: FontWeight.bold, // Keep bold style
@@ -741,7 +741,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               title: const Text(
-                "Add Dosage",
+                "Adicionar Dosagem",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -754,7 +754,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "WeekDay:",
+                      "Dia da Semana:",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -813,7 +813,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   Row(
                     children: [
                       const Text(
-                        "Time:",
+                        "Horário:",
                         style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(width: 10),
@@ -842,7 +842,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             child: Text(
                               selectedTime != null
                                   ? selectedTime!.format(context)
-                                  : "Select Time",
+                                  : "Selecionar Horário",
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),
@@ -856,7 +856,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   Row(
                     children: [
                       const Text(
-                        "Dosage:",
+                        "Dosagem:",
                         style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(width: 10),
@@ -892,7 +892,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
-                    "Cancel",
+                    "Cancelar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -901,7 +901,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     if (selectedWeekdays.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Please select at least one weekday."),
+                          content: Text("Selecione pelo menos um dia da semana."),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -911,7 +911,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     if (selectedTime == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Please select a time."),
+                          content: Text("Selecione um horário."),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -921,7 +921,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     if (selectedDosage <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Please select a valid dosage."),
+                          content: Text("Selecione uma dosagem válida."),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -936,7 +936,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     Navigator.pop(context);
                   },
                   child: const Text(
-                    "Confirm",
+                    "Confirmar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -985,7 +985,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               title: const Text(
-                "Edit Dosage",
+                "Editar dosagem",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -998,7 +998,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   Row(
                     children: [
                       const Text(
-                        "Time:",
+                        "Horário:",
                         style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(width: 10),
@@ -1039,7 +1039,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                   Row(
                     children: [
                       const Text(
-                        "Dosage:",
+                        "Dosagem:",
                         style: TextStyle(color: Colors.white),
                       ),
                       const SizedBox(width: 10),
@@ -1082,7 +1082,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     this.setState(() {}); // Update the parent widget's state
                   },
                   child: const Text(
-                    "Delete",
+                    "Eliminar",
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -1090,7 +1090,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
-                    "Cancel",
+                    "Cancelar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -1106,7 +1106,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     this.setState(() {}); // Update the parent widget's state
                   },
                   child: const Text(
-                    "Save",
+                    "Guardar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

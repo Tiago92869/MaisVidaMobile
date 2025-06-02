@@ -8,7 +8,6 @@ import 'package:testtest/activities/activities_page.dart';
 import 'package:testtest/diary/diary_page.dart';
 import 'package:testtest/goals/goals_page.dart';
 import 'package:testtest/medicines/medicines_page.dart';
-import 'package:testtest/menu/components/day_night_switch.dart';
 import 'package:testtest/menu/models/menu_item.dart';
 import 'dart:math' as math;
 import 'package:testtest/menu/navigation/custom_tab_bar.dart';
@@ -97,7 +96,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     color: Colors.red, // Fallback color for debugging
     alignment: Alignment.center,
     child: const Text(
-      "Invalid Tab",
+      "Menu inválido",
       style: TextStyle(fontSize: 20, color: Colors.white),
     ),
   );
@@ -256,7 +255,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
           color: Colors.red,
           alignment: Alignment.center,
           child: const Text(
-            "Invalid Tab",
+            "Menu inválido",
             style: TextStyle(fontSize: 20, color: Colors.white),
           ),
         );
@@ -282,7 +281,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  "Prizes",
+                  "Prémios Obtidos",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -326,7 +325,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     } catch (e) {
       print('Error fetching image previews: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load images')),
+        SnackBar(content: Text('Falha ao carregar imagens')),
       );
     }
   }
@@ -364,7 +363,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                       children: [
                         const Center(
                           child: Text(
-                            "Exit Application",
+                            "Sair da aplicação",
                             style: TextStyle(
                               fontSize: 28,
                               fontFamily: "Poppins",
@@ -376,7 +375,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                         const SizedBox(height: 20),
                         const Center(
                           child: Text(
-                            "Are you sure you want to exit?",
+                            "Tem a certeza de que quer sair?",
                             style: TextStyle(
                               fontSize: 16,
                               fontFamily: "Poppins",
@@ -407,7 +406,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                                 ),
                               ),
                               child: const Text(
-                                "No",
+                                "Não",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -431,7 +430,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                                 ),
                               ),
                               child: const Text(
-                                "Yes",
+                                "Sim",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

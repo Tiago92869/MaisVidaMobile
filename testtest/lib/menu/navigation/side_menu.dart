@@ -25,8 +25,8 @@ class _SideMenuState extends State<SideMenu> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   // Variables to store user data
-  String _userName = "Not Found";
-  String _userEmail = "Not Found";
+  String _userName = "Não encontrado";
+  String _userEmail = "Não encontrado";
 
   @override
   void initState() {
@@ -37,9 +37,9 @@ class _SideMenuState extends State<SideMenu> {
   Future<void> _fetchUserData() async {
     try {
       // Retrieve the user's first name, second name, and email from secure storage
-      final firstName = await _storage.read(key: 'firstName') ?? "Ashu";
+      final firstName = await _storage.read(key: 'firstName') ?? "";
       final secondName = await _storage.read(key: 'secondName') ?? "";
-      final email = await _storage.read(key: 'email') ?? "Software Engineer";
+      final email = await _storage.read(key: 'email') ?? "";
 
       // Limit the size of the name and email strings
       final String limitedName = _limitString(
@@ -142,13 +142,13 @@ class _SideMenuState extends State<SideMenu> {
               child: Column(
                 children: [
                   MenuButtonSection(
-                    title: "BROWSE",
+                    title: "Navegar",
                     selectedMenu: _selectedMenu,
                     menuIcons: _browseMenuIcons,
                     onMenuPress: onMenuPress,
                   ),
                   MenuButtonSection(
-                    title: "HISTORY",
+                    title: "Histórico",
                     selectedMenu: _selectedMenu,
                     menuIcons: _historyMenuIcons,
                     onMenuPress: onMenuPress,
@@ -170,7 +170,7 @@ class _SideMenuState extends State<SideMenu> {
               color: Colors.red,
             ), // Set icon color to red
             title: const Text(
-              "Logout",
+              "Sair",
               style: TextStyle(
                 color: Colors.red, // Set text color to red
                 fontSize: 16,

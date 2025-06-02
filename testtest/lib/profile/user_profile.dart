@@ -5,7 +5,6 @@ import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
-import 'package:testtest/menu/theme.dart'; // Ensure RiveAppTheme is imported
 
 class UserProfilePage extends StatefulWidget {
   @override
@@ -80,7 +79,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Failed to fetch user data. Please try again."),
+          content: Text("Falha ao procurar dados do utilizador. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -98,7 +97,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       print('Failed to fetch profile image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Failed to load profile image."),
+          content: Text("Falha ao carregar a imagem do perfil."),
           backgroundColor: Colors.red,
         ),
       );
@@ -126,7 +125,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Select an Image",
+                    "Seleciona uma imagem",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -192,7 +191,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       print('Failed to fetch image previews: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Failed to load image previews."),
+          content: Text("Falha ao carregar as imagens."),
           backgroundColor: Colors.red,
         ),
       );
@@ -205,7 +204,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       if (firstNameController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("First Name cannot be empty."),
+            content: Text("O primeiro nome não pode estar vazio."),
             backgroundColor: Colors.red,
           ),
         );
@@ -214,7 +213,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       if (firstNameController.text.trim().contains(' ')) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("First Name must be a single word."),
+            content: Text("O primeiro nome deve ser uma única palavra."),
             backgroundColor: Colors.red,
           ),
         );
@@ -225,7 +224,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       if (familyNameController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Family Name cannot be empty."),
+            content: Text("O apelido não pode estar vazio."),
             backgroundColor: Colors.red,
           ),
         );
@@ -236,7 +235,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       if (birthdayController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Birthdate cannot be empty."),
+            content: Text("A data de nascimento não pode estar vazia."),
             backgroundColor: Colors.red,
           ),
         );
@@ -256,7 +255,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                "Emergency Contact must follow the format + followed by 7 to 15 digits.",
+                "O contacto de emergência deve seguir o formato + seguido de 7 a 15 dígitos.",
               ),
               backgroundColor: Colors.red,
             ),
@@ -301,7 +300,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Data saved successfully!"),
+          content: Text("Dados guardados com sucesso!"),
           backgroundColor: Colors.green,
         ),
       );
@@ -312,7 +311,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Failed to save changes. Please try again."),
+          content: Text("Falha ao guardar as alterações. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -476,17 +475,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     const SizedBox(height: 40),
 
                     // User Info Fields
-                    _buildUserInfo("First Name", firstNameController),
+                    _buildUserInfo("Primeiro nome", firstNameController),
                     const SizedBox(height: 20),
-                    _buildUserInfo("Family Name", familyNameController),
+                    _buildUserInfo("Apelido", familyNameController),
                     const SizedBox(height: 20),
                     _buildUserInfo(
-                      "Email",
+                      "E-mail",
                       emailController,
                       editable: false,
                     ), // Email is not editable
                     const SizedBox(height: 20),
-                    _buildUserInfo("City", cityController),
+                    _buildUserInfo("Cidade", cityController),
                     const SizedBox(height: 20),
                     _buildBirthdayField(),
                     const SizedBox(height: 20),
@@ -499,7 +498,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "About Me",
+                          "Sobre mim",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -530,7 +529,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               color: Colors.grey[800],
                             ),
                             decoration: const InputDecoration.collapsed(
-                              hintText: 'Enter About Me',
+                              hintText: 'Digite Sobre Mim',
                             ),
                             maxLines: null,
                           ),
@@ -559,7 +558,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ),
                             child: const Text(
-                              "Reset Password",
+                              "Redefinir palavra-passe",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -681,7 +680,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             controller: controller,
             enabled: editable && editMode,
             style: TextStyle(fontSize: 16, color: Colors.grey[800]),
-            decoration: InputDecoration.collapsed(hintText: 'Enter $title'),
+            decoration: InputDecoration.collapsed(hintText: 'Introduza $title'),
           ),
         ),
       ],
@@ -693,7 +692,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Birthday",
+          "Data de nascimento",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -724,7 +723,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 enabled: editMode,
                 style: TextStyle(fontSize: 16, color: Colors.grey[800]),
                 decoration: const InputDecoration.collapsed(
-                  hintText: 'Select your birthday',
+                  hintText: 'Seleciona a sua data de nascimento',
                 ),
               ),
             ),
@@ -739,7 +738,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Emergency Contact",
+          "Contacto de emergência",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -776,7 +775,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   keyboardType: TextInputType.phone,
                   style: TextStyle(fontSize: 16, color: Colors.grey[800]),
                   decoration: const InputDecoration.collapsed(
-                    hintText: 'Enter Phone Number', // No placeholder text
+                    hintText: 'Introduza contacto de emergência', // No placeholder text
                   ),
                 ),
               ),

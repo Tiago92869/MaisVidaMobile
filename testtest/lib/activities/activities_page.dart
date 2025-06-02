@@ -66,7 +66,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       print('Error fetching activities: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch activities. Please try again."),
+          content: Text("Falha ao procurar atividades. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -92,7 +92,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       print('Error fetching favorite activities: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch favorite activities. Please try again."),
+          content: Text("Falha ao procurar atividades favoritas. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -225,7 +225,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             height: 20,
           ), // Increased spacing between description and resources
           Text(
-            "Resources: ${activity.resources?.length ?? 0}",
+            "Recursos: ${activity.resources?.length ?? 0}",
             style: const TextStyle(
               fontSize: 17,
               fontFamily: "Inter",
@@ -262,7 +262,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 ),
               ),
               child: const Text(
-                "Start",
+                "Iniciar",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
@@ -299,7 +299,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               const SizedBox(height: 60),
               const Center(
                 child: Text(
-                  "Activities",
+                  "Atividades",
                   style: TextStyle(
                     fontSize: 28,
                     fontFamily: "Poppins",
@@ -314,7 +314,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 child: TextField(
                   onChanged: _onSearch,
                   decoration: InputDecoration(
-                    labelText: "Search Activities",
+                    labelText: "Pesquisar atividades",
                     labelStyle: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,

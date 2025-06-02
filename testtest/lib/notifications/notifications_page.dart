@@ -68,7 +68,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Dismiss'),
+            child: const Text('Dispensar'),
           ),
         ],
       ),
@@ -114,7 +114,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       // Show error message using SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch notifications. Please try again."),
+          content: Text("Falha ao procurar notificações. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -181,7 +181,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         print("Error marking notification as read: $e");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Failed to mark notification as read."),
+            content: Text("Falha ao marcar a notificação como lida."),
             backgroundColor: Colors.red,
           ),
         );
@@ -223,7 +223,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 children: [
                   const Center(
                     child: Text(
-                      "Notifications",
+                      "Notificações",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,

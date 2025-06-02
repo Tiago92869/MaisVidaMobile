@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'diary_page.dart';
 import 'package:testtest/services/diary/diary_model.dart';
 import 'package:testtest/services/diary/diary_service.dart';
 
@@ -54,14 +53,14 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               borderRadius: BorderRadius.circular(20), // Rounded corners
             ),
             title: const Text(
-              "Missing Fields",
+              "Campos em falta",
               style: TextStyle(
                 color: Colors.white, // White text
                 fontWeight: FontWeight.bold,
               ),
             ),
             content: const Text(
-              "Please fill in all the fields (Title, Description, and Emotion) before saving.",
+              "Por favor preencha todos os campos (Título, Descrição e Emoção) antes de guardar.",
               style: TextStyle(
                 color: Colors.white70, // Subtle white text
               ),
@@ -108,12 +107,10 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     try {
       if (widget.createDiary) {
         // Call createDiary if this is a new diary
-        final createdDiary = await _diaryService.createDiary(diary);
         Navigator.pop(context); // Close the loading dialog
         Navigator.pop(context, true); // Return true to indicate success
       } else {
         // Call updateDiary if editing an existing diary
-        final updatedDiary = await _diaryService.updateDiary(diary.id, diary);
         Navigator.pop(context); // Close the loading dialog
         Navigator.pop(context, true); // Return true to indicate success
       }
@@ -122,7 +119,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
       // Handle errors (e.g., show a snackbar)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to save diary. Please try again."),
+          content: Text("Falha ao guardar o diário. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -139,28 +136,28 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               title: const Text(
-                "Delete Diary",
+                "Apagar Diário",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               content: const Text(
-                "Are you sure you want to delete this diary? This action cannot be undone.",
+                "Tem a certeza de que pretende eliminar este diário? Esta ação não pode ser anulada.",
                 style: TextStyle(color: Colors.white70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: const Text(
-                    "Cancel",
+                    "Cancelar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: const Text(
-                    "Delete",
+                    "Eliminar",
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -190,7 +187,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
       // Handle errors (e.g., show a snackbar)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to delete diary. Please try again."),
+          content: Text("Falha ao eliminar o diário. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -221,8 +218,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
         return Icons.mood_bad;
       case DiaryType.Sick:
         return Icons.sick;
-      default:
-        return Icons.sentiment_neutral;
     }
   }
 
@@ -308,7 +303,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       color: Colors.white,
                     ),
                     decoration: const InputDecoration(
-                      hintText: "Enter Diary Title",
+                      hintText: "Introduza o título do diário",
                       hintStyle: TextStyle(color: Colors.white70),
                       border: InputBorder.none,
                     ),
@@ -362,7 +357,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Recorded At",
+                        "Gravado em",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -446,7 +441,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       maxLines: null,
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                       decoration: const InputDecoration(
-                        hintText: "Enter Diary Description",
+                        hintText: "Introduza a descrição do diário",
                         hintStyle: TextStyle(color: Colors.white70),
                         border: InputBorder.none,
                       ),

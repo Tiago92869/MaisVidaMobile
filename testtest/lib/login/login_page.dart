@@ -6,7 +6,6 @@ import 'package:jwt_decoder/jwt_decoder.dart'; // Import the jwt_decoder package
 import 'package:testtest/login/loading_screen.dart';
 import 'create_account_page.dart';
 import 'reset_password_page.dart';
-import 'package:testtest/menu/menu.dart';
 import 'package:testtest/services/user/user_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -73,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Failed to login: ${e.toString()}",
+              "Falha ao efetuar login: ${e.toString()}",
               style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
@@ -212,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                                   controller: _emailController,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: "Email",
+                                    hintText: "E-mail",
                                     hintStyle: TextStyle(
                                       color: Colors.grey[700],
                                     ),
@@ -226,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                                   obscureText: true,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: "Password",
+                                    hintText: "Palavra-chave",
                                     hintStyle: TextStyle(
                                       color: Colors.grey[700],
                                     ),
@@ -287,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             child: const Center(
                               child: Text(
-                                "Create Account",
+                                "Criar conta",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -310,7 +309,7 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           },
                           child: const Text(
-                            "Forgot Password?",
+                            "Esqueceu-se da sua senha?",
                             style: TextStyle(
                               color: Color(0xFF557BE9),
                               decoration:

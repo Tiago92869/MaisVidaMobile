@@ -106,11 +106,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       if (widget.createResource) {
         // Call createGoal if creating a new goal
         await _goalService.createGoal(updatedGoal);
-        print('Goal created successfully.');
+        print('Meta criada com sucesso.');
       } else {
         // Call updateGoal if editing an existing goal
         await _goalService.updateGoal(updatedGoal.id, updatedGoal);
-        print('Goal updated successfully.');
+        print('Meta atualizada com sucesso.');
       }
       if (widget.onSave != null) {
         widget.onSave!(); // Trigger the callback to refresh goals
@@ -119,7 +119,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       print('Error saving goal: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to save goal. Please try again."),
+          content: Text("Falha ao salvar o meta. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -139,7 +139,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
 
     try {
       await _goalService.deleteGoal(widget.goal!.id);
-      print('Goal deleted successfully.');
+      print('Meta eliminado com sucesso.');
 
       if (widget.onSave != null) {
         widget.onSave!(); // Trigger the callback to refresh goals
@@ -151,7 +151,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       print('Error deleting goal: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to delete goal. Please try again."),
+          content: Text("Falha ao eliminar a meta. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -172,28 +172,28 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               title: const Text(
-                "Delete Goal",
+                "Apagar Meta",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               content: const Text(
-                "Are you sure you want to delete this goal? This action cannot be undone.",
+                "Tem a certeza de que pretende eliminar esta meta? Esta ação não pode ser anulada.",
                 style: TextStyle(color: Colors.white70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: const Text(
-                    "Cancel",
+                    "Cancelar",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: const Text(
-                    "Delete",
+                    "Eliminar",
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -288,7 +288,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       color: Colors.white,
                     ),
                     decoration: const InputDecoration(
-                      hintText: "Enter Goal Title",
+                      hintText: "Insira o título da meta",
                       hintStyle: TextStyle(color: Colors.white70),
                       border: InputBorder.none,
                     ),
@@ -336,7 +336,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                 .split('.')
                                 .last
                                 .capitalizeFirstLetter() ??
-                            "No Subject",
+                            "Sem Assunto",
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -351,7 +351,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Goal Date",
+                        "Data da meta",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -373,7 +373,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           child: Text(
                             selectedDate != null
                                 ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}"
-                                : "Select a date",
+                                : "Seleciona uma data",
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.white,
@@ -391,7 +391,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Completed",
+                          "Concluídas",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -418,7 +418,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Notifications",
+                        "Notificações",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -448,7 +448,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       maxLines: null,
                       style: const TextStyle(fontSize: 16, color: Colors.white),
                       decoration: const InputDecoration(
-                        hintText: "Enter Goal Description",
+                        hintText: "Insira a descrição da meta",
                         hintStyle: TextStyle(color: Colors.white70),
                         border: InputBorder.none,
                       ),
@@ -485,14 +485,14 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             ), // Rounded corners
                           ),
                           title: const Text(
-                            "Missing Fields",
+                            "Campos em falta",
                             style: TextStyle(
                               color: Colors.white, // White text
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           content: const Text(
-                            "Please fill in all the fields (Title, Description, Date, and Subject) before saving.",
+                            "Por favor preencha todos os campos (Título, Descrição, Data e Assunto) antes de guardar.",
                             style: TextStyle(
                               color: Colors.white70, // Subtle white text
                             ),

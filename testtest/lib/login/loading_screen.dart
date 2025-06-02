@@ -37,7 +37,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
             CircularProgressIndicator(color: Color(0xFF557BE9)),
             SizedBox(height: 20),
             Text(
-              "Loading...",
+              "A carregar...",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

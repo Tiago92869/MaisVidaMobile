@@ -48,7 +48,7 @@ class _JourneyPageState extends State<JourneyPage> {
       print('Error fetching journeys: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch journeys. Please try again."),
+          content: Text("Falha ao procurar as jornadas. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -81,7 +81,7 @@ class _JourneyPageState extends State<JourneyPage> {
       print('Error starting journey: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to start journey. Please try again."),
+          content: Text("Falha ao iniciar a jornada. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -115,7 +115,7 @@ class _JourneyPageState extends State<JourneyPage> {
       print('Error fetching journey details: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to fetch journey details. Please try again."),
+          content: Text("Falha ao obter os detalhes da jornada. Tente novamente."),
           backgroundColor: Colors.red,
         ),
       );
@@ -176,7 +176,7 @@ class _JourneyPageState extends State<JourneyPage> {
           ),
           const SizedBox(height: 20), // Increased spacing before the progress bar
           Text(
-            "${(progress * 100).toStringAsFixed(0)}% Completed",
+            "${(progress * 100).toStringAsFixed(0)}% Concluído",
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -215,7 +215,7 @@ class _JourneyPageState extends State<JourneyPage> {
             child: ElevatedButton(
               onPressed: () async {
                 print(
-                    '${journey.started ? "Continuing" : "Starting"} journey: ${journey.title}');
+                    '${journey.started ? "Continuar" : "Começar"} jornada: ${journey.title}');
                 await _navigateToJourneyDetails(journey.id, isStarting: !journey.started);
               },
               style: ElevatedButton.styleFrom(
@@ -226,7 +226,7 @@ class _JourneyPageState extends State<JourneyPage> {
                 ),
               ),
               child: Text(
-                journey.started ? "Continue" : "Start",
+                journey.started ? "Continuar" : "Começar",
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
@@ -260,7 +260,7 @@ class _JourneyPageState extends State<JourneyPage> {
               const SizedBox(height: 60),
               const Center(
                 child: Text(
-                  "Journeys",
+                  "Jornadas",
                   style: TextStyle(
                     fontSize: 28,
                     fontFamily: "Poppins",
@@ -280,7 +280,7 @@ class _JourneyPageState extends State<JourneyPage> {
                       child: _journeys.isEmpty
                           ? const Center(
                               child: Text(
-                                "No journeys created",
+                                "Nenhuma jornada criada",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontFamily: "Poppins",

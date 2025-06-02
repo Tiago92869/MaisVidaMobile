@@ -30,7 +30,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Passwords do not match."),
+          content: Text("As palavras-passe não coincidem."),
           backgroundColor: Colors.red,
         ),
       );
@@ -57,7 +57,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Account created successfully!"),
+          content: Text("Conta criada com sucesso!"),
           backgroundColor: Colors.green,
         ),
       );
@@ -68,7 +68,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "Failed to create account: ${e.toString()}",
+            "Falha ao criar conta: ${e.toString()}",
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
@@ -116,40 +116,40 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    _buildInputField("Email", _emailController, validator: (value) {
+                    _buildInputField("E-mail", _emailController, validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Email is required.";
+                        return "O e-mail é obrigatório.";
                       }
                       if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return "Enter a valid email.";
+                        return "Introduza um e-mail válido.";
                       }
                       return null;
                     }),
-                    _buildInputField("First Name", _firstNameController, validator: (value) {
+                    _buildInputField("Primeiro Nome", _firstNameController, validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "First name is required.";
+                        return "O primeiro nome é obrigatório.";
                       }
                       return null;
                     }),
-                    _buildInputField("Family Name", _familyNameController, validator: (value) {
+                    _buildInputField("Apelido", _familyNameController, validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Family name is required.";
+                        return "O apelido é obrigatório.";
                       }
                       return null;
                     }),
-                    _buildInputField("City", _cityController, validator: (value) {
+                    _buildInputField("Cidade", _cityController, validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "City is required.";
+                        return "Cidade é obrigatória.";
                       }
                       return null;
                     }),
-                    _buildDateInputField("Birthday Date", _birthdayController),
-                    _buildPasswordField("Password", _passwordController),
-                    _buildPasswordField("Confirm Password", _confirmPasswordController),
+                    _buildDateInputField("Data de Nascimento", _birthdayController),
+                    _buildPasswordField("Palavra-passe", _passwordController),
+                    _buildPasswordField("Confirmar Palavra-passe", _confirmPasswordController),
                     const SizedBox(height: 30),
-                    _buildButton(context, "Create Account", _createAccount),
+                    _buildButton(context, "Criar Conta", _createAccount),
                     const SizedBox(height: 20),
-                    _buildButton(context, "Go Back", () {
+                    _buildButton(context, "Voltar Atrás", () {
                       Navigator.pop(context);
                     }),
                   ],
@@ -235,7 +235,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       child: AbsorbPointer(
         child: _buildInputField(hint, controller, validator: (value) {
           if (value == null || value.isEmpty) {
-            return "Birthday date is required.";
+            return "Data de nascimento é obrigatória.";
           }
           return null;
         }),
@@ -280,10 +280,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return "$hint is required.";
+            return "$hint é obrigatório.";
           }
-          if (hint == "Password" && value.length < 6) {
-            return "Password must be at least 6 characters.";
+          if (hint == "Palavra-chave" && value.length < 6) {
+            return "A palavra-passe deve ter pelo menos 6 caracteres.";
           }
           return null;
         },

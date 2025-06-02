@@ -6,7 +6,6 @@ import 'login_page.dart'; // Import the Login Page
 
 class ResetPasswordPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
-  final UserService _userService = UserService();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class ResetPasswordPage extends StatelessWidget {
                   const SizedBox(height: 50),
                   const Center(
                     child: Text(
-                      "Reset Password",
+                      "Redefinir palavra-passe",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
@@ -44,7 +43,7 @@ class ResetPasswordPage extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      "Write your respective email address and a new password will be sent to you via email",
+                      "Escreva o seu respetivo endereço de e-mail e uma nova palavra-passe ser-lhe-á enviada por e-mail",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
@@ -52,18 +51,18 @@ class ResetPasswordPage extends StatelessWidget {
                   const SizedBox(height: 30),
 
                   // Input field
-                  _buildInputField("Email"),
+                  _buildInputField("E-mail"),
 
                   // Pushes everything above upwards, making buttons stay at the bottom
                   const Spacer(),
 
                   // Buttons at the bottom
-                  _buildButton(context, "Create New Password", () {
+                  _buildButton(context, "Criar nova palavra-passe", () {
                     // Check if email is not null
                     if (_emailController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Please enter your email address."),
+                          content: Text("Por favor, introduza o seu endereço de e-mail."),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -90,7 +89,7 @@ class ResetPasswordPage extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                "Password reset email sent successfully.",
+                                "E-mail de redefinição de palavra-passe enviado com sucesso.",
                               ),
                               backgroundColor: Colors.green,
                             ),
@@ -106,14 +105,14 @@ class ResetPasswordPage extends StatelessWidget {
                           Navigator.pop(context); // Dismiss loading animation
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("Failed to send email: $error"),
+                              content: Text("Falha ao enviar e-mail: $error"),
                               backgroundColor: Colors.red,
                             ),
                           );
                         });
                   }),
                   const SizedBox(height: 20),
-                  _buildButton(context, "Go Back", () {
+                  _buildButton(context, "Voltar Atrás", () {
                     Navigator.pop(context);
                   }),
                 ],

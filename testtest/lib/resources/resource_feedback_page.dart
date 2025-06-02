@@ -23,7 +23,6 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
   String? _feedbackId;
   String? _userId;
   bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
-  final JourneyService _journeyService = JourneyService();
 
   @override
   void initState() {
@@ -51,14 +50,14 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
   Future<void> _submitFeedback() async {
     if (_selectedRating == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a rating before saving.')),
+        const SnackBar(content: Text('Selecione uma classificação antes de guardar.')),
       );
       return;
     }
 
     if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User ID not found. Please log in again.')),
+        const SnackBar(content: Text('ID de utilizador não encontrado. Efetue novamente o login.')),
       );
       return;
     }
@@ -85,7 +84,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
       Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to submit feedback.')),
+        const SnackBar(content: Text('Falha ao enviar feedback.')),
       );
     } finally {
       setState(() {
@@ -168,7 +167,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text(
-                              'How useful was this resource?',
+                              'Quão útil foi este recurso?',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -182,7 +181,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
                               children: [
                                 _buildRatingIcon(
                                   icon: Icons.thumb_up,
-                                  label: 'Useful',
+                                  label: 'Útil',
                                   rating: feedback_model.UsefulnessRating.USEFUL,
                                 ),
                                 const SizedBox(height: 20),
@@ -194,7 +193,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
                                 const SizedBox(height: 20),
                                 _buildRatingIcon(
                                   icon: Icons.thumb_down,
-                                  label: 'Not Useful',
+                                  label: 'Não é útil',
                                   rating: feedback_model.UsefulnessRating.NOT_USEFUL,
                                 ),
                               ],
@@ -214,7 +213,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
                                       color: Color(0xFF0D1B2A),
                                     )
                                   : const Text(
-                                      'Save',
+                                      'Guardar',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,

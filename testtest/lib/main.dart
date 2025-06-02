@@ -25,12 +25,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter App',
+      title: 'Aplicação Flutter', // Tradução do título
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LoginPage(), // Replace with your app's home screen
+      home: const LoginPage(), // Substitua pela tela inicial do aplicativo
       routes: {
-        '/login': (context) => const LoginPage(), // Define the login route
-        '/menu': (context) => const MenuScreen(), // Define the menu route
+        '/login': (context) => const LoginPage(), // Defina a rota de login
+        '/menu': (context) => const MenuScreen(), // Defina a rota do menu
       },
       builder: (context, child) {
         // Ensure text rendering supports special characters

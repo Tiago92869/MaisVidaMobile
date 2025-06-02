@@ -15,7 +15,6 @@ class JourneyDetailPage extends StatefulWidget {
 }
 
 class _JourneyDetailPageState extends State<JourneyDetailPage> {
-  bool _showFirstStarfish = Random().nextBool();
   final ImageService _imageService = ImageService();
 
   Future<void> _showPrizeImage(String imageId) async {
@@ -31,7 +30,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  "Prize After Completion",
+                  "Prémio após a conclusão",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -55,7 +54,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
     } catch (e) {
       print('Error fetching prize image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load prize image.')),
+        const SnackBar(content: Text('Falha ao carregar a imagem do prémio.')),
       );
     }
   }
@@ -170,7 +169,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          "${(progress * 100).toStringAsFixed(0)}% Completed",
+                          "${(progress * 100).toStringAsFixed(0)}% Concluído",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -270,32 +269,6 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                         ),
                       ],
                     ),
-                  ),
-                ),
-
-                // Fixed footer
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Created At: ${journeyDetails.createdAt?.toLocal().toString().split(' ')[0] ?? 'N/A'}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Text(
-                        "Resources: ${journeyDetails.resourceQuantity}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
