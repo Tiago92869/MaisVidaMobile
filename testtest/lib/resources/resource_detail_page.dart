@@ -468,6 +468,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               )
             else if (!_isVideoInitialized)
               const Center(child: CircularProgressIndicator()),
+          ] else if (content.type.toLowerCase() == 'phrase' && content.contentValue != null) ...[
+            _buildPhraseContent(content.contentValue!),
           ],
           const SizedBox(height: 30), // Space between contents
         ],
@@ -517,6 +519,39 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           style: const TextStyle(fontSize: 14, color: Colors.white),
         ),
       ],
+    );
+  }
+
+  Widget _buildPhraseContent(String contentValue) {
+    final parts = contentValue.split('\n'); // Split the string by \n
+    final upperText = parts.isNotEmpty ? parts[0] : ''; // First line
+    final lowerText = parts.length > 1 ? parts[1] : ''; // Second line
+
+    return Center( // Center the entire content
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Center-align the text
+        children: [
+          Text(
+            '"$upperText"', // Add quotes around the upper text
+            style: const TextStyle(
+              fontStyle: FontStyle.italic,
+              color: Colors.white,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center, // Center-align the text
+          ),
+          const SizedBox(height: 8), // Add spacing between lines
+          Text(
+            lowerText, // Add quotes around the lower text
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center, // Center-align the text
+          ),
+        ],
+      ),
     );
   }
 }
