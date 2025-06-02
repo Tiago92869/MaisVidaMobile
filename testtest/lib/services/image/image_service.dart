@@ -109,13 +109,14 @@ class ImageService {
       );
 
       print('ImageService: Response status code: ${response.statusCode}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
 
       if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('Response Body: $decodedBody');
+        final responseBody = json.decode(decodedBody);
         final imageInfo = ImageInfoDTO.fromJson(responseBody);
-        print('ImageService: ImageInfoDTO fetched successfully. ID: ${imageInfo.id}');
 
-        // Remove the prefix if it exists
         String base64Image = imageInfo.data;
         if (base64Image.startsWith('data:image')) {
           base64Image = base64Image.split(',').last;

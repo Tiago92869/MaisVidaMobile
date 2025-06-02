@@ -63,10 +63,13 @@ class NotificationService {
           );
 
       print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> json = jsonDecode(response.body);
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('Response body: $decodedBody');
+
+        final Map<String, dynamic> json = jsonDecode(decodedBody);
 
         // Check the structure of the response
         if (json.containsKey('content')) {
@@ -76,7 +79,7 @@ class NotificationService {
               .map((e) => NotificationModel.fromJson(e))
               .toList();
         } else {
-          print('Unexpected response format: ${response.body}');
+          print('Unexpected response format: $decodedBody');
           throw Exception('Unexpected response format');
         }
       } else {

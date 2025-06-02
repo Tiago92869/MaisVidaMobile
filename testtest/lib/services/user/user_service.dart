@@ -63,10 +63,12 @@ class UserService {
           );
 
       print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
 
       if (response.statusCode == 200) {
-        return User.fromJson(json.decode(response.body));
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('Response body: $decodedBody');
+        return User.fromJson(json.decode(decodedBody));
       } else {
         throw Exception('Failed to load user');
       }

@@ -95,9 +95,7 @@ class ResourceService {
     try {
       print('Fetching resource with ID: $id');
       final String requestUrl = '$_baseUrl/$id';
-      print(
-        'Request URL for fetchResourceById: $requestUrl',
-      ); // Log the request URL
+      print('Request URL for fetchResourceById: $requestUrl'); // Log the request URL
 
       final response = await http
           .get(
@@ -118,11 +116,13 @@ class ResourceService {
           );
 
       print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
 
       if (response.statusCode == 200) {
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('Response Body: $decodedBody');
         print('Resource fetched successfully.');
-        return Resource.fromJson(jsonDecode(response.body));
+        return Resource.fromJson(jsonDecode(decodedBody));
       } else {
         print('Failed to load resource. Status Code: ${response.statusCode}');
         throw Exception('Failed to load resource');

@@ -78,12 +78,18 @@ class FeedbackService {
           )
           .timeout(_timeoutDuration);
 
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
+
       if (response.statusCode == 200) {
-        return Feedback.fromJson(jsonDecode(response.body));
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('Response Body: $decodedBody');
+        return Feedback.fromJson(jsonDecode(decodedBody));
       } else {
         throw Exception('Failed to fetch feedback');
       }
     } catch (e) {
+      print('Error fetching feedback: $e');
       rethrow;
     }
   }

@@ -75,9 +75,12 @@ class VideoService {
       );
 
       print('VideoService: Response status code: ${response.statusCode}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
 
       if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('VideoService: API response: $decodedBody');
+        final responseBody = json.decode(decodedBody);
         print('VideoService: VideoInfoDTO fetched successfully.');
         return VideoInfoDTO.fromJson(responseBody);
       } else {

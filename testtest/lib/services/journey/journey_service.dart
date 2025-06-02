@@ -32,9 +32,12 @@ class JourneyService {
       },
     ).timeout(_timeoutDuration);
 
+    print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
+
     if (response.statusCode == 200) {
-      print('API response: ${response.body}');
-      final List<dynamic> jsonList = jsonDecode(response.body);
+      final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+      print('API response: $decodedBody');
+      final List<dynamic> jsonList = jsonDecode(decodedBody);
       return jsonList.map((json) => JourneySimpleUser.fromJson(json)).toList();
     } else {
       print('Failed to fetch user journeys, status code: ${response.statusCode}');
@@ -56,9 +59,12 @@ class JourneyService {
       },
     ).timeout(_timeoutDuration);
 
+    print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
+
     if (response.statusCode == 200) {
-      print('API response: ${response.body}');
-      return UserJourneyProgress.fromJson(jsonDecode(response.body));
+      final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+      print('API response: $decodedBody');
+      return UserJourneyProgress.fromJson(jsonDecode(decodedBody));
     } else {
       print('Failed to fetch journey details, status code: ${response.statusCode}');
       throw Exception('Failed to fetch journey details');
@@ -89,6 +95,7 @@ class JourneyService {
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
 
       if (response.statusCode == 200) {
         print('Successfully updated user journey progress.');

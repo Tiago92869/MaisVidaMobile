@@ -43,7 +43,6 @@ class GoalService {
   }) async {
     await _loadStoredCredentials();
     try {
-      print('Fetching goals...');
       final String subjectsQuery = goalSubjects
           .map(
             (subject) =>
@@ -78,13 +77,12 @@ class GoalService {
           );
 
       print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> json = jsonDecode(response.body);
-
-        // Parse the JSON into a PagezGoalsDTO
-        return PagezGoalsDTO.fromJson(json);
+        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
+        print('Response Body: $decodedBody');
+        return PagezGoalsDTO.fromJson(jsonDecode(decodedBody));
       } else {
         print('Failed to load goals. Status Code: ${response.statusCode}');
         throw Exception('Failed to load goals');
