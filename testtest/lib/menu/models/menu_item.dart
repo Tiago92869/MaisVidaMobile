@@ -44,7 +44,7 @@ class MenuItemModel {
     ),
     MenuItemModel(
       title: "Journey",
-      riveIcon: TabItem(stateMachine: "HOME_interactivity", artboard: "HOME"),
+      riveIcon: TabItem(stateMachine: "State Machine 1", artboard: "ONLINE"),
     ),
   ];
 
