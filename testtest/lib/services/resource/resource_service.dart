@@ -59,7 +59,7 @@ class ResourceService {
             Uri.parse(url),
             headers: {
               'Authorization': 'Bearer $_accessToken',
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json; charset=utf-8', // Ensure UTF-8 encoding
             },
           )
           .timeout(
@@ -72,12 +72,14 @@ class ResourceService {
             },
           );
 
+      // Decode response body with UTF-8
+      final decodedBody = utf8.decode(response.bodyBytes);
       print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print('Response Body: $decodedBody');
 
       if (response.statusCode == 200) {
         print('Resources fetched successfully.');
-        return ResourcePage.fromJson(jsonDecode(response.body));
+        return ResourcePage.fromJson(jsonDecode(decodedBody));
       } else {
         print('Failed to load resources. Status Code: ${response.statusCode}');
         throw Exception('Failed to load resources');
