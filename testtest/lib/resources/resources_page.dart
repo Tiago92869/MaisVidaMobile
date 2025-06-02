@@ -20,7 +20,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
   Set<ResourceType> _selectedResourceTypes = {};
 
   // List of all available resource types for the filter
-  final List<ResourceType> _resourceTypes = ResourceType.values;
+  final List<ResourceType> _resourceTypes = ResourceTypeExtension.getFilterableTypes();
 
   // List of resources fetched from the service
   List<Resource> _resources = [];

@@ -11,11 +11,12 @@ enum ResourceType {
   MUSIC,
   SOS,
   OTHER,
+  TIVA,
 }
 
 extension ResourceTypeExtension on ResourceType {
   static ResourceType fromString(String type) {
-    switch (type) {
+    switch (type.toUpperCase()) { // Convert to uppercase for case-insensitive comparison
       case 'ARTICLE':
         return ResourceType.ARTICLE;
       case 'VIDEO':
@@ -36,44 +37,62 @@ extension ResourceTypeExtension on ResourceType {
         return ResourceType.SOS;
       case 'OTHER':
         return ResourceType.OTHER;
+      case 'TIVA': // Ensure TIVA is handled
+        return ResourceType.TIVA;
       default:
         throw ArgumentError('Unknown ResourceType: $type');
     }
+  }
+
+  static List<ResourceType> getFilterableTypes() {
+    return ResourceType.values.where((type) => type != ResourceType.TIVA).toList();
   }
 }
 
 class Content {
   final String id;
-  final String contentValue;
-  final String contentId;
+  final String? contentValue; // Made nullable
+  final String? contentId; // Made nullable
   final String type;
   final int order;
+  final List<String>? multipleValue;
+  final String? answerYes; // Already nullable
+  final String? answerNo; // Already nullable
 
   const Content({
     required this.id,
-    required this.contentValue,
-    required this.contentId,
+    this.contentValue, // Made nullable
+    this.contentId, // Made nullable
     required this.type,
     required this.order,
+    this.multipleValue,
+    this.answerYes,
+    this.answerNo,
   });
 
   factory Content.fromJson(Map<String, dynamic> json) {
     return Content(
       id: json['id'],
-      contentValue: json['contentValue'],
-      contentId: json['contentId'],
+      contentValue: json['contentValue'], // Nullable
+      contentId: json['contentId'], // Nullable
       type: json['type'],
       order: json['order'],
+      multipleValue: (json['multipleValue'] as List<dynamic>?)?.cast<String>(),
+      answerYes: json['answerYes'],
+      answerNo: json['answerNo'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'contentValue': contentValue,
-      'contentId': contentId,
+      'contentValue': contentValue, // Nullable
+      'contentId': contentId, // Nullable
       'type': type,
       'order': order,
+      'multipleValue': multipleValue,
+      'answerYes': answerYes,
+      'answerNo': answerNo,
     };
   }
 }

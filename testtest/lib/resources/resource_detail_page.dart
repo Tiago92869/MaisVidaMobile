@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:testtest/resources/fullscreen_video_page.dart';
@@ -10,8 +9,6 @@ import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:testtest/resources/resource_feedback_page.dart';
 import 'package:testtest/services/image/image_service.dart';
 import 'package:testtest/services/video/video_repository.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
@@ -65,8 +62,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       orElse: () => null,
     );
 
-    if (videoContent == null) {
-      print('ResourceDetailPage: No video content found.');
+    if (videoContent == null || videoContent.contentId == null) {
+      print('ResourceDetailPage: No valid video content found.');
       setState(() {
         _isVideoInitialized = false;
       });
@@ -76,33 +73,22 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     print('ResourceDetailPage: Video content found. ID: ${videoContent.contentId}');
 
     try {
-      print('ResourceDetailPage: Attempting to download video file...');
-      final file = await _videoRepository.downloadVideoFile(videoContent.contentId);
+      final file = await _videoRepository.downloadVideoFile(videoContent.contentId!);
 
-      if (file != null) {
-        print('ResourceDetailPage: Video file downloaded successfully. File path: ${file.path}');
-        if (await file.exists()) {
-          print('ResourceDetailPage: Video file exists and is readable.');
-          _videoController = VideoPlayerController.file(file)
-            ..initialize().then((_) {
-              print('ResourceDetailPage: Video player initialized successfully.');
-              setState(() {
-                _isVideoInitialized = true;
-              });
-            }).catchError((error) {
-              print('ResourceDetailPage: Error during video player initialization: $error');
-              setState(() {
-                _isVideoInitialized = false;
-              });
+      if (file != null && await file.exists()) {
+        _videoController = VideoPlayerController.file(file)
+          ..initialize().then((_) {
+            setState(() {
+              _isVideoInitialized = true;
             });
-        } else {
-          print('ResourceDetailPage: Video file does not exist or is not readable.');
-          setState(() {
-            _isVideoInitialized = false;
+          }).catchError((error) {
+            print('ResourceDetailPage: Error during video player initialization: $error');
+            setState(() {
+              _isVideoInitialized = false;
+            });
           });
-        }
       } else {
-        print('ResourceDetailPage: Error: Video file could not be downloaded.');
+        print('ResourceDetailPage: Video file does not exist or is not readable.');
         setState(() {
           _isVideoInitialized = false;
         });
@@ -118,13 +104,13 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   Future<void> _initializeImages() async {
     print('ResourceDetailPage: Initializing images...');
     final imageContents = widget.resource.contents
-        .where((content) => content.type.toLowerCase() == 'image')
+        .where((content) => content.type.toLowerCase() == 'image' && content.contentId != null)
         .toList();
 
     for (final content in imageContents) {
       try {
-        final base64Image = await _imageService.getImageBase64(content.contentId);
-        _imageCache[content.contentId] = base64Image; // Cache the image
+        final base64Image = await _imageService.getImageBase64(content.contentId!);
+        _imageCache[content.contentId!] = base64Image; // Cache the image
         print('ResourceDetailPage: Image cached for content ID: ${content.contentId}');
       } catch (e) {
         print('ResourceDetailPage: Error fetching image for content ID: ${content.contentId}: $e');
@@ -378,10 +364,10 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
         // Render contents in order
         for (final content in sortedContents) ...[
-          if (content.type.toLowerCase() == 'text') ...[
+          if (content.type.toLowerCase() == 'text' && content.contentValue != null) ...[
             Center(
               child: Text(
-                content.contentValue,
+                content.contentValue!,
                 style: const TextStyle(
                   fontSize: 16,
                   fontFamily: "Inter",
@@ -391,8 +377,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                 textAlign: TextAlign.center,
               ),
             ),
-          ] else if (content.type.toLowerCase() == 'image') ...[
-            _buildCachedImage(content.contentId),
+          ] else if (content.type.toLowerCase() == 'image' && content.contentId != null) ...[
+            _buildCachedImage(content.contentId!),
           ] else if (content.type.toLowerCase() == 'video') ...[
             if (_isVideoInitialized && _videoController != null)
               Column(
