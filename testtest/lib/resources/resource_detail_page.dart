@@ -704,10 +704,67 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         ? textSizes.map((size) => size.height).reduce((a, b) => a > b ? a : b)
         : 0.0;
 
-    return Center( // Center the entire content
+    if (content.multipleValue == null || content.multipleValue!.isEmpty) {
+      // Special case: multipleValue is empty
+      final isSelected = _selectedOptionsByContent[content.id] == content.contentValue;
+
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedOptionsByContent[content.id] =
+                      isSelected ? null : content.contentValue; // Allow deselect
+                });
+              },
+              child: Container(
+                width: 180, // Set a fixed larger width
+                height: 60, // Set a fixed larger height
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.blue
+                      : Colors.transparent, // Highlight selected option
+                  border: Border.all(
+                    color: Colors.white, // White border
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(12), // Rounded corners
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  content.contentValue ?? '',
+                  style: const TextStyle(
+                    fontSize: 16, // Slightly larger font size
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (isSelected && content.answerYes != null)
+              Text(
+                content.answerYes!,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+          ],
+        ),
+      );
+    }
+
+    // Default case: multipleValue is not empty
+    return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             content.contentValue ?? '',
