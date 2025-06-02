@@ -363,7 +363,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         Text(
           resource.description,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontFamily: "Inter",
             color: Colors.white70,
             height: 1.5,
@@ -385,7 +385,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               child: Text(
                 content.contentValue!,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontFamily: "Inter",
                   color: Colors.white,
                   height: 1.5,
@@ -560,7 +560,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             style: const TextStyle(
               fontStyle: FontStyle.italic,
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 18,
             ),
             textAlign: TextAlign.center, // Center-align the text
           ),
@@ -570,7 +570,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
-              fontSize: 16,
+              fontSize: 18,
             ),
             textAlign: TextAlign.center, // Center-align the text
           ),
@@ -586,7 +586,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         Text(
           content.contentValue ?? '',
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             color: Colors.white,
           ),
           textAlign: TextAlign.center,
@@ -669,7 +669,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                     ? (content.answerNo ?? '')
                     : '',
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,
@@ -686,7 +686,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             text: TextSpan(
               text: option,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -750,7 +750,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               Text(
                 content.answerYes!,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
@@ -769,7 +769,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           Text(
             content.contentValue ?? '',
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,
@@ -827,7 +827,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             text: TextSpan(
               text: option,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -852,7 +852,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           Text(
             content.contentValue ?? '',
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               color: Colors.white,
             ),
             textAlign: TextAlign.center,
@@ -916,7 +916,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         Text(
           content.contentValue ?? '',
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             color: Colors.white,
           ),
           textAlign: TextAlign.center,
