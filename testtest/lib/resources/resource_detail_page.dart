@@ -33,6 +33,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   String? _selectedYesNo; // Track the selected option for YESNO content
+  String? _selectedOption; // Track the selected option for SELECTONE content
+  Set<String> _selectedOptions = {}; // Track the selected options for SELECTMULTI content
 
   @override
   void initState() {
@@ -473,6 +475,10 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             _buildPhraseContent(content.contentValue!),
           ] else if (content.type.toLowerCase() == 'yesno') ...[
             _buildYesNoContent(content),
+          ] else if (content.type.toLowerCase() == 'selectone') ...[
+            _buildSelectOneContent(content),
+          ] else if (content.type.toLowerCase() == 'selectmulti') ...[
+            _buildSelectMultiContent(content),
           ],
           const SizedBox(height: 30), // Space between contents
         ],
@@ -655,6 +661,170 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSelectOneContent(Content content) {
+    // Calculate the largest width and height
+    final textSizes = content.multipleValue?.map((option) {
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: option,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          return textPainter.size;
+        }).toList() ??
+        [];
+
+    final maxWidth = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.width).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+
+    final maxHeight = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.height).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          content.contentValue ?? '',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          alignment: WrapAlignment.center,
+          children: content.multipleValue?.map((option) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedOption = _selectedOption == option ? null : option; // Allow deselect
+                    });
+                  },
+                  child: Container(
+                    width: maxWidth + 40, // Add padding to the width
+                    height: maxHeight + 40, // Add padding to the height
+                    decoration: BoxDecoration(
+                      color: _selectedOption == option
+                          ? Colors.blue
+                          : Colors.transparent, // Highlight selected option
+                      border: Border.all(
+                        color: Colors.white, // White border
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      option,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }).toList() ??
+              [],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectMultiContent(Content content) {
+    // Calculate the largest width and height
+    final textSizes = content.multipleValue?.map((option) {
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: option,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          return textPainter.size;
+        }).toList() ??
+        [];
+
+    final maxWidth = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.width).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+
+    final maxHeight = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.height).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+
+    return Center( // Center the entire content
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            content.contentValue ?? '',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: content.multipleValue?.map((option) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_selectedOptions.contains(option)) {
+                          _selectedOptions.remove(option); // Deselect option
+                        } else {
+                          _selectedOptions.add(option); // Select option
+                        }
+                      });
+                    },
+                    child: Container(
+                      width: maxWidth + 40, // Add padding to the width
+                      height: maxHeight + 40, // Add padding to the height
+                      decoration: BoxDecoration(
+                        color: _selectedOptions.contains(option)
+                            ? Colors.blue
+                            : Colors.transparent, // Highlight selected options
+                        border: Border.all(
+                          color: Colors.white, // White border
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8), // Rounded corners
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }).toList() ??
+                [],
+          ),
+        ],
+      ),
     );
   }
 }
