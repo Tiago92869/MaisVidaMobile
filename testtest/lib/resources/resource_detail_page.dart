@@ -9,6 +9,8 @@ import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:testtest/resources/resource_feedback_page.dart';
 import 'package:testtest/services/image/image_service.dart';
 import 'package:testtest/services/video/video_repository.dart';
+import 'package:testtest/services/audio/audio_repository.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
@@ -24,6 +26,10 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final FavoriteService _favoriteService = FavoriteService();
   final ImageService _imageService = ImageService();
   final VideoRepository _videoRepository = VideoRepository();
+  final AudioRepository _audioRepository = AudioRepository();
+  final Map<String, AudioPlayer> _audioPlayers = {}; // Map to store audio players for each content
+  final Map<String, bool> _audioLoadingStates = {}; // Map to track loading states for each content
+  final Map<String, String?> _audioUrls = {}; // Map to store audio URLs for each content
 
   bool _isFavorite = false;
   bool _initialFavoriteStatus = false;
@@ -35,6 +41,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   String? _selectedYesNo; // Track the selected option for YESNO content
   String? _selectedOption; // Track the selected option for SELECTONE content
   Set<String> _selectedOptions = {}; // Track the selected options for SELECTMULTI content
+  bool _isAudioLoading = false;
+  String? _currentAudioUrl;
 
   @override
   void initState() {
@@ -123,6 +131,10 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
   @override
   void dispose() {
+    // Dispose all audio players
+    for (final player in _audioPlayers.values) {
+      player.dispose();
+    }
     _videoController?.dispose();
     super.dispose();
   }
@@ -479,6 +491,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             _buildSelectOneContent(content),
           ] else if (content.type.toLowerCase() == 'selectmulti') ...[
             _buildSelectMultiContent(content),
+          ] else if (content.type.toLowerCase() == 'sound') ...[
+            _buildSoundContent(content),
           ],
           const SizedBox(height: 30), // Space between contents
         ],
@@ -825,6 +839,102 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSoundContent(Content content) {
+    final audioPlayer = _audioPlayers.putIfAbsent(content.id, () => AudioPlayer());
+    final isLoading = _audioLoadingStates[content.id] ?? false;
+    final audioUrl = _audioUrls[content.id];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          content.contentValue ?? '',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        isLoading
+            ? const CircularProgressIndicator()
+            : ElevatedButton(
+                onPressed: () async {
+                  if (audioUrl == null) {
+                    setState(() {
+                      _audioLoadingStates[content.id] = true;
+                    });
+                    try {
+                      final audioFile = await _audioRepository.downloadAudioFile(content.contentId!);
+                      if (audioFile != null) {
+                        _audioUrls[content.id] = audioFile.path;
+                        await audioPlayer.setSourceDeviceFile(audioFile.path);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Failed to load audio.')),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Error loading audio.')),
+                      );
+                    } finally {
+                      setState(() {
+                        _audioLoadingStates[content.id] = false;
+                      });
+                    }
+                  } else {
+                    if (audioPlayer.state == PlayerState.playing) {
+                      await audioPlayer.pause();
+                    } else {
+                      await audioPlayer.resume();
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  audioPlayer.state == PlayerState.playing ? 'Pause' : 'Play',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+        const SizedBox(height: 16),
+        StreamBuilder<Duration>(
+          stream: audioPlayer.onPositionChanged,
+          builder: (context, snapshot) {
+            final position = snapshot.data ?? Duration.zero;
+            return StreamBuilder<Duration>(
+              stream: audioPlayer.onDurationChanged,
+              builder: (context, snapshot) {
+                final duration = snapshot.data ?? Duration.zero;
+                return Column(
+                  children: [
+                    Slider(
+                      value: position.inSeconds.toDouble(),
+                      max: duration.inSeconds.toDouble(),
+                      onChanged: (value) async {
+                        await audioPlayer.seek(Duration(seconds: value.toInt()));
+                      },
+                      activeColor: Colors.blue,
+                      inactiveColor: Colors.grey,
+                    ),
+                    Text(
+                      '${position.inMinutes}:${(position.inSeconds % 60).toString().padLeft(2, '0')} / '
+                      '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ],
     );
   }
 }
