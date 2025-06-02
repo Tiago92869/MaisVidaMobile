@@ -534,7 +534,13 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   );
                 },
                 child: GestureDetector(
-                  onTap: onMenuPress,
+                  onTap: () async {
+                    if (FocusScope.of(context).hasFocus) {
+                      FocusScope.of(context).unfocus(); // Close the keyboard
+                      await Future.delayed(const Duration(milliseconds: 200)); // Wait for the keyboard to close
+                    }
+                    onMenuPress(); // Open the side menu
+                  },
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: Container(
