@@ -91,11 +91,12 @@ class DiaryService {
   }
 
   Future<Diary> createDiary(Diary diary) async {
+    print("DiaryService: createDiary called with diary: ${diary.toJson()}");
     await _loadStoredCredentials();
     final String url = '$_baseUrl';
     final requestBody = jsonEncode(diary.toJson());
-    print('Request URL for createDiary: $url'); // Log the request URL
-    print('Request Body for createDiary: $requestBody'); // Log the request body
+    print("DiaryService: Request URL: $url");
+    print("DiaryService: Request Body: $requestBody");
 
     try {
       final response = await http
@@ -110,25 +111,25 @@ class DiaryService {
           .timeout(
             _timeoutDuration,
             onTimeout: () {
-              print('Request to $url timed out.');
+              print("DiaryService: Request to $url timed out");
               throw TimeoutException(
                 'The connection has timed out, please try again later.',
               );
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      print("DiaryService: Response Status Code: ${response.statusCode}");
+      print("DiaryService: Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        print('Diary created successfully.');
+        print("DiaryService: Diary created successfully");
         return Diary.fromJson(jsonDecode(response.body));
       } else {
-        print('Failed to create diary. Status Code: ${response.statusCode}');
+        print("DiaryService: Failed to create diary. Status Code: ${response.statusCode}");
         throw Exception('Failed to create diary');
       }
     } catch (e) {
-      print('Error creating diary: $e');
+      print("DiaryService: Error creating diary: $e");
       rethrow;
     }
   }

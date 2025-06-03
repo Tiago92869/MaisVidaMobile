@@ -12,6 +12,7 @@ class DiaryRepository {
   }
 
   Future<Diary> createDiary(Diary diary) {
+    print("DiaryRepository: createDiary called with diary: ${diary.toJson()}");
     print('DiaryRepository: Creating diary with data: ${diary.toJson()}');
     return _diaryService.createDiary(diary);
   }

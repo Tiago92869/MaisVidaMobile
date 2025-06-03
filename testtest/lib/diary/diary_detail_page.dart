@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:testtest/services/diary/diary_model.dart';
 import 'package:testtest/services/diary/diary_service.dart';
+import 'dart:developer'; // Add this import for logging
 
 class DiaryDetailPage extends StatefulWidget {
   final Diary?
@@ -27,6 +28,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   @override
   void initState() {
     super.initState();
+    log("DiaryDetailPage initialized with createDiary: ${widget.createDiary}, diary: ${widget.diary}");
     editMode = widget.createDiary; // Start in edit mode if creating a new diary
     titleController = TextEditingController(text: widget.diary?.title ?? "");
     descriptionController = TextEditingController(
@@ -37,12 +39,15 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
     // Randomly decide which starfish to show
     _showFirstStarfish = DateTime.now().millisecondsSinceEpoch % 2 == 0;
+    log("Initial state set: editMode=$editMode, recordedAt=$recordedAt, selectedEmotion=$selectedEmotion");
   }
 
   Future<void> saveDiary() async {
+    log("saveDiary called");
     if (titleController.text.isEmpty ||
         descriptionController.text.isEmpty ||
         selectedEmotion == null) {
+      log("Missing fields: title=${titleController.text}, description=${descriptionController.text}, selectedEmotion=$selectedEmotion");
       // Show a styled popup message warning of missing fields
       showDialog(
         context: context,
@@ -95,6 +100,8 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
       updatedAt: DateTime.now(),
     );
 
+    log("Diary object created: $diary");
+
     // Show loading dialog
     showDialog(
       context: context,
@@ -106,15 +113,18 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
     try {
       if (widget.createDiary) {
+        log("Creating new diary");
         // Call createDiary if this is a new diary
         Navigator.pop(context); // Close the loading dialog
         Navigator.pop(context, true); // Return true to indicate success
       } else {
+        log("Updating existing diary with id: ${widget.diary?.id}");
         // Call updateDiary if editing an existing diary
         Navigator.pop(context); // Close the loading dialog
         Navigator.pop(context, true); // Return true to indicate success
       }
     } catch (e) {
+      log("Error saving diary: $e");
       Navigator.pop(context); // Close the loading dialog
       // Handle errors (e.g., show a snackbar)
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,6 +137,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   Future<bool> _showDeleteConfirmationDialog() async {
+    log("Delete confirmation dialog shown");
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
@@ -169,6 +180,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   Future<void> _deleteDiary() async {
+    log("Deleting diary with id: ${widget.diary?.id}");
     // Show loading dialog
     showDialog(
       context: context,
@@ -180,9 +192,11 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
     try {
       await _diaryService.deleteDiary(widget.diary!.id);
+      log("Diary deleted successfully");
       Navigator.pop(context); // Close the loading dialog
       Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
+      log("Error deleting diary: $e");
       Navigator.pop(context); // Close the loading dialog
       // Handle errors (e.g., show a snackbar)
       ScaffoldMessenger.of(context).showSnackBar(
@@ -195,9 +209,11 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   void toggleEditMode() {
+    log("Toggling edit mode. Current state: $editMode");
     setState(() {
       editMode = !editMode;
     });
+    log("Edit mode toggled. New state: $editMode");
   }
 
   IconData _getEmotionIcon(DiaryType emotion) {
@@ -223,6 +239,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    log("Building DiaryDetailPage UI");
     return Scaffold(
       body: Stack(
         children: [
@@ -458,6 +475,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
             right: 30,
             child: GestureDetector(
               onTap: () {
+                log("Save/Edit button tapped. createDiary=${widget.createDiary}, editMode=$editMode");
                 if (widget.createDiary || editMode) {
                   // Save the diary if creating or in edit mode
                   saveDiary();
@@ -483,7 +501,9 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               right: 20, // Move the button to the right side
               child: GestureDetector(
                 onTap: () async {
+                  log("Delete button tapped");
                   final shouldDelete = await _showDeleteConfirmationDialog();
+                  log("Delete confirmation result: $shouldDelete");
                   if (shouldDelete) {
                     await _deleteDiary();
                   }

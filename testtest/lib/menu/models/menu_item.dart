@@ -10,47 +10,47 @@ class MenuItemModel {
 
   static List<MenuItemModel> menuItems = [
     MenuItemModel(
-      title: "Home",
+      title: "Menu",
       riveIcon: TabItem(stateMachine: "HOME_interactivity", artboard: "HOME"),
     ),
     MenuItemModel(
-      title: "Diary",
+      title: "Diário",
       riveIcon: TabItem(
         stateMachine: "State Machine 1",
         artboard: "RULES",
       ),
     ),
     MenuItemModel(
-      title: "Goals",
+      title: "Metas",
       riveIcon: TabItem(
         stateMachine: "State Machine 1",
         artboard: "SCORE",
       ),
     ),
     MenuItemModel(
-      title: "Medicine",
+      title: "Medicamentos",
       riveIcon: TabItem(stateMachine: "CHAT_Interactivity", artboard: "CHAT"),
     ),
     MenuItemModel(
-      title: "Resources",
+      title: "Recursos",
       riveIcon: TabItem(stateMachine: "SEARCH_Interactivity", artboard: "SEARCH"),
     ),
     MenuItemModel(
-      title: "Activities",
+      title: "Atividades",
       riveIcon: TabItem(
         stateMachine: "State Machine 1",
         artboard: "DASHBOARD",
       ),
     ),
     MenuItemModel(
-      title: "Journey",
+      title: "Jornadas",
       riveIcon: TabItem(stateMachine: "State Machine 1", artboard: "ONLINE"),
     ),
   ];
 
   static List<MenuItemModel> menuItems2 = [
     MenuItemModel(
-      title: "Notifications",
+      title: "Notificações",
       riveIcon: TabItem(stateMachine: "BELL_Interactivity", artboard: "BELL"),
     ),
     MenuItemModel(
