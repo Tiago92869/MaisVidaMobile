@@ -232,17 +232,14 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   _buildFeelingOption(
-                                    emoji: '😊',
                                     label: 'Bem',
                                   ),
                                   const SizedBox(height: 20),
                                   _buildFeelingOption(
-                                    emoji: '😐',
                                     label: 'Normal',
                                   ),
                                   const SizedBox(height: 20),
                                   _buildFeelingOption(
-                                    emoji: '😔',
                                     label: 'Mal',
                                   ),
                                 ],
@@ -295,8 +292,15 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     );
   }
 
-  Widget _buildFeelingOption({required String emoji, required String label}) {
+    Widget _buildFeelingOption({required String label}) {
     final bool isSelected = _selectedFeeling == label;
+
+    // Map labels to image paths
+    final Map<String, String> imagePaths = {
+      'Bem': 'assets/images/bem.png',
+      'Normal': 'assets/images/normal.png',
+      'Mal': 'assets/images/muito mau.png',
+    };
 
     return GestureDetector(
       onTap: () {
@@ -307,19 +311,18 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(30), // Increase padding for larger icons
+            padding: const EdgeInsets.all(8), // Padding inside the circle
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isSelected
-                  ? Colors.white.withOpacity(0.8) // 30% transparent when selected
-                  : Colors.white.withOpacity(0.2),
+                  ? const Color.fromARGB(255, 255, 255, 255).withOpacity(0.9) // Slightly darker gray when selected
+                  : Colors.grey.withOpacity(0.4), // Lighter gray when not selected
             ),
-            child: Text(
-              emoji,
-              style: TextStyle(
-                fontSize: 50, // Emoji size
-                color: isSelected ? Colors.black : Colors.white,
-              ),
+            child: Image.asset(
+              imagePaths[label]!,
+              width: 120, // Adjust image size
+              height: 120,
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(height: 10),
