@@ -84,8 +84,8 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
-                  width: 150,
-                  height: 150,
+                  width: 200,
+                  height: 200,
                   child: Image.memory(
                     base64Decode(_rewardImageBase64!),
                     fit: BoxFit.contain,
@@ -119,7 +119,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       body: SingleChildScrollView(
         child: SizedBox(
           width: screenSize.width,
-          height: screenSize.height,
           child: Stack(
             children: [
               // Background gradient
@@ -134,151 +133,74 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                   ),
                 ),
               ),
-              // Randomly show one of the starfish images
-              if (_showFirstStarfish)
-                Positioned(
-                  right: 80,
-                  top: 320,
-                  width: 400,
-                  height: 400,
-                  child: Opacity(
-                    opacity: 0.1,
-                    child: Transform.rotate(
-                      angle: 0.7,
-                      child: Image.asset(
-                        'assets/images/starfish2.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                Positioned(
-                  left: 100,
-                  top: 250,
-                  width: 400,
-                  height: 400,
-                  child: Opacity(
-                    opacity: 0.1,
-                    child: Transform.rotate(
-                      angle: 0.5,
-                      child: Image.asset(
-                        'assets/images/starfish1.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start, // Align the back arrow to the left
                     children: [
-                      // Top Row with Back Icon, Info Icon, and Trophy Icon
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                          ),
-                          Row(
-                            children: [
-                              if (widget.resourceProgress.rewardId != null && !widget.resourceProgress.completed) ...[
-                                // Log the values for debugging
-                                () {
-                                  print('Debug: rewardId = ${widget.resourceProgress.rewardId}');
-                                  print('Debug: completed = ${widget.resourceProgress.completed}');
-                                  return const SizedBox.shrink(); // Return an empty widget to avoid breaking the layout
-                                }(),
-                                GestureDetector(
-                                  onTap: _showRewardPopup, // Show the reward popup when tapped
-                                  child: const Icon(Icons.emoji_events, color: Colors.white, size: 28), // Trophy icon
-                                ),
-                              ],
-                              const SizedBox(width: 10),
-                              if (widget.resourceProgress.completed) ...[
-                                // Log the values for debugging
-                                () {
-                                  print('Debug: completed = ${widget.resourceProgress.completed}');
-                                  return const SizedBox.shrink(); // Return an empty widget to avoid breaking the layout
-                                }(),
-                                GestureDetector(
-                                  onTap: _showInfoMessage, // Show the info message when tapped
-                                  child: const Icon(Icons.info, color: Colors.white, size: 28),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
                       ),
-                      Expanded(
-                        child: Center( // Center the rest of the content
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center, // Vertically center elements
-                            children: [
-                              const Text(
-                                'Como te sentes hoje?',
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Como você está se sentindo?',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 40),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildFeelingOption(label: 'Bem'),
+                                const SizedBox(height: 20),
+                                _buildFeelingOption(label: 'Normal'),
+                                const SizedBox(height: 20),
+                                _buildFeelingOption(label: 'Mal'),
+                              ],
+                            ),
+                            const SizedBox(height: 40),
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (widget.resourceProgress.completed) {
+                                  final resource = await _resourceService.fetchResourceById(
+                                    widget.resourceProgress.resourceId!,
+                                  );
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ResourceDetailPage(resource: resource),
+                                    ),
+                                  );
+                                } else {
+                                  await _handleContinue();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: const Color(0xFF0D1B2A),
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'Continuar',
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 40),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildFeelingOption(
-                                    label: 'Bem',
-                                  ),
-                                  const SizedBox(height: 20),
-                                  _buildFeelingOption(
-                                    label: 'Normal',
-                                  ),
-                                  const SizedBox(height: 20),
-                                  _buildFeelingOption(
-                                    label: 'Mal',
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 40),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (widget.resourceProgress.completed) {
-                                    // Skip updating progress if already completed
-                                    final resource = await _resourceService.fetchResourceById(
-                                      widget.resourceProgress.resourceId!,
-                                    );
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ResourceDetailPage(resource: resource),
-                                      ),
-                                    );
-                                  } else {
-                                    await _handleContinue(); // Call the update method if not completed
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: const Color(0xFF0D1B2A),
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Continuar',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -292,7 +214,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     );
   }
 
-    Widget _buildFeelingOption({required String label}) {
+  Widget _buildFeelingOption({required String label}) {
     final bool isSelected = _selectedFeeling == label;
 
     // Map labels to image paths

@@ -3,7 +3,6 @@ import 'dart:math'; // Import for Random
 import 'package:testtest/services/feedback/feedback_model.dart' as feedback_model;
 import 'package:testtest/services/feedback/feedback_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:testtest/services/journey/journey_service.dart';
 
 class ResourceFeedbackPage extends StatefulWidget {
   final String resourceId;
@@ -101,7 +100,6 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
       body: SingleChildScrollView(
         child: SizedBox(
           width: screenSize.width,
-          height: screenSize.height,
           child: Stack(
             children: [
               // Background gradient
@@ -116,53 +114,18 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
                   ),
                 ),
               ),
-              // Randomly show one of the starfish images
-              if (_showFirstStarfish)
-                Positioned(
-                  right: 80,
-                  top: 320,
-                  width: 400,
-                  height: 400,
-                  child: Opacity(
-                    opacity: 0.1,
-                    child: Transform.rotate(
-                      angle: 0.7,
-                      child: Image.asset(
-                        'assets/images/starfish2.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                Positioned(
-                  left: 100,
-                  top: 250,
-                  width: 400,
-                  height: 400,
-                  child: Opacity(
-                    opacity: 0.1,
-                    child: Transform.rotate(
-                      angle: 0.5,
-                      child: Image.asset(
-                        'assets/images/starfish1.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align the back arrow to the left
                     children: [
-                      // Go Back Icon
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
                       ),
-                      Expanded(
+                      const SizedBox(height: 20),
+                      Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -180,19 +143,16 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 _buildRatingIcon(
-                                  icon: Icons.thumb_up,
                                   label: 'Útil',
                                   rating: feedback_model.UsefulnessRating.USEFUL,
                                 ),
                                 const SizedBox(height: 20),
                                 _buildRatingIcon(
-                                  icon: Icons.thumbs_up_down,
-                                  label: 'Indifferent',
+                                  label: 'Indiferente',
                                   rating: feedback_model.UsefulnessRating.INDIFFERENT,
                                 ),
                                 const SizedBox(height: 20),
                                 _buildRatingIcon(
-                                  icon: Icons.thumb_down,
                                   label: 'Não é útil',
                                   rating: feedback_model.UsefulnessRating.NOT_USEFUL,
                                 ),
@@ -235,11 +195,17 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
   }
 
   Widget _buildRatingIcon({
-    required IconData icon,
     required String label,
     required feedback_model.UsefulnessRating rating,
   }) {
     final isSelected = _selectedRating == rating;
+
+    // Map labels to image paths
+    final Map<String, String> imagePaths = {
+      'Útil': 'assets/images/bem.png',
+      'Indiferente': 'assets/images/normal.png',
+      'Não é útil': 'assets/images/muito mau.png',
+    };
 
     return GestureDetector(
       onTap: () {
@@ -250,15 +216,16 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(30), // Increase padding for larger icons
+            padding: const EdgeInsets.all(8), // Increase padding for larger images
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isSelected ? Colors.yellow : Colors.white.withOpacity(0.2),
+              color: isSelected ? const Color.fromARGB(255, 255, 255, 255).withOpacity(0.9) : Colors.white.withOpacity(0.2),
             ),
-            child: Icon(
-              icon,
-              size: 50, // Increase icon size
-              color: isSelected ? Colors.black : Colors.white,
+            child: Image.asset(
+              imagePaths[label]!,
+              width: 120, // Adjust image size
+              height: 120,
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(height: 10),
@@ -267,7 +234,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
             style: TextStyle(
               fontSize: 18, // Slightly larger font size
               fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.yellow : Colors.white,
+              color: isSelected ? Colors.white : Colors.white,
             ),
           ),
         ],
