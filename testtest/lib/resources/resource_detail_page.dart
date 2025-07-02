@@ -33,13 +33,14 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final Map<String, String?> _selectedOptionsByContent = {}; // Track selected options per content
 
   bool _isFavorite = false;
+  bool _isLastContentReached = false; // Track if the last content has been reached
 
   final Map<String, String> _imageCache = {}; // Cache for all images
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   String? _selectedYesNo; // Track the selected option for YESNO content
-// Track the selected option for SELECTONE content
   Set<String> _selectedOptions = {}; // Track the selected options for SELECTMULTI content
+  int _currentContentIndex = 0; // Track the currently displayed content
 
   @override
   void initState() {
@@ -242,34 +243,35 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ResourceFeedbackPage(
-                                      resourceId: widget.resource.id,
+                          if (_isLastContentReached) // Show button only if last content is reached
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ResourceFeedbackPage(
+                                        resourceId: widget.resource.id,
+                                      ),
                                     ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: const Color(0xFF0D1B2A),
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: const Color(0xFF0D1B2A),
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                              child: const Text(
-                                'Continuar',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                child: const Text(
+                                  'Terminar',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -289,6 +291,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     // Sort contents by ascending order
     final sortedContents = List.of(resource.contents)
       ..sort((a, b) => a.order.compareTo(b.order));
+
+    final currentContent = sortedContents[_currentContentIndex]; // Get the current content
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,125 +377,182 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         ),
         const SizedBox(height: 20),
 
-        // Render contents in order
-        for (final content in sortedContents) ...[
-          if (content.type.toLowerCase() == 'text' && content.contentValue != null) ...[
-            Center(
-              child: Text(
-                content.contentValue!,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: "Inter",
-                  color: Colors.white,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
+        // Render current content
+        if (currentContent.type.toLowerCase() == 'text' && currentContent.contentValue != null) ...[
+          Center(
+            child: Text(
+              currentContent.contentValue!,
+              style: const TextStyle(
+                fontSize: 18,
+                fontFamily: "Inter",
+                color: Colors.white,
+                height: 1.5,
               ),
+              textAlign: TextAlign.center,
             ),
-          ] else if (content.type.toLowerCase() == 'image' && content.contentId != null) ...[
-            _buildCachedImage(content.contentId!),
-          ] else if (content.type.toLowerCase() == 'video') ...[
-            if (_isVideoInitialized && _videoController != null)
-              Column(
-                children: [
-                  AspectRatio(
-                    aspectRatio: _videoController!.value.aspectRatio,
-                    child: VideoPlayer(_videoController!),
+          ),
+        ] else if (currentContent.type.toLowerCase() == 'image' && currentContent.contentId != null) ...[
+          _buildCachedImage(currentContent.contentId!),
+        ] else if (currentContent.type.toLowerCase() == 'video') ...[
+          if (_isVideoInitialized && _videoController != null)
+            Column(
+              children: [
+                AspectRatio(
+                  aspectRatio: _videoController!.value.aspectRatio,
+                  child: VideoPlayer(_videoController!),
+                ),
+                const SizedBox(height: 12),
+                VideoProgressIndicator(
+                  _videoController!,
+                  allowScrubbing: true,
+                  colors: const VideoProgressColors(
+                    playedColor: Colors.redAccent,
+                    bufferedColor: Colors.grey,
+                    backgroundColor: Colors.white30,
                   ),
-                  const SizedBox(height: 12),
-                  VideoProgressIndicator(
-                    _videoController!,
-                    allowScrubbing: true,
-                    colors: const VideoProgressColors(
-                      playedColor: Colors.redAccent,
-                      bufferedColor: Colors.grey,
-                      backgroundColor: Colors.white30,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.replay_5, color: Colors.white),
+                      onPressed: () {
+                        final currentPosition = _videoController!.value.position;
+                        Duration newPosition = currentPosition - const Duration(seconds: 5);
+                        if (newPosition < Duration.zero) newPosition = Duration.zero;
+                        _videoController!.seekTo(newPosition);
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.replay_5, color: Colors.white),
-                        onPressed: () {
-                          final currentPosition = _videoController!.value.position;
-                          Duration newPosition = currentPosition - const Duration(seconds: 5);
-                          if (newPosition < Duration.zero) newPosition = Duration.zero;
-                          _videoController!.seekTo(newPosition);
-                        },
+                    IconButton(
+                      icon: Icon(
+                        _videoController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                        color: Colors.white,
+                        size: 36,
                       ),
-                      IconButton(
-                        icon: Icon(
-                          _videoController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
-                          color: Colors.white,
-                          size: 36,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            if (_videoController!.value.isPlaying) {
-                              _videoController!.pause();
-                            } else {
-                              _videoController!.play();
-                            }
-                          });
-                        },
+                      onPressed: () {
+                        setState(() {
+                          if (_videoController!.value.isPlaying) {
+                            _videoController!.pause();
+                          } else {
+                            _videoController!.play();
+                          }
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.forward_5, color: Colors.white),
+                      onPressed: () {
+                        final currentPosition = _videoController!.value.position;
+                        final maxPosition = _videoController!.value.duration;
+                        Duration newPosition = currentPosition + const Duration(seconds: 5);
+                        if (newPosition > maxPosition) newPosition = maxPosition;
+                        _videoController!.seekTo(newPosition);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        _videoController!.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                        color: Colors.white,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.forward_5, color: Colors.white),
-                        onPressed: () {
-                          final currentPosition = _videoController!.value.position;
-                          final maxPosition = _videoController!.value.duration;
-                          Duration newPosition = currentPosition + const Duration(seconds: 5);
-                          if (newPosition > maxPosition) newPosition = maxPosition;
-                          _videoController!.seekTo(newPosition);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          _videoController!.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _videoController!.setVolume(
-                              _videoController!.value.volume > 0 ? 0 : 1,
-                            );
-                          });
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.fullscreen, color: Colors.white),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FullscreenVideoPage(
-                                videoController: _videoController!,
-                              ),
-                            ),
+                      onPressed: () {
+                        setState(() {
+                          _videoController!.setVolume(
+                            _videoController!.value.volume > 0 ? 0 : 1,
                           );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            else if (!_isVideoInitialized)
-              const Center(child: CircularProgressIndicator()),
-          ] else if (content.type.toLowerCase() == 'phrase' && content.contentValue != null) ...[
-            _buildPhraseContent(content.contentValue!),
-          ] else if (content.type.toLowerCase() == 'yesno') ...[
-            _buildYesNoContent(content),
-          ] else if (content.type.toLowerCase() == 'selectone') ...[
-            _buildSelectOneContent(content),
-          ] else if (content.type.toLowerCase() == 'selectmulti') ...[
-            _buildSelectMultiContent(content),
-          ] else if (content.type.toLowerCase() == 'sound') ...[
-            _buildSoundContent(content),
-          ],
-          const SizedBox(height: 30), // Space between contents
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.fullscreen, color: Colors.white),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FullscreenVideoPage(
+                              videoController: _videoController!,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            )
+          else if (!_isVideoInitialized)
+            const Center(child: CircularProgressIndicator()),
+        ] else if (currentContent.type.toLowerCase() == 'phrase' && currentContent.contentValue != null) ...[
+          _buildPhraseContent(currentContent.contentValue!),
+        ] else if (currentContent.type.toLowerCase() == 'yesno') ...[
+          _buildYesNoContent(currentContent),
+        ] else if (currentContent.type.toLowerCase() == 'selectone') ...[
+          _buildSelectOneContent(currentContent),
+        ] else if (currentContent.type.toLowerCase() == 'selectmulti') ...[
+          _buildSelectMultiContent(currentContent),
+        ] else if (currentContent.type.toLowerCase() == 'sound') ...[
+          _buildSoundContent(currentContent),
         ],
+
+        const SizedBox(height: 30),
+
+        // Navigation buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (_currentContentIndex > 0)
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _currentContentIndex--;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Anterior',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            else
+              Spacer(), // Push "Próximo" to the right when "Anterior" is not displayed
+            if (_currentContentIndex < sortedContents.length - 1)
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _currentContentIndex++;
+                    _isLastContentReached = _currentContentIndex == sortedContents.length - 1;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Próximo',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
       ],
     );
   }

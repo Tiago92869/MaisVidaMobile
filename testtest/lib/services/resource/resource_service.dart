@@ -120,7 +120,10 @@ class ResourceService {
 
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
-        print('Response Body: $decodedBody');
+        const chunkSize = 1000; // Define the size of each chunk
+        for (int i = 0; i < decodedBody.length; i += chunkSize) {
+          print(decodedBody.substring(i, i + chunkSize > decodedBody.length ? decodedBody.length : i + chunkSize));
+        }
         print('Resource fetched successfully.');
         return Resource.fromJson(jsonDecode(decodedBody));
       } else {
