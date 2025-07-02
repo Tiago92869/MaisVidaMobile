@@ -114,12 +114,14 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     try {
       if (widget.createDiary) {
         log("Creating new diary");
-        // Call createDiary if this is a new diary
+        await _diaryService.createDiary(diary);
+        log("Diary created successfully");
         Navigator.pop(context); // Close the loading dialog
         Navigator.pop(context, true); // Return true to indicate success
       } else {
         log("Updating existing diary with id: ${widget.diary?.id}");
-        // Call updateDiary if editing an existing diary
+        await _diaryService.updateDiary(widget.diary!.id, diary);
+        log("Diary updated successfully");
         Navigator.pop(context); // Close the loading dialog
         Navigator.pop(context, true); // Return true to indicate success
       }

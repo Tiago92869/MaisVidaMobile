@@ -12,9 +12,16 @@ class DiaryRepository {
   }
 
   Future<Diary> createDiary(Diary diary) {
-    print("DiaryRepository: createDiary called with diary: ${diary.toJson()}");
-    print('DiaryRepository: Creating diary with data: ${diary.toJson()}');
-    return _diaryService.createDiary(diary);
+    print("DiaryRepository: createDiary called");
+    print("DiaryRepository: Diary data: ${diary.toJson()}");
+    print("DiaryRepository: Sending diary creation request to DiaryService");
+    return _diaryService.createDiary(diary).then((createdDiary) {
+      print("DiaryRepository: Diary successfully created: ${createdDiary.toJson()}");
+      return createdDiary;
+    }).catchError((error) {
+      print("DiaryRepository: Error occurred during diary creation: $error");
+      throw error;
+    });
   }
 
   Future<Diary> updateDiary(String id, Diary diary) {
