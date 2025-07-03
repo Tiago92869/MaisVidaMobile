@@ -46,10 +46,10 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                     color: Colors.white, // White title color
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 SizedBox(
-                  width: 150,
-                  height: 150,
+                  width: 250,
+                  height: 250,
                   child: Image.memory(
                     base64Decode(base64Image),
                     fit: BoxFit.contain,

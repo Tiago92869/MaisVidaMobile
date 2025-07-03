@@ -60,57 +60,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       }
     }
   }
-
-  void _showRewardPopup() {
-    if (_rewardImageBase64 != null) {
-      showDialog(
-        context: context,
-        barrierColor: const Color(0xFF0D1B2A).withOpacity(0.7), // Semi-transparent background
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.transparent, // Transparent background for the dialog
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Center(
-                  child: Text(
-                    "Prémio após completar este dia",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // White title color
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: Image.memory(
-                    base64Decode(_rewardImageBase64!),
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    }
-  }
-
-  void _showInfoMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          "Este dia já foi concluído. Mas pode visualizá-lo novamente.",
-        ),
-        duration: const Duration(seconds: 5), // Automatically close after 5 seconds
-        backgroundColor: Colors.blueAccent,
-      ),
-    );
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size; // Get the screen size
