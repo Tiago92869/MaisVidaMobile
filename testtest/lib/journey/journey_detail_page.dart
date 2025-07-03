@@ -178,12 +178,27 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                         ),
                         const SizedBox(height: 30),
 
+                        // Add day labels
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: const [
+                            Text("S", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text("T", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text("Q", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text("Q", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text("S", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text("S", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text("D", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+
                         // Resource progress grid
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5, // 5 squares per line
+                            crossAxisCount: 7, // 7 squares per line
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                           ),
@@ -224,7 +239,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                                     child: Text(
                                       resource.order.toString(),
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: resource.unlocked
                                             ? Colors.white
@@ -239,7 +254,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                                       child: Icon(
                                         Icons.check_circle,
                                         color: Colors.greenAccent,
-                                        size: 20,
+                                        size: 16,
                                       ),
                                     )
                                   else if (!resource.unlocked)
@@ -249,7 +264,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                                       child: Icon(
                                         Icons.lock,
                                         color: Colors.redAccent,
-                                        size: 20,
+                                        size: 16,
                                       ),
                                     ),
                                   if (isLastSquare)
@@ -259,7 +274,7 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                                       child: Icon(
                                         Icons.star,
                                         color: Colors.yellow,
-                                        size: 20,
+                                        size: 16,
                                       ),
                                     ),
                                 ],
