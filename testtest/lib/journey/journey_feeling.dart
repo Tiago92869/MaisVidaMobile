@@ -33,6 +33,9 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
     debugPrint('completed: ${widget.resourceProgress.completed}'); // Log completed specifically
     _initializeSelectedFeeling(); // Initialize the selected feeling
     _fetchRewardImage(); // Fetch the reward image
+    if (!widget.resourceProgress.completed && widget.resourceProgress.rewardId != null) {
+      _showRewardImage(widget.resourceProgress.rewardId!); // Show reward image only if not completed
+    }
   }
 
   void _initializeSelectedFeeling() {
@@ -60,7 +63,49 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       }
     }
   }
-  
+
+  Future<void> _showRewardImage(String rewardId) async {
+    try {
+      final base64Image = await _imageService.getImageBase64(rewardId);
+      showDialog(
+        context: context,
+        barrierColor: const Color(0xFF0D1B2A).withOpacity(0.7), // Semi-transparent background
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.transparent, // Transparent background for the dialog
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Prémio após a conclusão",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // White title color
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 250,
+                  height: 250,
+                  child: Image.memory(
+                    base64Decode(base64Image),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print('Error fetching reward image: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Falha ao carregar a imagem do prémio.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size; // Get the screen size
@@ -243,6 +288,11 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         widget.resourceProgress.id,
         updateProgress,
       );
+
+      // Show reward image if available
+      if (widget.resourceProgress.rewardId != null) {
+        await _showRewardImage(widget.resourceProgress.rewardId!);
+      }
 
       if (mounted) {
         Navigator.popUntil(context, (route) => route.isFirst);
