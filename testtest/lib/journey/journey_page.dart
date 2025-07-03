@@ -66,11 +66,14 @@ class _JourneyPageState extends State<JourneyPage> {
 
       print('Started journey and fetched details: ${journeyDetails.currentStep}');
 
-      // Navigate to the JourneyDetailPage with the fetched details
+      // Navigate to the JourneyDetailPage with the fetched details and isNewJourney flag
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => JourneyDetailPage(journey: journeyDetails),
+          builder: (context) => JourneyDetailPage(
+            journey: journeyDetails,
+            isNewJourney: true, // Indicate this is a newly started journey
+          ),
         ),
       );
 
@@ -100,11 +103,14 @@ class _JourneyPageState extends State<JourneyPage> {
 
       print('Fetched journey details: ${journeyDetails.currentStep}');
 
-      // Navigate to the JourneyDetailPage with the fetched details
+      // Navigate to the JourneyDetailPage without isNewJourney flag
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => JourneyDetailPage(journey: journeyDetails),
+          builder: (context) => JourneyDetailPage(
+            journey: journeyDetails,
+            isNewJourney: false, // Indicate this is not a newly started journey
+          ),
         ),
       );
 

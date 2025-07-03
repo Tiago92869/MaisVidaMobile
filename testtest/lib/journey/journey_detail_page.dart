@@ -4,11 +4,13 @@ import 'dart:math';
 import 'package:testtest/journey/journey_feeling.dart'; // Import JourneyFeelingPage
 import 'package:testtest/services/image/image_service.dart';
 import 'dart:convert';
+import 'dart:ui'; // For BackdropFilter
 
 class JourneyDetailPage extends StatefulWidget {
   final UserJourneyProgress journey;
+  final bool isNewJourney; // Flag to indicate if this is a newly started journey
 
-  const JourneyDetailPage({Key? key, required this.journey}) : super(key: key);
+  const JourneyDetailPage({Key? key, required this.journey, required this.isNewJourney}) : super(key: key);
 
   @override
   _JourneyDetailPageState createState() => _JourneyDetailPageState();
@@ -16,6 +18,13 @@ class JourneyDetailPage extends StatefulWidget {
 
 class _JourneyDetailPageState extends State<JourneyDetailPage> {
   final ImageService _imageService = ImageService();
+  bool _showWelcomePopup = false; // State variable to show the popup
+
+  @override
+  void initState() {
+    super.initState();
+    _showWelcomePopup = widget.isNewJourney; // Show popup only for new journeys
+  }
 
   Future<void> _showPrizeImage(String imageId) async {
     try {
@@ -289,6 +298,89 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
               ],
             ),
           ),
+          if (_showWelcomePopup)
+            Stack(
+              children: [
+                // Blurred background
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.5), // Semi-transparent overlay
+                    ),
+                  ),
+                ),
+                // Popup box
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1B263B), // Match page background color
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/images/genial.png', // Add the image
+                          width: 250, // Adjust width as needed
+                          height: 250, // Adjust height as needed
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Olá, o meu nome é TIVA!",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white, // White text color
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Durante os próximos 28 dias, estarei aqui todos os dias para saber como se sente e propor uma atividade que ajude a fortalecer a sua Saúde Mental Positiva.\n\nQuero acompanhá-la nesta jornada e crescer consigo. Está pronta para começar?",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70, // Slightly transparent text
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _showWelcomePopup = false; // Close the popup
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white, // White button background
+                            foregroundColor: const Color(0xFF1B263B), // Transparent font color
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "SIM",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
