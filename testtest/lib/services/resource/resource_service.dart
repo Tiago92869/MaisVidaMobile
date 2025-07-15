@@ -44,6 +44,12 @@ class ResourceService {
       print('Fetching resources...');
       print('Resource Types: $resourceTypes, Page: $page, Size: $size, Search: $search');
 
+      // If resourceTypes is empty, use all types except TIVA
+      /*
+      if (resourceTypes.isEmpty) {
+        resourceTypes = ResourceType.values.where((type) => type != ResourceType.TIVA).toList();
+      }
+      */
       // Convert resourceTypes to a comma-separated string
       final String resourceTypesParam = resourceTypes
           .map((type) => type.toString().split('.').last)

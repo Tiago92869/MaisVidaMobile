@@ -225,7 +225,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   const SizedBox(
                     height: 10,
                   ), // Add spacing between the text and the button
-                  if (title != "Resources")
+                  if (title != "Recursos")
                     ElevatedButton(
                       onPressed: () {
                         widget.onTabChange(tabIndex); // Pass the tab index
