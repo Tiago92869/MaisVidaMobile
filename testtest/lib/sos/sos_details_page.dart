@@ -5,6 +5,7 @@ import 'package:testtest/services/resource/resource_service.dart';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:io' show Platform;
 
 class SosDetailsPage extends StatefulWidget {
   const SosDetailsPage({Key? key}) : super(key: key);
@@ -76,104 +77,137 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
   }
 
   Future<void> _makePhoneCall(String? number) async {
-    if (number == null || number.isEmpty) {
-      // Show a custom-styled popup message if no emergency contact is set up
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Erro",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Contacto de emergência não definido.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.white70),
-                  ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child: Text(
-                        "OK",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-      return; // Do not proceed with the call
-    }
+  print("📱 Platform check — is iOS: ${Platform.isIOS}");
+  print("📱 Platform check — is Android: ${Platform.isAndroid}");
 
-    final Uri phoneUri = Uri(scheme: 'tel', path: number);
+  if (number == null || number.isEmpty) {
+    print("⚠️ No number provided, showing no contact dialog.");
+    _showNoContactDialog();
+    return;
+  }
+
+  final Uri phoneUri = Uri(scheme: 'tel', path: number);
+  print("📞 Constructed phone URI: $phoneUri");
+
+  if (Platform.isAndroid) {
+    print("🤖 On Android — checking phone permissions...");
+
     final status = await Permission.phone.status;
+    print("📊 Permission status: $status");
 
     if (status.isDenied || status.isRestricted) {
+      print("🔒 Permission is denied or restricted — requesting permission...");
       final result = await Permission.phone.request();
-      if (!result.isGranted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("É necessária permissão para chamada telefónica."),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-    }
+      print("📊 Permission request result: $result");
 
-    if (await canLaunchUrl(phoneUri)) {
-      await launchUrl(phoneUri);
+      if (!result.isGranted) {
+        print("❌ Permission not granted — showing permission error.");
+        _showPermissionError();
+        return;
+      } else {
+        print("✅ Permission granted.");
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Não é possível redirecionar para as chamadas"),
-          backgroundColor: Colors.red,
+      print("✅ Permission already granted.");
+    }
+  } else {
+    print("🍏 On iOS — skipping permission check.");
+  }
+
+  print("🚀 Checking if can launch URI...");
+
+  if (await canLaunchUrl(phoneUri)) {
+    print("✅ Can launch URI — launching...");
+    await launchUrl(phoneUri);
+  } else {
+    print("❌ Cannot launch URI — showing launch error.");
+    _showLaunchError();
+  }
+}
+
+
+  void _showNoContactDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Erro",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Contacto de emergência não definido.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.white70),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text(
+                    "OK",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
-    }
-  }
+    },
+  );
+}
+
+void _showPermissionError() {
+  print("🚨 _showPermissionError triggered");
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("É necessária permissão para chamada telefónica."),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
+
+void _showLaunchError() {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Não é possível redirecionar para as chamadas"),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
 
   void _navigateToResourceDetail(BuildContext context, Resource resource) {
     Navigator.push(
