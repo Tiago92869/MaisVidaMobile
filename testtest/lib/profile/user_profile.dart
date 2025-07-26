@@ -125,7 +125,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    "Seleciona uma imagem",
+                    "Imagem de perfil",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -318,7 +318,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  void cancelEdit() {
+  Future<void> cancelEdit() async {
+    if (editMode) {
+      final discard = await _showDiscardChangesDialog();
+      if (!discard) return;
+    }
     setState(() {
       firstNameController.text = lastSavedFirstName;
       familyNameController.text = lastSavedFamilyName;
@@ -336,18 +340,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      locale: const Locale('pt', 'PT'),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFF0D1B2A), // Header background color
-            hintColor: const Color(0xFF0D1B2A), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A),
+            hintColor: const Color(0xFF0D1B2A),
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF0D1B2A), // Header text color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black, // Body text color
+              primary: Color(0xFF0D1B2A),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
-            dialogBackgroundColor:
-                Colors.white, // Background color of the calendar
+            dialogBackgroundColor: Colors.white,
           ),
           child: child!,
         );
@@ -386,8 +390,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return Material( // <-- Adicionado para garantir MaterialLocalizations
+      child: WillPopScope(
+        onWillPop: () async {
+          if (editMode) {
+            final discard = await _showDiscardChangesDialog();
+            if (discard) {
+              setState(() {
+                firstNameController.text = lastSavedFirstName;
+                familyNameController.text = lastSavedFamilyName;
+                cityController.text = lastSavedCity;
+                birthdayController.text = lastSavedBirthday;
+                aboutMeController.text = lastSavedAboutMe;
+                emergencyContactController.text = lastSavedEmergencyContact;
+                editMode = false;
+              });
+              return true;
+            } else {
+              return false;
+            }
+          }
+          return true;
+        },
+        child: Scaffold(
+          body: Stack(
         children: [
           // Background
           Positioned.fill(
@@ -529,7 +555,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               color: Colors.grey[800],
                             ),
                             decoration: const InputDecoration.collapsed(
-                              hintText: 'Digite Sobre Mim',
+                              hintText: 'Sobre mim',
                             ),
                             maxLines: null,
                           ),
@@ -558,7 +584,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ),
                             child: const Text(
-                              "Redefinir palavra-passe",
+                              "Alterar palavra-passe",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -584,7 +610,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
               children: [
                 if (editMode)
                   GestureDetector(
-                    onTap: cancelEdit,
+                    onTap: () async {
+                      await cancelEdit();
+                    },
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: Container(
@@ -640,6 +668,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
         ],
+        ),
+      ),
       ),
     );
   }
@@ -649,6 +679,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     TextEditingController controller, {
     bool editable = true,
   }) {
+    String hint = title;
+    if (title == "Primeiro nome") hint = "Primeiro nome";
+    if (title == "Apelido") hint = "Apelido";
+    if (title == "Cidade") hint = "Cidade";
+    if (title == "E-mail") hint = "E-mail";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -680,7 +715,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             controller: controller,
             enabled: editable && editMode,
             style: TextStyle(fontSize: 16, color: Colors.grey[800]),
-            decoration: InputDecoration.collapsed(hintText: 'Introduza $title'),
+            decoration: InputDecoration.collapsed(hintText: hint),
           ),
         ),
       ],
@@ -775,7 +810,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   keyboardType: TextInputType.phone,
                   style: TextStyle(fontSize: 16, color: Colors.grey[800]),
                   decoration: const InputDecoration.collapsed(
-                    hintText: 'Introduza contacto de emergência', // No placeholder text
+                    hintText: 'Contacto de emergência',
                   ),
                 ),
               ),
@@ -784,5 +819,47 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       ],
     );
+  }
+
+  Future<bool> _showDiscardChangesDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0D1B2A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Guardar Dados",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Text(
+                "Tem a certeza que não quer guardar os dados alterados?",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    "Voltar",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    "Sim",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 }

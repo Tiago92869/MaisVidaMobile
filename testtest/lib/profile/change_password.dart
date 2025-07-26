@@ -1,19 +1,20 @@
+
 import 'package:flutter/material.dart';
 import 'package:testtest/services/user/user_service.dart';
 import 'package:testtest/services/user/user_model.dart';
 import 'package:testtest/login/login_page.dart';
+
 
 class ChangePasswordPage extends StatefulWidget {
   @override
   _ChangePasswordPageState createState() => _ChangePasswordPageState();
 }
 
+
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
-  // Controllers for text fields
   TextEditingController currentPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-
   final UserService _userService = UserService();
   bool _showFirstStarfish = true;
 
@@ -37,7 +38,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       );
       return;
     }
-
     if (newPasswordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -47,21 +47,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       );
       return;
     }
-
     try {
       final passwordUpdateDTO = PasswordUpdateDTO(
         currentPassword: currentPasswordController.text,
         newPassword: newPasswordController.text,
       );
-
       await _userService.updateUserPassword(passwordUpdateDTO);
-
-      // If no exception is thrown, assume the update was successful
-      await _userService.logout(); // Call the logout method
+      await _userService.logout();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false, // Remove all previous routes
+        (route) => false,
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -82,11 +78,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:
-          false, // Prevents the screen from resizing when the keyboard appears
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Background gradient
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -98,8 +92,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ),
             ),
           ),
-
-          // Starfish Decorations
           if (_showFirstStarfish)
             Positioned(
               right: 80,
@@ -134,15 +126,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
               ),
             ),
-
-          // Main Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back Arrow
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: const Icon(
@@ -151,10 +140,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       size: 28,
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Title
                   const Center(
                     child: Text(
                       "Atualizar palavra-passe",
@@ -165,36 +151,24 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 60),
-
-                  // Current Password Field
                   _buildPasswordField(
                     "Palavra-passe atual",
                     currentPasswordController,
                   ),
-
                   const SizedBox(height: 30),
-
-                  // New Password Field
                   _buildPasswordField("Nova palavra-passe", newPasswordController),
-
                   const SizedBox(height: 30),
-
-                  // Confirm Password Field
                   _buildPasswordField(
                     "Confirmar palavra-passe",
                     confirmPasswordController,
                   ),
-
                   const SizedBox(height: 100),
-
-                  // Update Button
                   Center(
                     child: ElevatedButton(
                       onPressed: updatePassword,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white, // Button color
+                        backgroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
@@ -224,7 +198,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   Widget _buildPasswordField(String label, TextEditingController controller) {
     bool _isObscured = true;
-
     return StatefulBuilder(
       builder: (context, setState) {
         return Column(
@@ -262,7 +235,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       obscureText: _isObscured,
                       style: TextStyle(fontSize: 16, color: Colors.grey[800]),
                       decoration: InputDecoration.collapsed(
-                        hintText: 'Introduza $label',
+                        hintText: '$label',
                       ),
                     ),
                   ),
