@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:testtest/login/login_page.dart';
-import 'package:testtest/menu/menu.dart'; // Replace with your app's entry point
+import 'package:testtest/menu/menu.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // Adicionado
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,15 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(), // Defina a rota de login
         '/menu': (context) => const MenuScreen(), // Defina a rota do menu
       },
+      locale: const Locale('pt', 'PT'), // Defina o locale padrão para português de Portugal
+      supportedLocales: const [
+        Locale('pt', 'PT'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       builder: (context, child) {
         // Ensure text rendering supports special characters
         return Directionality(
