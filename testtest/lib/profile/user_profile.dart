@@ -389,9 +389,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material( // <-- Adicionado para garantir MaterialLocalizations
+    return Material(
       child: WillPopScope(
         onWillPop: () async {
+          // Se estiver em modo de edição, mostra o dialogo de descartar alterações
           if (editMode) {
             final discard = await _showDiscardChangesDialog();
             if (discard) {
@@ -404,12 +405,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 emergencyContactController.text = lastSavedEmergencyContact;
                 editMode = false;
               });
-              return true;
+              return false; // Não sai da página, apenas sai do modo de edição
             } else {
-              return false;
+              return false; // Fica na página e continua em modo de edição
             }
           }
-          return true;
+          // Se não estiver em modo de edição, redireciona para o menu
+          Navigator.of(context).pushReplacementNamed('/menu');
+          return false; // Impede o pop padrão
         },
         child: Scaffold(
           body: Stack(
