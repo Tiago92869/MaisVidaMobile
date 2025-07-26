@@ -89,18 +89,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Future<void> fetchUserProfileImage() async {
     try {
       final profileImage = await userRepository.userService.getProfileImage();
-      final base64Image = profileImage.data.split(',').last; // Extract base64 content
+      final base64Image = profileImage.data.split(',').last;
       setState(() {
         profileImageBase64 = base64Image;
       });
     } catch (e) {
-      print('Failed to fetch profile image: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Falha ao carregar a imagem do perfil."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // Não mostra mensagem de erro se não houver imagem de perfil
+      setState(() {
+        profileImageBase64 = null;
+      });
     }
   }
 
@@ -392,8 +389,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Material(
       child: WillPopScope(
         onWillPop: () async {
-          // Se estiver em modo de edição, mostra o dialogo de descartar alterações
-          if (editMode) {
+          // Só mostra o dialogo se algum campo foi alterado
+          bool hasChanges =
+              firstNameController.text != lastSavedFirstName ||
+              familyNameController.text != lastSavedFamilyName ||
+              cityController.text != lastSavedCity ||
+              birthdayController.text != lastSavedBirthday ||
+              aboutMeController.text != lastSavedAboutMe ||
+              emergencyContactController.text != lastSavedEmergencyContact;
+
+          if (editMode && hasChanges) {
             final discard = await _showDiscardChangesDialog();
             if (discard) {
               setState(() {
@@ -405,14 +410,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 emergencyContactController.text = lastSavedEmergencyContact;
                 editMode = false;
               });
-              return false; // Não sai da página, apenas sai do modo de edição
+              return false;
             } else {
-              return false; // Fica na página e continua em modo de edição
+              return false;
             }
           }
-          // Se não estiver em modo de edição, redireciona para o menu
+          // Se não houver alterações, apenas sai do modo de edição ou permite o pop normal
+          if (editMode) {
+            setState(() {
+              editMode = false;
+            });
+            return false;
+          }
+          // Mantém a navegação para o menu conforme pedido
           Navigator.of(context).pushReplacementNamed('/menu');
-          return false; // Impede o pop padrão
+          return false;
         },
         child: Scaffold(
           body: Stack(
@@ -485,11 +497,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            radius: 60,
-                            backgroundImage: profileImageBase64 != null && profileImageBase64!.isNotEmpty
-                                ? MemoryImage(base64Decode(profileImageBase64!))
-                                : null, // Leave the circle empty if null or empty
+                            radius: 75,
                             backgroundColor: Colors.grey[300],
+                            backgroundImage: (profileImageBase64 != null && profileImageBase64!.isNotEmpty)
+                                ? MemoryImage(base64Decode(profileImageBase64!))
+                                : null,
+                            child: (profileImageBase64 == null || profileImageBase64!.isEmpty)
+                                ? const Icon(Icons.person, size: 70, color: Colors.grey)
+                                : null,
                           ),
                           if (editMode)
                             IconButton(
