@@ -448,7 +448,8 @@ class _DiaryPageState extends State<DiaryPage> {
                         ),
                         const SizedBox(width: 30),
                         const Text(
-                          "Filtrar por emoção",
+                          //"Filtrar por emoção",
+                          "Emoções",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -470,6 +471,34 @@ class _DiaryPageState extends State<DiaryPage> {
                                 final isSelected = _selectedEmotions.contains(
                                   emotion,
                                 );
+                                // Map DiaryType to Portuguese display names
+                                String emotionDisplay;
+                                switch (emotion) {
+                                  case DiaryType.Love:
+                                    emotionDisplay = "Amor";
+                                    break;
+                                  case DiaryType.Fantastic:
+                                    emotionDisplay = "Fantástico";
+                                    break;
+                                  case DiaryType.Happy:
+                                    emotionDisplay = "Feliz";
+                                    break;
+                                  case DiaryType.Neutral:
+                                    emotionDisplay = "Neutro";
+                                    break;
+                                  case DiaryType.Disappointed:
+                                    emotionDisplay = "Desapontado";
+                                    break;
+                                  case DiaryType.Sad:
+                                    emotionDisplay = "Triste";
+                                    break;
+                                  case DiaryType.Angry:
+                                    emotionDisplay = "Zangado";
+                                    break;
+                                  case DiaryType.Sick:
+                                    emotionDisplay = "Doente";
+                                    break;
+                                }
                                 return GestureDetector(
                                   onTap: () {
                                     _toggleEmotion(emotion);
@@ -508,33 +537,18 @@ class _DiaryPageState extends State<DiaryPage> {
                                     margin: const EdgeInsets.symmetric(
                                       vertical: 8,
                                     ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          _getEmotionIcon(emotion),
-                                          color:
-                                              isSelected
-                                                  ? Colors
-                                                      .white // Selected button color
-                                                  : Color(
-                                                    0xFF0D1B2A,
-                                                  ), // Default button color // Purplish color
-                                          size: 28, // Increased size
+                                    child: Center(
+                                      child: Text(
+                                        emotionDisplay,
+                                        style: TextStyle(
+                                          color: isSelected
+                                              ? Colors.white
+                                              : const Color(0xFF0D1B2A),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Poppins",
                                         ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          emotion.name,
-                                          style: TextStyle(
-                                            color:
-                                                isSelected
-                                                    ? Colors.white
-                                                    : const Color(0xFF0D1B2A),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: "Poppins",
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 );
