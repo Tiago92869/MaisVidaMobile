@@ -381,6 +381,20 @@ class _GoalsPageState extends State<GoalsPage> {
     );
   }
 
+  // Helper to get the translated name and emoji for a GoalSubject
+String getSubjectDisplayName(GoalSubject subject) {
+  switch (subject) {
+    case GoalSubject.Personal:
+      return "👤 Pessoal";
+    case GoalSubject.Work:
+      return "💼 Trabalho";
+    case GoalSubject.Studies:
+      return "📚 Estudos";
+    case GoalSubject.Family:
+      return "👪 Família";
+    }
+}
+
   Widget _buildGoalCard(GoalInfoCard goal) {
     return GestureDetector(
       onTap: () {
@@ -466,9 +480,7 @@ class _GoalsPageState extends State<GoalsPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    StringCapitalization(
-                      goal.subject.toString().split('.').last,
-                    ).capitalizeFirstLetter(),
+                    getSubjectDisplayName(goal.subject),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -661,9 +673,7 @@ class _GoalsPageState extends State<GoalsPage> {
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             child: Center(
                               child: Text(
-                                StringCapitalization(
-                                  subject.toString().split('.').last,
-                                ).capitalizeFirstLetter(),
+                                getSubjectDisplayName(subject),
                                 style: TextStyle(
                                   color:
                                       isSelected
@@ -758,10 +768,3 @@ class _GoalsPageState extends State<GoalsPage> {
   }
 }
 
-// Extension to capitalize the first letter of a string
-extension StringCapitalization on String {
-  String capitalizeFirstLetter() {
-    if (isEmpty) return this;
-    return this[0].toUpperCase() + substring(1).toLowerCase();
-  }
-}
