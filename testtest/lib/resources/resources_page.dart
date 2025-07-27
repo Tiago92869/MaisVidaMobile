@@ -630,7 +630,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
     return Center(
       child: Container(
         width: 520, // aumenta a largura do card
-        constraints: const BoxConstraints(maxHeight: 140),
+        constraints: const BoxConstraints(minHeight: 140), // altura mínima, cresce conforme necessário
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
         decoration: BoxDecoration(
           color: backgroundColor.withOpacity(0.65), // reduz opacidade do fundo
