@@ -276,129 +276,158 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context); // Simply go back without saving
-                    },
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Title
-                  TextField(
-                    controller: titleController,
-                    enabled: editMode,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: "Insira o título da meta",
-                      hintStyle: TextStyle(color: Colors.white70),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Subject Dropdown
-                  if (editMode)
-                    DropdownButton<GoalSubject>(
-                      value: selectedSubject,
-                      dropdownColor: const Color(0xFF0D1B2A),
-                      items:
-                          GoalSubject.values.map((subject) {
-                            return DropdownMenuItem(
-                              value: subject,
-                              child: Text(
-                                getSubjectDisplayName(subject),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            );
-                          }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSubject = value!;
-                        });
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Back button
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context); // Simply go back without saving
                       },
-                    )
-                  else
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        selectedSubject != null
-                            ? getSubjectDisplayName(selectedSubject!)
-                            : "Sem Assunto",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 28,
                       ),
                     ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Goal Date Picker
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Data da meta",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
+                    // Title
+                    TextField(
+                      controller: titleController,
+                      enabled: editMode,
+                      maxLines: null, // Allow unlimited lines for title
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      decoration: const InputDecoration(
+                        hintText: "Insira o título da meta",
+                        hintStyle: TextStyle(color: Colors.white70),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Subject Dropdown
+                    if (editMode)
+                      DropdownButton<GoalSubject>(
+                        value: selectedSubject,
+                        dropdownColor: const Color(0xFF0D1B2A),
+                        items:
+                            GoalSubject.values.map((subject) {
+                              return DropdownMenuItem(
+                                value: subject,
+                                child: Text(
+                                  getSubjectDisplayName(subject),
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              );
+                            }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedSubject = value!;
+                          });
+                        },
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          selectedSubject != null
+                              ? getSubjectDisplayName(selectedSubject!)
+                              : "Sem Assunto",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: editMode ? _pickDate : null,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
+                    const SizedBox(height: 20),
+
+                    // Goal Date Picker
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Data da meta",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            selectedDate != null
-                                ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}"
-                                : "Seleciona uma data",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: editMode ? _pickDate : null,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              selectedDate != null
+                                  ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}"
+                                  : "Seleciona uma data",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
 
-                  // Completed Toggle
-                  if (!widget.createResource) // Show only when editing
+                    // Completed Toggle
+                    if (!widget.createResource) // Show only when editing
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Concluídas",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          Switch(
+                            value: completed,
+                            onChanged:
+                                editMode
+                                    ? (value) {
+                                      setState(() {
+                                        completed = value;
+                                      });
+                                    }
+                                    : null,
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 20),
+
+                    // Notifications Toggle
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Concluídas",
+                          "Notificações",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -406,50 +435,22 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ),
                         ),
                         Switch(
-                          value: completed,
+                          value: hasNotifications,
                           onChanged:
                               editMode
                                   ? (value) {
                                     setState(() {
-                                      completed = value;
+                                      hasNotifications = value;
                                     });
                                   }
                                   : null,
                         ),
                       ],
                     ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Notifications Toggle
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Notificações",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      Switch(
-                        value: hasNotifications,
-                        onChanged:
-                            editMode
-                                ? (value) {
-                                  setState(() {
-                                    hasNotifications = value;
-                                  });
-                                }
-                                : null,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Description
-                  Expanded(
-                    child: TextField(
+                    // Description
+                    TextField(
                       controller: descriptionController,
                       enabled: editMode,
                       maxLines: null,
@@ -460,8 +461,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                         border: InputBorder.none,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

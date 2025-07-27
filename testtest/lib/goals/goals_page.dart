@@ -448,6 +448,8 @@ String getSubjectDisplayName(GoalSubject subject) {
           children: [
             Text(
               goal.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -457,7 +459,7 @@ String getSubjectDisplayName(GoalSubject subject) {
             const SizedBox(height: 8),
             Text(
               goal.description,
-              maxLines: 2,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 14, color: Colors.white70),
             ),
