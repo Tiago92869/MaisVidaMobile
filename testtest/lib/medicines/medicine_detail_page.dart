@@ -232,7 +232,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: const Text(
-            "Preencha todos os campos (Nome, Descrição, Data de início e Data de fim) antes de guardar.",
+            "Preencha todos os campos antes de guardar.",
             style: TextStyle(color: Colors.white70),
           ),
           actions: [
@@ -271,7 +271,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                        color: Colors.white70, // Use white70 for subtitle
               ),
             ),
             if (editMode) // Show "+" button only in edit mode
@@ -302,7 +302,16 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        plan.weekDay,
+                        // Translate English weekday to Portuguese for display
+                        {
+                          "MONDAY": "SEGUNDA",
+                          "TUESDAY": "TERÇA",
+                          "WEDNESDAY": "QUARTA",
+                          "THURSDAY": "QUINTA",
+                          "FRIDAY": "SEXTA",
+                          "SATURDAY": "SÁBADO",
+                          "SUNDAY": "DOMINGO",
+                        }[plan.weekDay] ?? plan.weekDay,
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -512,10 +521,11 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Name
+                    // Name (title)
                     TextField(
                       controller: nameController,
                       enabled: editMode,
+                      maxLines: null, // Allow unlimited lines for title
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -525,23 +535,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                         hintText: "Introduza o nome do medicamento",
                         hintStyle: TextStyle(color: Colors.white70),
                         border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 18), // More vertical space
                       ),
                     ),
                     const SizedBox(height: 10),
-
-                    // Description
-                    TextField(
-                      controller: descriptionController,
-                      enabled: editMode,
-                      maxLines: null,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: "Introduza a descrição do medicamento",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
 
                     // Start Date
                     const Text(
@@ -549,7 +546,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.white70, // Use white70 for subtitle
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -584,7 +581,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.white70, // Use white70 for subtitle
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -622,23 +619,27 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Notificações",
+                          "Notificações ativadas",
                           style: TextStyle(
-                            fontSize: 16, // Match font size with "Start Date"
-                            fontWeight: FontWeight.bold, // Keep bold style
-                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70, // Use white70 for subtitle
                           ),
                         ),
-                        Switch(
+                        Checkbox(
                           value: hasNotifications,
-                          onChanged:
-                              editMode
-                                  ? (value) {
-                                    setState(() {
-                                      hasNotifications = value;
-                                    });
-                                  }
-                                  : null,
+                          onChanged: editMode
+                              ? (value) {
+                                  setState(() {
+                                    hasNotifications = value ?? false;
+                                  });
+                                }
+                              : null,
+                          activeColor: Colors.green,
+                          checkColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ],
                     ),
@@ -652,24 +653,44 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                           const Text(
                             "Arquivado",
                             style: TextStyle(
-                              fontSize: 16, // Match font size with "Start Date"
-                              fontWeight: FontWeight.bold, // Keep bold style
-                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70, // Use white70 for subtitle
                             ),
                           ),
-                          Switch(
+                          Checkbox(
                             value: isArchived,
-                            onChanged:
-                                editMode
-                                    ? (value) {
-                                      setState(() {
-                                        isArchived = value;
-                                      });
-                                    }
-                                    : null,
+                            onChanged: editMode
+                                ? (value) {
+                                    setState(() {
+                                      isArchived = value ?? false;
+                                    });
+                                  }
+                                : null,
+                            activeColor: Colors.green,
+                            checkColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
                         ],
                       ),
+
+                    const SizedBox(height: 20),
+
+                    // Description (moved here)
+                    const SizedBox(height: 5),
+                    TextField(
+                      controller: descriptionController,
+                      enabled: editMode,
+                      maxLines: null,
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: "Introduza a descrição do medicamento",
+                        hintStyle: TextStyle(color: Colors.white70),
+                        border: InputBorder.none,
+                      ),
+                    ),
 
                     const SizedBox(height: 100),
                   ],
@@ -730,6 +751,17 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     TimeOfDay? selectedTime;
     double selectedDosage = 0.25;
 
+    // Dias da semana em português, mas mantendo os valores lógicos em inglês
+    final Map<String, String> weekDayLabels = {
+      "MONDAY": "Segunda",
+      "TUESDAY": "Terça",
+      "WEDNESDAY": "Quarta",
+      "THURSDAY": "Quinta",
+      "FRIDAY": "Sexta",
+      "SATURDAY": "Sábado",
+      "SUNDAY": "Domingo",
+    };
+
     showDialog(
       context: context,
       builder: (context) {
@@ -775,7 +807,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                       ])
                         FilterChip(
                           label: Text(
-                            day,
+                            weekDayLabels[day]!,
                             style: TextStyle(
                               color:
                                   selectedWeekdays.contains(day)
@@ -823,6 +855,21 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
                             final time = await showTimePicker(
                               context: context,
                               initialTime: TimeOfDay.now(),
+                              builder: (BuildContext context, Widget? child) {
+                                return Theme(
+                                  data: ThemeData.light().copyWith(
+                                    primaryColor: const Color(0xFF0D1B2A),
+                                    hintColor: const Color(0xFF0D1B2A),
+                                    colorScheme: const ColorScheme.light(
+                                      primary: Color(0xFF0D1B2A),
+                                      onPrimary: Colors.white,
+                                      onSurface: Colors.black,
+                                    ),
+                                    dialogBackgroundColor: Colors.white,
+                                  ),
+                                  child: child!,
+                                );
+                              },
                             );
                             if (time != null) {
                               setState(() {

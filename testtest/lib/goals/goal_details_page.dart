@@ -479,14 +479,14 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             ), // Rounded corners
                           ),
                           title: const Text(
-                            "Campos em falta",
+                            "Campos ausentes",
                             style: TextStyle(
                               color: Colors.white, // White text
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           content: const Text(
-                            "Por favor preencha todos os campos (Título, Descrição, Data e Assunto) antes de guardar.",
+                            "Por favor preencha todos os campos antes de guardar.",
                             style: TextStyle(
                               color: Colors.white70, // Subtle white text
                             ),
