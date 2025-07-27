@@ -492,6 +492,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _resources,
                   _isLoadingResources,
                   (resource) {
+                    final backgroundColor = Color(0xFF6E6AE8);
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -505,7 +506,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: _buildHCard(resource),
+                        child: _buildResourceCard(resource, backgroundColor),
                       ),
                     );
                   },
@@ -596,11 +597,10 @@ class _HomeTabViewState extends State<HomeTabView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => GoalDetailPage(
-                                  goal: goal,
-                                  createResource: false,
-                                ),
+                            builder: (context) => GoalDetailPage(
+                              goal: goal,
+                              createResource: false,
+                            ),
                           ),
                         );
                       },
@@ -667,15 +667,13 @@ class _HomeTabViewState extends State<HomeTabView> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            Colors.white70, // Subtle white text
+                                        color: Colors.white70,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
                                     Switch(
                                       value: goal.completed,
-                                      onChanged:
-                                          null, // Disable toggle in this view
+                                      onChanged: null, // Disable toggle in this view
                                     ),
                                   ],
                                 ),
@@ -698,11 +696,10 @@ class _HomeTabViewState extends State<HomeTabView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => DiaryDetailPage(
-                                  diary: diary,
-                                  createDiary: false,
-                                ),
+                            builder: (context) => DiaryDetailPage(
+                              diary: diary,
+                              createDiary: false,
+                            ),
                           ),
                         );
                       },
@@ -718,7 +715,6 @@ class _HomeTabViewState extends State<HomeTabView> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            // Left side: Diary information
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -738,8 +734,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 14,
-                                      color:
-                                          Colors.white70, // Subtle white text
+                                      color: Colors.white70,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -747,18 +742,16 @@ class _HomeTabViewState extends State<HomeTabView> {
                                     "Criado: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
                                     style: const TextStyle(
                                       fontSize: 14,
-                                      color:
-                                          Colors.white70, // Subtle white text
+                                      color: Colors.white70,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            // Right side: Emotion icon
                             Icon(
                               _getEmotionIcon(diary.emotion),
-                              color: Colors.white, // White icon
-                              size: 48, // Larger size for better visibility
+                              color: Colors.white,
+                              size: 48,
                             ),
                           ],
                         ),
@@ -776,87 +769,154 @@ class _HomeTabViewState extends State<HomeTabView> {
     );
   }
 
-  Widget _buildHCard(Resource resource) {
-    const int maxDescriptionLength = 30; // Maximum length for the description
+  // Novo método para o modelo visual dos recursos igual ao resources_page.dart
+  Widget _buildResourceCard(Resource resource, Color backgroundColor) {
+    const int maxDescriptionLength = 90;
+    String truncatedDescription = resource.description.length > maxDescriptionLength
+        ? '${resource.description.substring(0, maxDescriptionLength)}...'
+        : resource.description;
 
-    String truncatedDescription =
-        resource.description.length > maxDescriptionLength
-            ? '${resource.description.substring(0, maxDescriptionLength)}...'
-            : resource.description;
+    String emoji;
+    switch (resource.type) {
+      case ResourceType.ARTICLE:
+        emoji = "📖";
+        break;
+      case ResourceType.VIDEO:
+        emoji = "🎬";
+        break;
+      case ResourceType.PODCAST:
+        emoji = "🎧";
+        break;
+      case ResourceType.PHRASE:
+        emoji = "💬";
+        break;
+      case ResourceType.CARE:
+        emoji = "💚";
+        break;
+      case ResourceType.EXERCISE:
+        emoji = "🏋️";
+        break;
+      case ResourceType.RECIPE:
+        emoji = "🍲";
+        break;
+      case ResourceType.MUSIC:
+        emoji = "🎵";
+        break;
+      case ResourceType.SOS:
+        emoji = "🚨";
+        break;
+      case ResourceType.OTHER:
+        emoji = "🗂️";
+        break;
+      case ResourceType.TIVA:
+        emoji = "🧠";
+        break;
+      default:
+        emoji = "❓";
+    }
 
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 110),
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.blueAccent.withOpacity(0.3), // Transparent blue
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  resource.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold, // Make the title bold
-                    fontFamily: "Poppins",
-                    color: Colors.white, // White text
+    String _translateResourceType(ResourceType type) {
+      switch (type) {
+        case ResourceType.ARTICLE:
+          return "Artigo";
+        case ResourceType.VIDEO:
+          return "Vídeo";
+        case ResourceType.PODCAST:
+          return "Podcast";
+        case ResourceType.PHRASE:
+          return "Frase";
+        case ResourceType.CARE:
+          return "Cuidado";
+        case ResourceType.EXERCISE:
+          return "Exercício";
+        case ResourceType.RECIPE:
+          return "Receita";
+        case ResourceType.MUSIC:
+          return "Música";
+        case ResourceType.SOS:
+          return "SOS";
+        case ResourceType.OTHER:
+          return "Outro";
+        case ResourceType.TIVA:
+          return "TIVA";
+        default:
+          return type.toString().split('.').last;
+      }
+    }
+
+    return Center(
+      child: Container(
+        width: 520,
+        constraints: const BoxConstraints(minHeight: 140),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        decoration: BoxDecoration(
+          color: backgroundColor.withOpacity(0.65),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    resource.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  truncatedDescription,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Inter",
-                    color: Colors.white70, // Subtle white text
+                  const SizedBox(height: 8),
+                  Text(
+                    truncatedDescription,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2, // Ensure it doesn't exceed two lines
-                  overflow:
-                      TextOverflow.ellipsis, // Add ellipsis if it overflows
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          emoji,
+                          style: const TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _translateResourceType(resource.type),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: VerticalDivider(thickness: 0.8, width: 0),
-          ),
-          Opacity(
-            opacity: 0.9,
-            child: Image.asset(
-              _getImageForResourceType(resource.type),
-              width: 48, // Set the width to 48
-              height: 48, // Set the height to 48
-              fit: BoxFit.contain, // Ensure the image fits within the bounds
-            ),
-          ),
-        ],
+            const SizedBox(width: 24),
+          ],
+        ),
       ),
     );
-  }
-
-  String _getImageForResourceType(ResourceType type) {
-    switch (type) {
-      case ResourceType.ARTICLE:
-        return 'assets/images/resources/newspaper.png';
-      case ResourceType.VIDEO:
-        return 'assets/images/resources/video.png';
-      case ResourceType.PODCAST:
-        return 'assets/images/resources/recording.png';
-      case ResourceType.EXERCISE:
-        return 'assets/images/resources/physical-wellbeing.png';
-      case ResourceType.RECIPE:
-        return 'assets/images/resources/recipe.png';
-      case ResourceType.SOS:
-        return 'assets/images/resources/sos.png';
-      default:
-        return 'assets/images/resources/other.png';
-    }
   }
 }
 
