@@ -65,7 +65,8 @@ class ActivityService {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
+        // Use utf8.decode para garantir o encoding correto
+        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
         final activityPage = ActivityPage.fromJson(jsonResponse);
         print(
           'Successfully fetched ${activityPage.content.length} activities.',
@@ -109,7 +110,8 @@ class ActivityService {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final activity = Activity.fromJson(jsonDecode(response.body));
+        // Use utf8.decode para garantir o encoding correto
+        final activity = Activity.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
         print('Successfully fetched activity: ${activity.toJson()}');
         return activity;
       } else {
