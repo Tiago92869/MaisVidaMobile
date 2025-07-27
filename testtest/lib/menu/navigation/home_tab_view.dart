@@ -737,6 +737,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _diaries,
                   _isLoadingDiaries,
                   (diary) {
+                    // Novo modelo igual ao diary_page.dart
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -753,51 +754,69 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFF64B5F6,
-                          ).withOpacity(0.3), // Transparent blue
+                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
                           borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                diary.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              subtitle: Text(
+                                diary.description,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    diary.title,
+                                    _getEmotionEmoji(diary.emotion),
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _getEmotionDisplayName(diary.emotion),
                                     style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white, // White text
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    diary.description,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Criado: ${diary.createdAt.toLocal().toString().split(' ')[0]}",
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Icon(
-                              _getEmotionIcon(diary.emotion),
-                              color: Colors.white,
-                              size: 48,
                             ),
                           ],
                         ),
@@ -974,27 +993,6 @@ extension StringCapitalization on String {
   }
 }
 
-IconData _getEmotionIcon(DiaryType emotion) {
-  switch (emotion) {
-    case DiaryType.Love:
-      return Icons.favorite;
-    case DiaryType.Fantastic:
-      return Icons.star;
-    case DiaryType.Happy:
-      return Icons.sentiment_satisfied;
-    case DiaryType.Neutral:
-      return Icons.sentiment_neutral;
-    case DiaryType.Disappointed:
-      return Icons.sentiment_dissatisfied;
-    case DiaryType.Sad:
-      return Icons.sentiment_very_dissatisfied;
-    case DiaryType.Angry:
-      return Icons.mood_bad;
-    case DiaryType.Sick:
-      return Icons.sick;
-  }
-}
-
 // Adicione esta função utilitária ao final da classe _HomeTabViewState:
 String _getSubjectDisplayName(GoalSubject subject) {
   switch (subject) {
@@ -1006,5 +1004,47 @@ String _getSubjectDisplayName(GoalSubject subject) {
       return "📚 Estudos";
     case GoalSubject.Family:
       return "👪 Família";
+  }
+}
+
+String _getEmotionEmoji(DiaryType emotion) {
+  switch (emotion) {
+    case DiaryType.Love:
+      return "❤️";
+    case DiaryType.Fantastic:
+      return "🤩";
+    case DiaryType.Happy:
+      return "😊";
+    case DiaryType.Neutral:
+      return "😐";
+    case DiaryType.Disappointed:
+      return "😞";
+    case DiaryType.Sad:
+      return "😢";
+    case DiaryType.Angry:
+      return "😡";
+    case DiaryType.Sick:
+      return "🤒";
+  }
+}
+
+String _getEmotionDisplayName(DiaryType emotion) {
+  switch (emotion) {
+    case DiaryType.Love:
+      return "Amor";
+    case DiaryType.Fantastic:
+      return "Fantástico";
+    case DiaryType.Happy:
+      return "Feliz";
+    case DiaryType.Neutral:
+      return "Neutro";
+    case DiaryType.Disappointed:
+      return "Desapontado";
+    case DiaryType.Sad:
+      return "Triste";
+    case DiaryType.Angry:
+      return "Zangado";
+    case DiaryType.Sick:
+      return "Doente";
   }
 }
