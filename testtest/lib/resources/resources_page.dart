@@ -156,34 +156,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
     }
   }
 
-  // Function to map ResourceType to image paths
-  static String getImageForResourceType(ResourceType type) {
-    switch (type) {
-      case ResourceType.ARTICLE:
-        return 'assets/images/resources/newspaper.png';
-      case ResourceType.VIDEO:
-        return 'assets/images/resources/video.png';
-      case ResourceType.PODCAST:
-        return 'assets/images/resources/recording.png';
-      case ResourceType.PHRASE:
-        return 'assets/images/resources/training-phrase.png';
-      case ResourceType.CARE:
-        return 'assets/images/resources/healthcare.png';
-      case ResourceType.EXERCISE:
-        return 'assets/images/resources/physical-wellbeing.png';
-      case ResourceType.RECIPE:
-        return 'assets/images/resources/recipe.png';
-      case ResourceType.MUSIC:
-        return 'assets/images/resources/headphones.png';
-      case ResourceType.SOS:
-        return 'assets/images/resources/sos.png';
-      case ResourceType.OTHER:
-        return 'assets/images/resources/other.png';
-      default:
-        return 'assets/samples/ui/rive_app/images/topics/topic_1.png';
-    }
-  }
-
   // Function to detect when the user scrolls to the bottom
   void _onScroll(ScrollController controller) {
     if (controller.position.pixels >=
@@ -428,6 +400,36 @@ class _ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
+  // Substitua o método _iconForResourceType pelo getResourceDisplayName para mostrar emoji+nome
+  String getResourceDisplayName(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return "📖 Artigo";
+      case ResourceType.VIDEO:
+        return "🎬 Vídeo";
+      case ResourceType.PODCAST:
+        return "🎧 Podcast";
+      case ResourceType.PHRASE:
+        return "💬 Frase";
+      case ResourceType.CARE:
+        return "💚 Cuidado";
+      case ResourceType.EXERCISE:
+        return "🏋️ Exercício";
+      case ResourceType.RECIPE:
+        return "🍲 Receita";
+      case ResourceType.MUSIC:
+        return "🎵 Música";
+      case ResourceType.SOS:
+        return "🚨 Ajuda";
+      case ResourceType.OTHER:
+        return "🗂️ Outro";
+      case ResourceType.TIVA:
+        return "🧠 Tiva";
+      default:
+        return "❓ Desconhecido";
+    }
+  }
+
   Widget _buildFilterPanel() {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
@@ -508,8 +510,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                 borderRadius: BorderRadius.circular(12),
                                 color:
                                     isSelected
-                                        ? const Color(0xFF0D1B2A) // Cor igual ao fundo para selecionado
-                                        : Colors.white, // Default button color
+                                        ? const Color(0xFF0D1B2A)
+                                        : Colors.white,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.1),
@@ -525,11 +527,12 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               child: Center(
                                 child: Text(
-                                  _translateResourceType(resourceType),
+                                  getResourceDisplayName(resourceType),
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: isSelected
                                         ? Colors.white
-                                        : const Color(0xFF0D1B2A), // cor das opções não selecionadas
+                                        : const Color(0xFF0D1B2A),
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: "Poppins",
@@ -587,9 +590,49 @@ class _ResourcesPageState extends State<ResourcesPage> {
         ? '${resource.description.substring(0, maxDescriptionLength)}...'
         : resource.description;
 
+    // Emoji para cada tipo de recurso (incluindo TIVA)
+    String emoji;
+    switch (resource.type) {
+      case ResourceType.ARTICLE:
+        emoji = "📖";
+        break;
+      case ResourceType.VIDEO:
+        emoji = "🎬";
+        break;
+      case ResourceType.PODCAST:
+        emoji = "🎧";
+        break;
+      case ResourceType.PHRASE:
+        emoji = "💬";
+        break;
+      case ResourceType.CARE:
+        emoji = "💚";
+        break;
+      case ResourceType.EXERCISE:
+        emoji = "🏋️";
+        break;
+      case ResourceType.RECIPE:
+        emoji = "🍲";
+        break;
+      case ResourceType.MUSIC:
+        emoji = "🎵";
+        break;
+      case ResourceType.SOS:
+        emoji = "🚨";
+        break;
+      case ResourceType.OTHER:
+        emoji = "🗂️";
+        break;
+      case ResourceType.TIVA:
+        emoji = "🧠";
+        break;
+      default:
+        emoji = "❓";
+    }
+
     return Container(
       constraints: const BoxConstraints(maxHeight: 120),
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10), // mais espaço horizontal
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(30),
@@ -597,6 +640,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
       child: Row(
         children: [
           Expanded(
+            flex: 5, // mais espaço para o texto
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,35 +664,37 @@ class _ResourcesPageState extends State<ResourcesPage> {
                     fontFamily: "Inter",
                     color: Colors.white,
                   ),
-                  maxLines: 2,
+                  maxLines: 2, // Limite de duas linhas
                   overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                // Tipo de recurso (como no goals_page)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _translateResourceType(resource.type),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: VerticalDivider(thickness: 0.8, width: 0),
-          ),
+          const SizedBox(width: 24), // mais espaço entre texto e emoji
           Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Opacity(
-                opacity: 0.9,
-                child: Image.asset(
-                  getImageForResourceType(resource.type),
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 4),
               Text(
-                _translateResourceType(resource.type), // traduzido
+                emoji,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "Poppins",
+                  fontSize: 36,
                 ),
               ),
             ],
