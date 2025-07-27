@@ -106,6 +106,11 @@ class _ResourcesPageState extends State<ResourcesPage> {
       });
     } catch (e) {
       print('Error fetching favorite resources: $e');
+      // If error (e.g., 404), clear the resources list
+      setState(() {
+        _resources.clear();
+        _isLastPage = true;
+      });
     }
   }
 
@@ -277,42 +282,53 @@ class _ResourcesPageState extends State<ResourcesPage> {
                         });
                         await _fetchResources();
                       },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        itemCount: _resources.length,
-                        itemBuilder: (context, index) {
-                          final resource = _resources[index];
-                          final backgroundColor =
-                              _resourceColors[index % _resourceColors.length];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: GestureDetector(
-                              onTap: () async {
-                                // Navigate to ResourceDetailPage and wait for the result
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ResourceDetailPage(resource: resource),
+                      child: _resources.isEmpty
+                          ? Center(
+                                child: Text(
+                                  "Nenhum recurso encontrado",
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.8),
+                                    fontSize: 18,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                            )
+                          : ListView.builder(
+                              controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              itemCount: _resources.length,
+                              itemBuilder: (context, index) {
+                                final resource = _resources[index];
+                                final backgroundColor =
+                                    _resourceColors[index % _resourceColors.length];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      // Navigate to ResourceDetailPage and wait for the result
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ResourceDetailPage(resource: resource),
+                                        ),
+                                      );
+
+                                      // Refresh the resources list when returning
+                                      if (_isStarGlowing) {
+                                        // If the star icon is glowing, fetch favorite resources
+                                        await _fetchFavoriteResources();
+                                      } else {
+                                        // Otherwise, refresh the default resources list
+                                        _onSearch(_searchText);
+                                      }
+                                    },
+                                    child: _buildHCard(resource, backgroundColor),
                                   ),
                                 );
-
-                                // Refresh the resources list when returning
-                                if (_isStarGlowing) {
-                                  // If the star icon is glowing, fetch favorite resources
-                                  await _fetchFavoriteResources();
-                                } else {
-                                  // Otherwise, refresh the default resources list
-                                  _onSearch(_searchText);
-                                }
                               },
-                              child: _buildHCard(resource, backgroundColor),
                             ),
-                          );
-                        },
-                      ),
                     ),
                   ),
                 ],
@@ -322,7 +338,11 @@ class _ResourcesPageState extends State<ResourcesPage> {
           // Filter Icon
           _buildFilterIcon(),
           // Blur effect under the filter panel
-          if (_isFilterPanelVisible) _buildBlurEffect(),
+          if (_isFilterPanelVisible)
+            GestureDetector(
+              onTap: _closeFilterPanel,
+              child: _buildBlurEffect(),
+            ),
           // Sliding Filter Panel
           _buildFilterPanel(),
           // Loading indicator in the center of the screen
@@ -366,20 +386,10 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: _isStarGlowing
-                          ? Colors.blue.withOpacity(0.8) // Glowing shadow when pressed
-                          : Colors.black.withOpacity(0.2), // Default shadow when not pressed
-                      blurRadius: _isStarGlowing ? 15 : 5,
-                      spreadRadius: _isStarGlowing ? 5 : 0,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
                 ),
                 child: Icon(
                   Icons.star,
-                  color: _isStarGlowing ? Colors.blue : Colors.grey,
+                  color: _isStarGlowing ? const Color.fromARGB(255, 255, 217, 0) : Colors.grey,
                   size: 28,
                 ),
               ),
@@ -407,7 +417,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 ),
                 child: const Icon(
                   Icons.filter_alt,
-                  color: Colors.blue,
+                  color: Color(0xFF0D1B2A), // Igual ao goals_page
                   size: 28,
                 ),
               ),
@@ -429,8 +439,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-              Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+              Color(0xFF0D1B2A), // Start color (igual ao fundo)
+              Color(0xFF1B263B), // End color (igual ao fundo)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -460,7 +470,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                   ),
                   const SizedBox(width: 30),
                   const Text(
-                    "Filtra por tipo",
+                    "Tipo", // Tradução para português
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -498,12 +508,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                 borderRadius: BorderRadius.circular(12),
                                 color:
                                     isSelected
-                                        ? const Color.fromRGBO(
-                                          85,
-                                          123,
-                                          233,
-                                          1,
-                                        ) // Selected button color
+                                        ? const Color(0xFF0D1B2A) // Cor igual ao fundo para selecionado
                                         : Colors.white, // Default button color
                                 boxShadow: [
                                   BoxShadow(
@@ -520,19 +525,11 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               child: Center(
                                 child: Text(
-                                  StringCapitalization(
-                                    resourceType.toString().split('.').last,
-                                  ).capitalizeFirstLetter(),
+                                  _translateResourceType(resourceType),
                                   style: TextStyle(
-                                    color:
-                                        isSelected
-                                            ? Colors.white
-                                            : const Color.fromRGBO(
-                                              72,
-                                              85,
-                                              204,
-                                              1,
-                                            ),
+                                    color: isSelected
+                                        ? Colors.white
+                                        : const Color(0xFF0D1B2A), // cor das opções não selecionadas
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: "Poppins",
@@ -551,6 +548,36 @@ class _ResourcesPageState extends State<ResourcesPage> {
         ),
       ),
     );
+  }
+
+  // Função para traduzir tipos de recurso para português
+  String _translateResourceType(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return "Artigo";
+      case ResourceType.VIDEO:
+        return "Vídeo";
+      case ResourceType.PODCAST:
+        return "Podcast";
+      case ResourceType.PHRASE:
+        return "Frase";
+      case ResourceType.CARE:
+        return "Cuidado";
+      case ResourceType.EXERCISE:
+        return "Exercício";
+      case ResourceType.RECIPE:
+        return "Receita";
+      case ResourceType.MUSIC:
+        return "Música";
+      case ResourceType.SOS:
+        return "SOS";
+      case ResourceType.OTHER:
+        return "Outro";
+      case ResourceType.TIVA:
+        return "TIVA";
+      default:
+        return type.toString().split('.').last;
+    }
   }
 
   Widget _buildHCard(Resource resource, Color backgroundColor) {
@@ -603,14 +630,28 @@ class _ResourcesPageState extends State<ResourcesPage> {
             padding: EdgeInsets.all(20),
             child: VerticalDivider(thickness: 0.8, width: 0),
           ),
-          Opacity(
-            opacity: 0.9,
-            child: Image.asset(
-              getImageForResourceType(resource.type),
-              width: 48,
-              height: 48,
-              fit: BoxFit.contain,
-            ),
+          Column(
+            children: [
+              Opacity(
+                opacity: 0.9,
+                child: Image.asset(
+                  getImageForResourceType(resource.type),
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _translateResourceType(resource.type), // traduzido
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Poppins",
+                ),
+              ),
+            ],
           ),
         ],
       ),

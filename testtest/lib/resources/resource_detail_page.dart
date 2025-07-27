@@ -167,6 +167,36 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
     }
   }
 
+  // Função para traduzir tipos de recurso para português
+  String _translateResourceType(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return "Artigo";
+      case ResourceType.VIDEO:
+        return "Vídeo";
+      case ResourceType.PODCAST:
+        return "Podcast";
+      case ResourceType.PHRASE:
+        return "Frase";
+      case ResourceType.CARE:
+        return "Cuidado";
+      case ResourceType.EXERCISE:
+        return "Exercício";
+      case ResourceType.RECIPE:
+        return "Receita";
+      case ResourceType.MUSIC:
+        return "Música";
+      case ResourceType.SOS:
+        return "SOS";
+      case ResourceType.OTHER:
+        return "Outro";
+      case ResourceType.TIVA:
+        return "TIVA";
+      default:
+        return type.toString().split('.').last;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print('ResourceDetailPage: Building UI...');
@@ -348,7 +378,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            resource.type.toString().split('.').last,
+            _translateResourceType(resource.type), // traduzido
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
