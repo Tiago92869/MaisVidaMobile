@@ -341,227 +341,230 @@ class _DiaryPageState extends State<DiaryPage> {
             ),
           ),
 
-          // Apply blur effect when filter panel is visible
+          // Overlay to detect taps outside the filter panel and apply blur
           if (_isFilterPanelVisible)
-            BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 5.0,
-                sigmaY: 5.0,
-              ), // Adjust blur intensity
-              child: Container(
-                color: Colors.black.withOpacity(
-                  0.2,
-                ), // Optional: Add a semi-transparent overlay
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: _toggleFilterPanel,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 5.0,
+                    sigmaY: 5.0,
+                  ),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.2),
+                  ),
+                ),
               ),
             ),
 
-          // Filter Button
-          Positioned(
-            top: 58,
-            right: 20,
-            child: GestureDetector(
-              onTap: _toggleFilterPanel,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Stack(
+          // Sliding filter panel (should be above everything except FAB)
+          if (_isFilterPanelVisible)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              right: _isFilterPanelVisible ? 0 : -230,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 230,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(-5, 0), // Shadow on the left side
+                    ),
+                  ],
+                ),
+                child: Column(
                   children: [
-                    Container(
-                      width: 40,
+                    const SizedBox(
                       height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 5,
-                            offset: const Offset(0, 5),
+                    ), // Space between the arrow and text
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, left: 15),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _toggleFilterPanel,
+                            child: const Icon(
+                              Icons.arrow_forward,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 30),
+                          const Text(
+                            //"Filtrar por emoção",
+                            "Emoções",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: "Poppins",
+                            ),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.filter_alt,
-                        color: Color(0xFF0D1B2A),
-                        size: 28,
-                      ),
                     ),
-                    if (_selectedEmotions
-                        .isNotEmpty) // Show the small circle if filters are selected
-                      Positioned(
-                        top: 3,
-                        right: 4,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(
-                              0xFF0D1B2A,
-                            ), // Blue color for the indicator
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children:
+                                DiaryType.values.map((emotion) {
+                                  final isSelected = _selectedEmotions.contains(
+                                    emotion,
+                                  );
+                                  // Map DiaryType to Portuguese display names
+                                  String emotionDisplay;
+                                  switch (emotion) {
+                                    case DiaryType.Love:
+                                      emotionDisplay = "Amor";
+                                      break;
+                                    case DiaryType.Fantastic:
+                                      emotionDisplay = "Fantástico";
+                                      break;
+                                    case DiaryType.Happy:
+                                      emotionDisplay = "Feliz";
+                                      break;
+                                    case DiaryType.Neutral:
+                                      emotionDisplay = "Neutro";
+                                      break;
+                                    case DiaryType.Disappointed:
+                                      emotionDisplay = "Desapontado";
+                                      break;
+                                    case DiaryType.Sad:
+                                      emotionDisplay = "Triste";
+                                      break;
+                                    case DiaryType.Angry:
+                                      emotionDisplay = "Zangado";
+                                      break;
+                                    case DiaryType.Sick:
+                                      emotionDisplay = "Doente";
+                                      break;
+                                  }
+                                  return GestureDetector(
+                                    onTap: () {
+                                      _toggleEmotion(emotion);
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : Colors.transparent,
+                                          width: 1.5,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        color:
+                                            isSelected
+                                                ? const Color(
+                                                  0xFF0D1B2A,
+                                                ) // Selected button color
+                                                : Colors
+                                                    .white, // Default button color
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.1),
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                        horizontal: 15,
+                                      ),
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          emotionDisplay,
+                                          style: TextStyle(
+                                            color: isSelected
+                                                ? Colors.white
+                                                : const Color(0xFF0D1B2A),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Poppins",
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                           ),
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
             ),
-          ),
 
-          // Sliding filter panel
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            right: _isFilterPanelVisible ? 0 : -230, // Slide in/out effect
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 230,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(-5, 0), // Shadow on the left side
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 40,
-                  ), // Space between the arrow and text
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20, left: 15),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _toggleFilterPanel,
-                          child: const Icon(
-                            Icons.arrow_forward,
-                            size: 30,
-                            color: Colors.white,
-                          ),
+          // Filter Button (move this BEFORE the filter panel in the stack)
+          if (!_isFilterPanelVisible)
+            Positioned(
+              top: 58,
+              right: 20,
+              child: GestureDetector(
+                onTap: _toggleFilterPanel,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 5,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 30),
-                        const Text(
-                          //"Filtrar por emoção",
-                          "Emoções",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: "Poppins",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children:
-                              DiaryType.values.map((emotion) {
-                                final isSelected = _selectedEmotions.contains(
-                                  emotion,
-                                );
-                                // Map DiaryType to Portuguese display names
-                                String emotionDisplay;
-                                switch (emotion) {
-                                  case DiaryType.Love:
-                                    emotionDisplay = "Amor";
-                                    break;
-                                  case DiaryType.Fantastic:
-                                    emotionDisplay = "Fantástico";
-                                    break;
-                                  case DiaryType.Happy:
-                                    emotionDisplay = "Feliz";
-                                    break;
-                                  case DiaryType.Neutral:
-                                    emotionDisplay = "Neutro";
-                                    break;
-                                  case DiaryType.Disappointed:
-                                    emotionDisplay = "Desapontado";
-                                    break;
-                                  case DiaryType.Sad:
-                                    emotionDisplay = "Triste";
-                                    break;
-                                  case DiaryType.Angry:
-                                    emotionDisplay = "Zangado";
-                                    break;
-                                  case DiaryType.Sick:
-                                    emotionDisplay = "Doente";
-                                    break;
-                                }
-                                return GestureDetector(
-                                  onTap: () {
-                                    _toggleEmotion(emotion);
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color:
-                                            isSelected
-                                                ? Colors.white
-                                                : Colors.transparent,
-                                        width: 1.5,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      color:
-                                          isSelected
-                                              ? const Color(
-                                                0xFF0D1B2A,
-                                              ) // Selected button color
-                                              : Colors
-                                                  .white, // Default button color
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                      horizontal: 15,
-                                    ),
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        emotionDisplay,
-                                        style: TextStyle(
-                                          color: isSelected
-                                              ? Colors.white
-                                              : const Color(0xFF0D1B2A),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: "Poppins",
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                        child: const Icon(
+                          Icons.filter_alt,
+                          color: Color(0xFF0D1B2A),
+                          size: 28,
                         ),
                       ),
-                    ),
+                      if (_selectedEmotions.isNotEmpty)
+                        Positioned(
+                          top: 3,
+                          right: 4,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFF0D1B2A),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                ],
+                ),
               ),
             ),
-          ),
 
           // Floating Action Button Positioned Upwards
           Positioned(

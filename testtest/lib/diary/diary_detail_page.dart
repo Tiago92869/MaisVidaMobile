@@ -65,7 +65,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               ),
             ),
             content: const Text(
-              "Por favor preencha todos os campos (Título, Descrição e Emoção) antes de guardar.",
+              "Por favor preencha todos os campos antes de guardar.",
               style: TextStyle(
                 color: Colors.white70, // Subtle white text
               ),
@@ -239,6 +239,28 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     }
   }
 
+  // Adiciona esta função auxiliar para mostrar o nome em português
+  String _emotionDisplayPt(DiaryType emotion) {
+    switch (emotion) {
+      case DiaryType.Love:
+        return "Amor";
+      case DiaryType.Fantastic:
+        return "Fantástico";
+      case DiaryType.Happy:
+        return "Feliz";
+      case DiaryType.Neutral:
+        return "Neutro";
+      case DiaryType.Disappointed:
+        return "Desapontado";
+      case DiaryType.Sad:
+        return "Triste";
+      case DiaryType.Angry:
+        return "Zangado";
+      case DiaryType.Sick:
+        return "Doente";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     log("Building DiaryDetailPage UI");
@@ -339,7 +361,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                             return DropdownMenuItem(
                               value: emotion,
                               child: Text(
-                                emotion.toString().split('.').last,
+                                _emotionDisplayPt(emotion),
                                 style: const TextStyle(color: Colors.white),
                               ),
                             );
@@ -360,7 +382,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          selectedEmotion!.toString().split('.').last,
+                          _emotionDisplayPt(selectedEmotion!),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

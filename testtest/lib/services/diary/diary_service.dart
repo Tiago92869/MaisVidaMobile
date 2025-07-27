@@ -104,9 +104,9 @@ class DiaryService {
             Uri.parse(url),
             headers: {
               'Authorization': 'Bearer $_accessToken',
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json; charset=utf-8', // Remover charset=utf-8
             },
-            body: requestBody,
+            body: utf8.encode(jsonEncode(diary.toJson())),
           )
           .timeout(
             _timeoutDuration,
@@ -147,9 +147,9 @@ class DiaryService {
             Uri.parse(url),
             headers: {
               'Authorization': 'Bearer $_accessToken',
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json; charset=utf-8', // Remover charset=utf-8
             },
-            body: json.encode(diary.toJson()),
+            body: utf8.encode(jsonEncode(diary.toJson())),
           )
           .timeout(
             _timeoutDuration,
