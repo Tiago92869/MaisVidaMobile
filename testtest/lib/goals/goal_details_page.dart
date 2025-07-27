@@ -400,44 +400,12 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ],
                         ),
 
-                        // Completed Toggle
-                        if (!widget.createResource) // Show only when editing
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Concluídas",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                              Checkbox(
-                                value: completed,
-                                onChanged: editMode
-                                    ? (value) {
-                                        setState(() {
-                                          completed = value ?? false;
-                                        });
-                                      }
-                                    : null,
-                                activeColor: Colors.green,
-                                checkColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                            ],
-                          ),
-                        const SizedBox(height: 20),
-
                         // Notifications Toggle
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              "Notificações",
+                              "Notificações ativadas",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
