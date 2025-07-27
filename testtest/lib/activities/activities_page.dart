@@ -61,6 +61,10 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
         }
         _isLastPage = activityPage.last;
         _currentPage = activityPage.number + 1; // Increment page for next fetch
+        // Garantir que a lista vazia mostra o estado vazio
+        if (_activities.isEmpty) {
+          _isLastPage = true;
+        }
       });
     } catch (e) {
       print('Error fetching activities: $e');
@@ -70,6 +74,10 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           backgroundColor: Colors.red,
         ),
       );
+      setState(() {
+        _activities = [];
+        _isLastPage = true;
+      });
     } finally {
       setState(() {
         _isLoading = false;
@@ -90,12 +98,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       });
     } catch (e) {
       print('Error fetching favorite activities: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Falha ao procurar atividades favoritas. Tente novamente."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // Show empty state if 404 or any error
+      setState(() {
+        _activities = [];
+        _isLastPage = true;
+      });
+      // Optionally, you can still show the snackbar for other errors
     } finally {
       setState(() {
         _isLoading = false;
@@ -151,22 +159,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: _isStarGlowing
-                      ? Colors.blue.withOpacity(0.8) // Glowing shadow when active
-                      : Colors.black.withOpacity(0.2), // Default shadow
-                  blurRadius: _isStarGlowing ? 15 : 5,
-                  spreadRadius: _isStarGlowing ? 5 : 0,
-                  offset: const Offset(0, 5),
-                ),
-              ],
             ),
             child: Icon(
-              Icons.star,
-              color: _isStarGlowing ? Color(0xFF0D1B2A) : Colors.grey,
-              size: 28,
-            ),
+                  Icons.star,
+                  color: _isStarGlowing ? const Color.fromARGB(255, 255, 217, 0) : Colors.grey,
+                  size: 28,
+                ),
           ),
         ),
       ),
@@ -352,34 +350,45 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       onRefresh: () async {
                         await _fetchActivities(); // Refresh the list
                       },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount:
-                            _activities.length + 1, // Add 1 for the SizedBox
-                        itemBuilder: (context, index) {
-                          if (index < _activities.length) {
-                            final activity = _activities[index];
-                            final backgroundColor =
-                                _activityColors[index % _activityColors.length];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 20,
+                      child: _activities.isEmpty
+                          ? Center(
+                              child: Text(
+                                "Nenhuma atividade encontrada",
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              child: _buildActivityCard(
-                                activity,
-                                backgroundColor,
-                              ),
-                            );
-                          } else {
-                            return const SizedBox(
-                              height: 60,
-                            ); // Add spacing at the end
-                          }
-                        },
-                      ),
+                            )
+                          : ListView.builder(
+                              controller: _scrollController,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              itemCount:
+                                  _activities.length + 1, // Add 1 for the SizedBox
+                              itemBuilder: (context, index) {
+                                if (index < _activities.length) {
+                                  final activity = _activities[index];
+                                  final backgroundColor =
+                                      _activityColors[index % _activityColors.length];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 15,
+                                      horizontal: 20,
+                                    ),
+                                    child: _buildActivityCard(
+                                      activity,
+                                      backgroundColor,
+                                    ),
+                                  );
+                                } else {
+                                  return const SizedBox(
+                                    height: 60,
+                                  ); // Add spacing at the end
+                                }
+                              },
+                            ),
                     ),
                     if (_isLoading)
                       const Center(child: CircularProgressIndicator()),

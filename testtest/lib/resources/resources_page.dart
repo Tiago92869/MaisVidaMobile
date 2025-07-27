@@ -201,7 +201,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       "Recursos",
                       style: TextStyle(
                         fontSize: 28,
-                        fontFamily: "Poppins",
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -477,7 +476,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontFamily: "Poppins",
                     ),
                   ),
                 ],
@@ -535,7 +533,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                         : const Color(0xFF0D1B2A),
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: "Poppins",
                                   ),
                                 ),
                               ),
@@ -584,7 +581,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
   }
 
   Widget _buildHCard(Resource resource, Color backgroundColor) {
-    const int maxDescriptionLength = 30;
+    const int maxDescriptionLength = 90; // expandido para permitir até ~2 linhas
 
     String truncatedDescription = resource.description.length > maxDescriptionLength
         ? '${resource.description.substring(0, maxDescriptionLength)}...'
@@ -630,76 +627,76 @@ class _ResourcesPageState extends State<ResourcesPage> {
         emoji = "❓";
     }
 
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 120),
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10), // mais espaço horizontal
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 5, // mais espaço para o texto
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  resource.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontFamily: "Poppins",
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  truncatedDescription,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: "Inter",
-                    color: Colors.white,
-                  ),
-                  maxLines: 2, // Limite de duas linhas
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                // Tipo de recurso (como no goals_page)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _translateResourceType(resource.type),
+    return Center(
+      child: Container(
+        width: 520, // aumenta a largura do card
+        constraints: const BoxConstraints(maxHeight: 140),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        decoration: BoxDecoration(
+          color: backgroundColor.withOpacity(0.65), // reduz opacidade do fundo
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    resource.title,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    truncatedDescription,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _translateResourceType(resource.type),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 24),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  emoji,
+                  style: const TextStyle(
+                    fontSize: 36,
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 24), // mais espaço entre texto e emoji
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                emoji,
-                style: const TextStyle(
-                  fontSize: 36,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
