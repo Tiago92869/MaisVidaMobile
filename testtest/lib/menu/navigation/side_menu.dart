@@ -19,7 +19,6 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   final List<MenuItemModel> _browseMenuIcons = MenuItemModel.menuItems;
-  final List<MenuItemModel> _historyMenuIcons = MenuItemModel.menuItems2;
   String _selectedMenu = MenuItemModel.menuItems[0].title;
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
@@ -79,6 +78,8 @@ class _SideMenuState extends State<SideMenu> {
 
   @override
   Widget build(BuildContext context) {
+    // Debug: Print all menu titles to check if Notificações and SOS are present
+    print("Menu lateral: ${_browseMenuIcons.map((e) => e.title).toList()}");
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top,
@@ -147,12 +148,7 @@ class _SideMenuState extends State<SideMenu> {
                     menuIcons: _browseMenuIcons,
                     onMenuPress: onMenuPress,
                   ),
-                  MenuButtonSection(
-                    title: "Histórico",
-                    selectedMenu: _selectedMenu,
-                    menuIcons: _historyMenuIcons,
-                    onMenuPress: onMenuPress,
-                  ),
+                  // Não há mais secções, tudo está em Navegar
                 ],
               ),
             ),
@@ -267,3 +263,4 @@ class MenuButtonSection extends StatelessWidget {
     );
   }
 }
+

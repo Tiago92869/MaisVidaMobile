@@ -46,9 +46,6 @@ class MenuItemModel {
       title: "Jornadas",
       riveIcon: TabItem(stateMachine: "State Machine 1", artboard: "ONLINE"),
     ),
-  ];
-
-  static List<MenuItemModel> menuItems2 = [
     MenuItemModel(
       title: "Notificações",
       riveIcon: TabItem(stateMachine: "BELL_Interactivity", artboard: "BELL"),

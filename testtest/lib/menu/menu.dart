@@ -181,12 +181,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     });
   }
 
-  // Save the theme mode to SharedPreferences
-  Future<void> _saveThemeMode(bool isDarkMode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', isDarkMode);
-  }
-
   void _onMenuIconInit(rive.Artboard artboard) {
     final controller = rive.StateMachineController.fromArtboard(
       artboard,
@@ -229,18 +223,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     int index = MenuItemModel.menuItems.indexWhere(
       (menuItem) => menuItem.title == menuTitle,
     );
-
-    if (index == -1) {
-      // If not found in menuItems, search in menuItems2
-      index = MenuItemModel.menuItems2.indexWhere(
-        (menuItem) => menuItem.title == menuTitle,
-      );
-
-      if (index != -1) {
-        // Adjust the index to match the position in _screens
-        index += MenuItemModel.menuItems.length;
-      }
-    }
 
     if (index != -1) {
       print('Menu title found at index: $index'); // Debugging print
