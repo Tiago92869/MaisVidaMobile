@@ -370,20 +370,59 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         ),
         const SizedBox(height: 10),
 
-        // Resource Type
+        // Resource Type with emoji
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Text(
-            _translateResourceType(resource.type), // traduzido
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                () {
+                  switch (resource.type) {
+                    case ResourceType.ARTICLE:
+                      return "📖";
+                    case ResourceType.VIDEO:
+                      return "🎬";
+                    case ResourceType.PODCAST:
+                      return "🎧";
+                    case ResourceType.PHRASE:
+                      return "💬";
+                    case ResourceType.CARE:
+                      return "💚";
+                    case ResourceType.EXERCISE:
+                      return "🏋️";
+                    case ResourceType.RECIPE:
+                      return "🍲";
+                    case ResourceType.MUSIC:
+                      return "🎵";
+                    case ResourceType.SOS:
+                      return "🚨";
+                    case ResourceType.OTHER:
+                      return "🗂️";
+                    case ResourceType.TIVA:
+                      return "🧠";
+                    default:
+                      return "❓";
+                  }
+                }(),
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _translateResourceType(resource.type),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 20),

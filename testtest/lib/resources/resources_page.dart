@@ -671,30 +671,31 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                      _translateResourceType(resource.type),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          emoji,
+                          style: const TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _translateResourceType(resource.type),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 24),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  emoji,
-                  style: const TextStyle(
-                    fontSize: 36,
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
