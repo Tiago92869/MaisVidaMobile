@@ -176,14 +176,17 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
+        // ignore: deprecated_member_use
         color: backgroundColor.withOpacity(0.65),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: backgroundColor.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 12),
           ),
           BoxShadow(
+            // ignore: deprecated_member_use
             color: backgroundColor.withOpacity(0.3),
             blurRadius: 2,
             offset: const Offset(0, 1),
@@ -215,6 +218,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             overflow: TextOverflow.ellipsis,
             maxLines: 4, // Limit the description to a maximum of 3 lines
             style: TextStyle(
+              // ignore: deprecated_member_use
               color: Colors.white.withOpacity(0.9),
               fontSize: 16,
             ),
@@ -253,6 +257,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 }
               },
               style: ElevatedButton.styleFrom(
+                // ignore: deprecated_member_use
                 foregroundColor: backgroundColor.withOpacity(0.65),
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -272,8 +277,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ScrollController _scrollController = ScrollController();
-    _scrollController.addListener(() => _onScroll(_scrollController));
+    final ScrollController scrollController = ScrollController();
+    scrollController.addListener(() => _onScroll(scrollController));
 
     return Scaffold(
       body: Stack(
@@ -355,6 +360,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               child: Text(
                                 "Nenhuma atividade encontrada",
                                 style: TextStyle(
+                                  // ignore: deprecated_member_use
                                   color: Colors.white.withOpacity(0.8),
                                   fontSize: 18,
                                 ),
@@ -362,7 +368,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               ),
                             )
                           : ListView.builder(
-                              controller: _scrollController,
+                              controller: scrollController,
                               physics: const AlwaysScrollableScrollPhysics(),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               itemCount:

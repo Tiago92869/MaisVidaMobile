@@ -3,12 +3,20 @@ import 'dart:math'; // Import for Random
 import 'package:mentara/services/feedback/feedback_model.dart' as feedback_model;
 import 'package:mentara/services/feedback/feedback_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mentara/services/journey/journey_model.dart';
+import 'package:mentara/services/journey/journey_service.dart';
 
 class ResourceFeedbackPage extends StatefulWidget {
   final String resourceId;
+  final String? resourceProgressId; // Nullable
+  final int? order;                 // Nullable
 
-  const ResourceFeedbackPage({Key? key, required this.resourceId})
-      : super(key: key);
+  const ResourceFeedbackPage({
+    Key? key,
+    required this.resourceId,
+    this.resourceProgressId,
+    this.order,
+  }) : super(key: key);
 
   @override
   _ResourceFeedbackPageState createState() => _ResourceFeedbackPageState();
@@ -18,6 +26,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
   feedback_model.UsefulnessRating? _selectedRating;
   final FeedbackService _feedbackService = FeedbackService();
   final _storage = const FlutterSecureStorage();
+  final JourneyService _journeyService = JourneyService(); // <-- Add this
   bool _isSubmitting = false;
   String? _feedbackId;
   String? _userId;
@@ -77,6 +86,19 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
         await _feedbackService.createFeedback(feedback);
       } else {
         await _feedbackService.updateFeedback(feedback);
+      }
+
+      // Only update journey progress if both are not null
+      if (widget.resourceProgressId != null && widget.order != null) {
+        final updateProgress = UpdateUserJourneyResourceProgress(
+          order: widget.order!,
+          completed: true,
+          unlocked: true,
+        );
+        await _journeyService.editUserJourneyProgress(
+          widget.resourceProgressId!,
+          updateProgress,
+        );
       }
 
       // Close all pages until the JourneyDetailPage

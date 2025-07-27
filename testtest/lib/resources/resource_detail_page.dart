@@ -14,9 +14,15 @@ import 'package:audioplayers/audioplayers.dart';
 
 class ResourceDetailPage extends StatefulWidget {
   final Resource resource;
+  final String? resourceProgressId; // Add nullable
+  final int? order;                 // Add nullable
 
-  const ResourceDetailPage({Key? key, required this.resource})
-      : super(key: key);
+  const ResourceDetailPage({
+    Key? key,
+    required this.resource,
+    this.resourceProgressId,
+    this.order,
+  }) : super(key: key);
 
   @override
   _ResourceDetailPageState createState() => _ResourceDetailPageState();
@@ -282,6 +288,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                                     MaterialPageRoute(
                                       builder: (context) => ResourceFeedbackPage(
                                         resourceId: widget.resource.id,
+                                        resourceProgressId: widget.resourceProgressId,
+                                        order: widget.order,
                                       ),
                                     ),
                                   );

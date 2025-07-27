@@ -21,9 +21,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   final JourneyService _journeyService = JourneyService();
   final ImageService _imageService = ImageService();
 
-  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
   String? _selectedFeeling; // Track the selected feeling
-  String? _rewardImageBase64; // Cache for the reward image
 
   @override
   void initState() {
@@ -54,9 +52,7 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   Future<void> _fetchRewardImage() async {
     if (widget.resourceProgress.rewardId != null) { // Fix the condition to check if rewardId is not null
       try {
-        final base64Image = await _imageService.getImageBase64(widget.resourceProgress.rewardId!);
         setState(() {
-          _rewardImageBase64 = base64Image;
         });
       } catch (e) {
         print('Error fetching reward image: $e');
@@ -173,7 +169,11 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ResourceDetailPage(resource: resource),
+                                      builder: (context) => ResourceDetailPage(
+                                        resource: resource,
+                                        resourceProgressId: widget.resourceProgress.id, // Pass progress ID
+                                        order: widget.resourceProgress.order,           // Pass order
+                                      ),
                                     ),
                                   );
                                 } else {
@@ -273,7 +273,11 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResourceDetailPage(resource: resource),
+          builder: (context) => ResourceDetailPage(
+            resource: resource,
+            resourceProgressId: widget.resourceProgress.id, // Pass progress ID
+            order: widget.resourceProgress.order,           // Pass order
+          ),
         ),
       );
 
