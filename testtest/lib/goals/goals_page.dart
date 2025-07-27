@@ -199,7 +199,93 @@ class _GoalsPageState extends State<GoalsPage> {
             ),
           ),
           if (_isFilterPanelVisible) _buildBlurEffect(),
-          _buildFilterIcon(),
+          // Filtro e toggle de completadas
+          Positioned(
+            top: 58,
+            right: 20,
+            child: Row(
+              children: [
+                // Toggle completed/por completar
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isCompleted = !_isCompleted;
+                    });
+                    if (_selectedDay != null) {
+                      _fetchGoalsForDay(_selectedDay!);
+                    } else {
+                      _fetchGoalsForWeek();
+                    }
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    margin: const EdgeInsets.only(right: 10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _isCompleted ? Colors.green : Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 5,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      _isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+                      color: _isCompleted ? Colors.white : const Color(0xFF0D1B2A),
+                      size: 28,
+                    ),
+                  ),
+                ),
+                // Filtro
+                GestureDetector(
+                  onTap: _toggleFilterPanel,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 5,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.filter_alt,
+                            color: Color(0xFF0D1B2A),
+                            size: 28,
+                          ),
+                        ),
+                        if (_selectedSubjects.isNotEmpty)
+                          Positioned(
+                            top: 3,
+                            right: 4,
+                            child: Container(
+                              width: 8,
+                              height: 8,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(0xFF0D1B2A),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Move FAB before filter panel so the panel covers it
           Positioned(
             bottom: 10,
@@ -730,45 +816,6 @@ String getSubjectDisplayName(GoalSubject subject) {
                           ),
                         );
                       }).toList(),
-
-                      const SizedBox(height: 20),
-
-                      // Completed Filter Switch
-                      Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    const Text(
-      "Mostrar completadas",
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    ),
-    const SizedBox(height: 10), // Add spacing between the text and the switch
-    Switch(
-      value: _isCompleted,
-      onChanged: (value) {
-        setState(() {
-          _isCompleted = value;
-        });
-        if (_selectedDay != null) {
-          _fetchGoalsForDay(
-            _selectedDay!,
-          ); // Fetch goals for the selected day
-        } else {
-          _fetchGoalsForWeek(); // Fetch goals for the entire week
-        }
-      },
-      activeColor: const Color.fromARGB(
-        255,
-        255,
-        255,
-        255,
-      ),
-    ),
-  ],
-),
                     ],
                   ),
                 ),
@@ -810,5 +857,6 @@ String getSubjectDisplayName(GoalSubject subject) {
     );
   }
 }
+
 
 
