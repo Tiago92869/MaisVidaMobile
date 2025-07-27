@@ -266,6 +266,12 @@ class _HomeTabViewState extends State<HomeTabView> {
     bool isLoading,
     int tabIndex, // Use tab index for navigation
   ) {
+    final List<Color> activityColors = [
+      const Color(0xFF9CC5FF),
+      const Color(0xFF6E6AE8),
+      const Color(0xFF005FE7),
+      const Color(0xFFBBA6FF),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -314,13 +320,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                 children:
                     activities.map((activity) {
                       final backgroundColor =
-                          const [
-                            Color(0xFF9CC5FF),
-                            Color(0xFF6E6AE8),
-                            Color(0xFF005FE7),
-                            Color(0xFFBBA6FF),
-                          ][activities.indexOf(activity) %
-                              4]; // Cycle through colors
+                          activityColors[activities.indexOf(activity) % activityColors.length];
 
                       return GestureDetector(
                         onTap: () {
@@ -340,7 +340,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                             height: 300,
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: backgroundColor,
+                              color: backgroundColor.withOpacity(0.65),
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
@@ -361,19 +361,32 @@ class _HomeTabViewState extends State<HomeTabView> {
                                 Text(
                                   activity.title,
                                   style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    fontFamily: "Poppins",
                                     color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  activity.description,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 30),
+                                Text(
+                                  activity.description,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  "Recursos: ${activity.resources?.length ?? 0}",
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white70,
+                                    fontSize: 17,
+                                    fontFamily: "Inter",
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
                                   ),
                                 ),
                                 const Spacer(),
@@ -391,16 +404,16 @@ class _HomeTabViewState extends State<HomeTabView> {
                                       );
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      foregroundColor: backgroundColor,
+                                      foregroundColor: backgroundColor.withOpacity(0.65),
                                       backgroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
                                     child: const Text(
-                                      "Start",
+                                      "Iniciar",
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
