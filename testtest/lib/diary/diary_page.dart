@@ -98,8 +98,9 @@ class _DiaryPageState extends State<DiaryPage> {
       );
 
       setState(() {
-        if (diaries.isNotEmpty) {
-          // Append fetched data to the existing diary entries
+        // Verifica se algum DiaryDay tem diaries
+        final hasAnyDiary = diaries.any((d) => d.diaries.isNotEmpty);
+        if (hasAnyDiary) {
           for (var diaryDay in diaries) {
             _diaryEntries.addAll(diaryDay.diaries);
           }
@@ -273,10 +274,11 @@ class _DiaryPageState extends State<DiaryPage> {
                   Expanded(
                     child: NotificationListener<ScrollNotification>(
                       onNotification: (ScrollNotification scrollInfo) {
+                        // Só faz novo pedido se _hasMoreData for true
                         if (!_isLoading &&
+                            _hasMoreData && // <-- Adicionado: só busca se ainda há mais dados
                             scrollInfo.metrics.pixels ==
                                 scrollInfo.metrics.maxScrollExtent) {
-                          // User has scrolled to the bottom, fetch the next page
                           _fetchDiariesForSelectedDate(isScrolling: true);
                         }
                         return false;

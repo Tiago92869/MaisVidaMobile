@@ -445,13 +445,13 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                               children: [
                                 Text(
                                   _getEmotionEmoji(selectedEmotion!),
-                                  style: const TextStyle(fontSize: 22),
+                                  style: const TextStyle(fontSize: 16),
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
                                   _emotionDisplayPt(selectedEmotion!),
                                   style: const TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
