@@ -77,50 +77,50 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
   }
 
   Future<void> _makePhoneCall(String? number) async {
-  print("📱 Platform check — is iOS: ${Platform.isIOS}");
-  print("📱 Platform check — is Android: ${Platform.isAndroid}");
+  // ...removed print...
+  // ...removed print...
 
   if (number == null || number.isEmpty) {
-    print("⚠️ No number provided, showing no contact dialog.");
+    // ...removed print...
     _showNoContactDialog();
     return;
   }
 
   final Uri phoneUri = Uri(scheme: 'tel', path: number);
-  print("📞 Constructed phone URI: $phoneUri");
+  // ...removed print...
 
   if (Platform.isAndroid) {
-    print("🤖 On Android — checking phone permissions...");
+    // ...removed print...
 
     final status = await Permission.phone.status;
-    print("📊 Permission status: $status");
+    // ...removed print...
 
     if (status.isDenied || status.isRestricted) {
-      print("🔒 Permission is denied or restricted — requesting permission...");
+      // ...removed print...
       final result = await Permission.phone.request();
-      print("📊 Permission request result: $result");
+      // ...removed print...
 
       if (!result.isGranted) {
-        print("❌ Permission not granted — showing permission error.");
+        // ...removed print...
         _showPermissionError();
         return;
       } else {
-        print("✅ Permission granted.");
+        // ...removed print...
       }
     } else {
-      print("✅ Permission already granted.");
+      // ...removed print...
     }
   } else {
-    print("🍏 On iOS — skipping permission check.");
+    // ...removed print...
   }
 
-  print("🚀 Checking if can launch URI...");
+  // ...removed print...
 
   if (await canLaunchUrl(phoneUri)) {
-    print("✅ Can launch URI — launching...");
+    // ...removed print...
     await launchUrl(phoneUri);
   } else {
-    print("❌ Cannot launch URI — showing launch error.");
+    // ...removed print...
     _showLaunchError();
   }
 }
@@ -191,7 +191,7 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
 }
 
 void _showPermissionError() {
-  print("🚨 _showPermissionError triggered");
+  // ...removed print...
   ScaffoldMessenger.of(context).showSnackBar(
     const SnackBar(
       content: Text("É necessária permissão para chamada telefónica."),

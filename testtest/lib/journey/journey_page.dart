@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:mentara/services/journey/journey_service.dart';
 import 'package:mentara/services/journey/journey_model.dart';
@@ -38,14 +37,11 @@ class _JourneyPageState extends State<JourneyPage> {
     });
 
     try {
-      print('Fetching user journeys...');
       final journeys = await _journeyService.getAllJourneys();
-      print('Fetched ${journeys.length} journeys');
       setState(() {
         _journeys = journeys;
       });
     } catch (e) {
-      print('Error fetching journeys: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar as jornadas. Tente novamente."),
@@ -61,10 +57,7 @@ class _JourneyPageState extends State<JourneyPage> {
 
   Future<void> _startJourneyAndNavigate(String journeyId) async {
     try {
-      print('Starting journey: $journeyId');
       final journeyDetails = await _journeyService.startJourneyForUser(journeyId);
-
-      print('Started journey and fetched details: ${journeyDetails.currentStep}');
 
       // Navigate to the JourneyDetailPage with the fetched details and isNewJourney flag
       await Navigator.push(
@@ -78,10 +71,8 @@ class _JourneyPageState extends State<JourneyPage> {
       );
 
       // Refresh the journeys list when returning
-      print('Returned from JourneyDetailPage, refreshing journeys');
       _fetchJourneys();
     } catch (e) {
-      print('Error starting journey: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao iniciar a jornada. Tente novamente."),
@@ -98,10 +89,7 @@ class _JourneyPageState extends State<JourneyPage> {
     }
 
     try {
-      print('Fetching details for journey: $journeyId');
       final journeyDetails = await _journeyService.getJourneyDetails(journeyId);
-
-      print('Fetched journey details: ${journeyDetails.currentStep}');
 
       // Navigate to the JourneyDetailPage without isNewJourney flag
       await Navigator.push(
@@ -115,10 +103,8 @@ class _JourneyPageState extends State<JourneyPage> {
       );
 
       // Refresh the journeys list when returning
-      print('Returned from JourneyDetailPage, refreshing journeys');
       _fetchJourneys();
     } catch (e) {
-      print('Error fetching journey details: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao obter os detalhes da jornada. Tente novamente."),
@@ -129,7 +115,6 @@ class _JourneyPageState extends State<JourneyPage> {
   }
 
   Widget _buildJourneyCard(JourneySimpleUser journey, Color backgroundColor) {
-    print('Building journey card for: ${journey.title}');
     final double progress = journey.completedQuantity / journey.resourceQuantity;
     final bool isComplete = progress >= 1.0;
 
@@ -205,7 +190,6 @@ class _JourneyPageState extends State<JourneyPage> {
               GestureDetector(
                 onTap: isComplete
                     ? () {
-                        print("Random message: ${Random().nextInt(100)}");
                       }
                     : null,
                 child: Icon(
@@ -220,8 +204,6 @@ class _JourneyPageState extends State<JourneyPage> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                print(
-                    '${journey.started ? "Continuar" : "Começar"} jornada: ${journey.title}');
                 await _navigateToJourneyDetails(journey.id, isStarting: !journey.started);
               },
               style: ElevatedButton.styleFrom(

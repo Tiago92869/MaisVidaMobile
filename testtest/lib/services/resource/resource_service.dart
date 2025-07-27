@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:mentara/services/resource/resource_model.dart';
@@ -16,21 +15,8 @@ class ResourceService {
   String? _userId;
 
   Future<void> _loadStoredCredentials() async {
-    print('Loading stored credentials...');
     _accessToken = await _storage.read(key: 'accessToken');
     _userId = await _storage.read(key: 'userId');
-
-    if (_accessToken != null) {
-      print('Access token loaded: $_accessToken');
-    } else {
-      print('No access token found');
-    }
-
-    if (_userId != null) {
-      print('User ID loaded: $_userId');
-    } else {
-      print('No User ID found');
-    }
   }
 
   Future<ResourcePage> fetchResources(
@@ -41,9 +27,6 @@ class ResourceService {
   }) async {
     await _loadStoredCredentials();
     try {
-      print('Fetching resources...');
-      print('Resource Types: $resourceTypes, Page: $page, Size: $size, Search: $search');
-
       // If resourceTypes is empty, use all types except TIVA
       /*
       if (resourceTypes.isEmpty) {
@@ -58,8 +41,6 @@ class ResourceService {
       // Build the URL with query parameters
       final String url =
           '$_baseUrl?userId=$_userId&page=$page&size=$size&search=$search&resourceType=$resourceTypesParam';
-      print('Request URL for fetchResources: $url'); // Log the request URL
-
       final response = await http
           .get(
             Uri.parse(url),
@@ -71,7 +52,6 @@ class ResourceService {
           .timeout(
             _timeoutDuration,
             onTimeout: () {
-              print('Request to $url timed out.');
               throw TimeoutException(
                 'The connection has timed out, please try again later.',
               );
@@ -80,18 +60,13 @@ class ResourceService {
 
       // Decode response body with UTF-8
       final decodedBody = utf8.decode(response.bodyBytes);
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: $decodedBody');
 
       if (response.statusCode == 200) {
-        print('Resources fetched successfully.');
         return ResourcePage.fromJson(jsonDecode(decodedBody));
       } else {
-        print('Failed to load resources. Status Code: ${response.statusCode}');
         throw Exception('Failed to load resources');
       }
     } catch (e) {
-      print('Error fetching resources: $e');
       rethrow;
     }
   }
@@ -99,9 +74,7 @@ class ResourceService {
   Future<Resource> fetchResourceById(String id) async {
     await _loadStoredCredentials();
     try {
-      print('Fetching resource with ID: $id');
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for fetchResourceById: $requestUrl'); // Log the request URL
 
       final response = await http
           .get(
@@ -114,30 +87,19 @@ class ResourceService {
           .timeout(
             _timeoutDuration,
             onTimeout: () {
-              print('Request to $requestUrl timed out.');
               throw TimeoutException(
                 'The connection has timed out, please try again later.',
               );
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
-
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
-        const chunkSize = 1000; // Define the size of each chunk
-        for (int i = 0; i < decodedBody.length; i += chunkSize) {
-          print(decodedBody.substring(i, i + chunkSize > decodedBody.length ? decodedBody.length : i + chunkSize));
-        }
-        print('Resource fetched successfully.');
         return Resource.fromJson(jsonDecode(decodedBody));
       } else {
-        print('Failed to load resource. Status Code: ${response.statusCode}');
         throw Exception('Failed to load resource');
       }
     } catch (e) {
-      print('Error fetching resource by ID: $e');
       throw Exception('Failed to fetch resource');
     }
   }

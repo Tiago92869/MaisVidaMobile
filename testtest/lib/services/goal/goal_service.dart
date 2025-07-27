@@ -16,21 +16,8 @@ class GoalService {
   String? _userId;
 
   Future<void> _loadStoredCredentials() async {
-    print('Loading stored credentials...');
     _accessToken = await _storage.read(key: 'accessToken');
     _userId = await _storage.read(key: 'userId');
-
-    if (_accessToken != null) {
-      print('Access token loaded: $_accessToken');
-    } else {
-      print('No access token found');
-    }
-
-    if (_userId != null) {
-      print('User ID loaded: $_userId');
-    } else {
-      print('No User ID found');
-    }
   }
 
   Future<PagezGoalsDTO> fetchGoals(
@@ -54,9 +41,7 @@ class GoalService {
       final String url =
           '$_baseUrl?&userId=$_userId$isCompletedQuery&$subjectsQuery'
           '&startDate=${_formatDate(startDate)}&endDate=${_formatDate(endDate)}'
-          '&page=$page&size=$size'; // Added pagination parameters
-
-      print('Request URL for fetchGoals: $url'); // Log the request URL
+          '&page=$page&size=$size';
 
       final response = await http
           .get(
@@ -69,26 +54,19 @@ class GoalService {
           .timeout(
             _timeoutDuration,
             onTimeout: () {
-              print('Request to $url timed out.');
               throw TimeoutException(
                 'The connection has timed out, please try again later.',
               );
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
-
       if (response.statusCode == 200) {
-        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
-        print('Response Body: $decodedBody');
+        final decodedBody = utf8.decode(response.bodyBytes);
         return PagezGoalsDTO.fromJson(jsonDecode(decodedBody));
       } else {
-        print('Failed to load goals. Status Code: ${response.statusCode}');
         throw Exception('Failed to load goals');
       }
     } catch (e) {
-      print('Error fetching goals: $e');
       throw Exception('Failed to fetch goals');
     }
   }
@@ -97,9 +75,6 @@ class GoalService {
     await _loadStoredCredentials();
     try {
       final requestBody = jsonEncode(goal.toJson());
-      print(
-        'Request Body for createGoal: $requestBody',
-      ); // Log the request body
 
       final response = await http
           .post(
@@ -119,18 +94,12 @@ class GoalService {
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
-        print('Goal created successfully.');
         return GoalInfoCard.fromJson(jsonDecode(response.body));
       } else {
-        print('Failed to create goal. Status Code: ${response.statusCode}');
         throw HttpException('Failed to create goal: ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Error creating goal: $e');
       throw Exception('Failed to create goal');
     }
   }
@@ -140,10 +109,6 @@ class GoalService {
     try {
       final requestBody = jsonEncode(goal.toJson());
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for updateGoal: $requestUrl'); // Log the request URL
-      print(
-        'Request Body for updateGoal: $requestBody',
-      ); // Log the request body
 
       final response = await http
           .patch(
@@ -163,18 +128,12 @@ class GoalService {
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
-        print('Goal updated successfully.');
         return GoalInfoCard.fromJson(jsonDecode(response.body));
       } else {
-        print('Failed to update goal. Status Code: ${response.statusCode}');
         throw Exception('Failed to update goal');
       }
     } catch (e) {
-      print('Error updating goal: $e');
       throw Exception('Failed to update goal');
     }
   }
@@ -183,7 +142,6 @@ class GoalService {
     await _loadStoredCredentials();
     try {
       final String requestUrl = '$_baseUrl/$id';
-      print('Request URL for deleteGoal: $requestUrl'); // Log the request URL
 
       final response = await http
           .delete(
@@ -199,15 +157,11 @@ class GoalService {
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('Goal deleted successfully.');
       } else {
-        print('Failed to delete goal. Status Code: ${response.statusCode}');
         throw HttpException('Failed to delete goal: ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Error deleting goal: $e');
       throw Exception('Failed to delete goal');
     }
   }
@@ -220,3 +174,4 @@ class GoalService {
     return '$year-$month-$day';
   }
 }
+

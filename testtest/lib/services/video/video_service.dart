@@ -23,9 +23,6 @@ class VideoService {
   Future<VideoFile> uploadVideo(File file) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/upload';
-    print('VideoService: Starting uploadVideo...');
-    print('VideoService: Request URL: $requestUrl');
-    print('VideoService: File path: ${file.path}');
 
     final request = http.MultipartRequest('POST', Uri.parse(requestUrl))
       ..headers['Authorization'] = 'Bearer $_accessToken'
@@ -35,23 +32,17 @@ class VideoService {
       final response = await request.send().timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('VideoService: Upload request to $requestUrl timed out.');
           throw TimeoutException('The connection has timed out, please try again later.');
         },
       );
 
-      print('VideoService: Upload response status code: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print('VideoService: Upload response body: $responseBody');
         return VideoFile.fromJson(json.decode(responseBody));
       } else {
-        print('VideoService: Failed to upload video. Status Code: ${response.statusCode}');
         throw Exception('Failed to upload video');
       }
     } catch (e) {
-      print('VideoService: Error during uploadVideo: $e');
       rethrow;
     }
   }
@@ -59,8 +50,6 @@ class VideoService {
   Future<VideoInfoDTO> getVideoBase64(String id) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/$id';
-    print('VideoService: Starting getVideoBase64...');
-    print('VideoService: Request URL: $requestUrl');
 
     try {
       final response = await http.get(
@@ -69,26 +58,18 @@ class VideoService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('VideoService: Request to $requestUrl timed out.');
           throw TimeoutException('The connection has timed out, please try again later.');
         },
       );
 
-      print('VideoService: Response status code: ${response.statusCode}');
-      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
-
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
-        print('VideoService: API response: $decodedBody');
         final responseBody = json.decode(decodedBody);
-        print('VideoService: VideoInfoDTO fetched successfully.');
         return VideoInfoDTO.fromJson(responseBody);
       } else {
-        print('VideoService: Failed to fetch video Base64. Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch video Base64');
       }
     } catch (e) {
-      print('VideoService: Error during getVideoBase64: $e');
       rethrow;
     }
   }
@@ -96,8 +77,6 @@ class VideoService {
   Future<http.StreamedResponse> streamVideo(String id) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/stream/$id';
-    print('VideoService: Starting streamVideo...');
-    print('VideoService: Request URL: $requestUrl');
 
     try {
       final request = http.Request('GET', Uri.parse(requestUrl))
@@ -106,15 +85,12 @@ class VideoService {
       final response = await request.send().timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('VideoService: Request to $requestUrl timed out.');
           throw TimeoutException('The connection has timed out, please try again later.');
         },
       );
 
-      print('VideoService: Response status code: ${response.statusCode}');
       return response;
     } catch (e) {
-      print('VideoService: Error during streamVideo: $e');
       rethrow;
     }
   }
@@ -122,14 +98,11 @@ class VideoService {
   Future<File?> downloadVideoFile(String id) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/download/$id';
-    print('VideoService: Starting downloadVideoFile...');
-    print('VideoService: Request URL: $requestUrl');
 
     try {
       final headers = {
         'Authorization': 'Bearer $_accessToken',
       };
-      print('VideoService: Headers: $headers');
 
       final fileInfo = await DefaultCacheManager().downloadFile(
         requestUrl,
@@ -137,21 +110,17 @@ class VideoService {
       );
 
       if (fileInfo.file.existsSync()) {
-        print('VideoService: Video file downloaded successfully. File path: ${fileInfo.file.path}');
 
         // Save the file to the app's documents directory
         final appDocDir = await getApplicationDocumentsDirectory();
         final savedFilePath = '${appDocDir.path}/${fileInfo.file.uri.pathSegments.last}';
         final savedFile = await fileInfo.file.copy(savedFilePath);
 
-        print('VideoService: Video file saved to permanent storage. Path: $savedFilePath');
         return savedFile;
       } else {
-        print('VideoService: Video file does not exist after download.');
         return null;
       }
     } catch (e) {
-      print('VideoService: Error downloading video file: $e');
       return null;
     }
   }

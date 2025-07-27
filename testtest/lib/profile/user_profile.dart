@@ -185,7 +185,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         },
       );
     } catch (e) {
-      print('Failed to fetch image previews: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Falha ao carregar as imagens."),

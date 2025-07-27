@@ -880,7 +880,7 @@ class _HomeTabViewState extends State<HomeTabView> {
         emoji = "❓";
     }
 
-    String _translateResourceType(ResourceType type) {
+    String translateResourceType(ResourceType type) {
       switch (type) {
         case ResourceType.ARTICLE:
           return "Artigo";
@@ -964,7 +964,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          _translateResourceType(resource.type),
+                          translateResourceType(resource.type),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,

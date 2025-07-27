@@ -1,8 +1,8 @@
-import 'dart:ui'; // For BackdropFilter
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:mentara/services/diary/diary_service.dart'; // Import DiaryService
-import 'package:mentara/services/diary/diary_model.dart'; // Import DiaryModel
-import 'diary_detail_page.dart'; // Import the new page
+import 'package:mentara/services/diary/diary_service.dart';
+import 'package:mentara/services/diary/diary_model.dart';
+import 'diary_detail_page.dart';
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({Key? key}) : super(key: key);
@@ -12,34 +12,31 @@ class DiaryPage extends StatefulWidget {
 }
 
 class _DiaryPageState extends State<DiaryPage> {
-  final DiaryService _diaryService = DiaryService(); // Initialize DiaryService
-  bool _isLoading = false; // Tracks if data is being fetched
-  bool _hasError = false; // Tracks if there was an error during fetch
-  bool _hasMoreData = true; // Tracks if there is more data to fetch
-  int _currentPage = 0; // Tracks the current page for pagination
+  final DiaryService _diaryService = DiaryService();
+  bool _isLoading = false;
+  bool _hasError = false;
+  bool _hasMoreData = true;
+  int _currentPage = 0;
 
   DateTime _selectedDate = DateTime.now();
 
-  Set<DiaryType> _selectedEmotions = {}; // Selected filter emotions
-  bool _isFilterPanelVisible = false; // Filter panel visibility
+  final Set<DiaryType> _selectedEmotions = {};
+  bool _isFilterPanelVisible = false;
 
-  List<Diary> _diaryEntries =
-      []; // Initialize _diaryEntries as an empty list of Diary
+  List<Diary> _diaryEntries = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchDiariesForSelectedDate(); // Fetch diaries for the initial selected date
+    _fetchDiariesForSelectedDate();
   }
 
-  // Function to toggle the filter panel visibility
   void _toggleFilterPanel() {
     setState(() {
       _isFilterPanelVisible = !_isFilterPanelVisible;
     });
   }
 
-  // Function to handle emotion selection
   void _toggleEmotion(DiaryType emotion) {
     setState(() {
       if (_selectedEmotions.contains(emotion)) {
@@ -48,19 +45,15 @@ class _DiaryPageState extends State<DiaryPage> {
         _selectedEmotions.add(emotion);
       }
     });
-
-    // Fetch diaries with the updated emotions
     _fetchDiariesForSelectedDate();
   }
 
-  // Function to filter diary entries by the selected date and emotions
   List<Diary> _getEntriesForSelectedDate() {
     return _diaryEntries
         .where(
           (entry) =>
               entry.recordedAt.toLocal().year == _selectedDate.toLocal().year &&
-              entry.recordedAt.toLocal().month ==
-                  _selectedDate.toLocal().month &&
+              entry.recordedAt.toLocal().month == _selectedDate.toLocal().month &&
               entry.recordedAt.toLocal().day == _selectedDate.toLocal().day &&
               (_selectedEmotions.isEmpty ||
                   _selectedEmotions.contains(entry.emotion)),
@@ -68,54 +61,45 @@ class _DiaryPageState extends State<DiaryPage> {
         .toList();
   }
 
-  // Function to fetch diaries for the selected date
   Future<void> _fetchDiariesForSelectedDate({bool isScrolling = false}) async {
     if (isScrolling && !_hasMoreData) {
-      // If there is no more data to fetch, stop further requests
       return;
     }
 
     setState(() {
       _isLoading = true;
       _hasError = false;
-
-      // Reset _diaryEntries and _currentPage only if not scrolling
       if (!isScrolling) {
         _diaryEntries = [];
         _currentPage = 0;
-        _hasMoreData = true; // Reset hasMoreData when fetching new data
+        _hasMoreData = true;
       }
     });
 
     try {
-      // Fetch diaries from the DiaryService
       final diaries = await _diaryService.fetchDiaries(
-        _selectedEmotions.toList(), // Pass selected emotions
-        _selectedDate, // Start date
-        _selectedDate, // End date (same as start date for a single day)
-        page: _currentPage, // Current page
-        size: 10, // Fetch 10 diaries per page
+        _selectedEmotions.toList(),
+        _selectedDate,
+        _selectedDate,
+        page: _currentPage,
+        size: 10,
       );
 
       setState(() {
-        // Verifica se algum DiaryDay tem diaries
         final hasAnyDiary = diaries.any((d) => d.diaries.isNotEmpty);
         if (hasAnyDiary) {
           for (var diaryDay in diaries) {
             _diaryEntries.addAll(diaryDay.diaries);
           }
-          _currentPage++; // Increment the page number
+          _currentPage++;
         } else {
-          _hasMoreData = false; // No more data to fetch
+          _hasMoreData = false;
         }
       });
     } catch (e) {
-      print("Error fetching diaries: $e");
       setState(() {
         _hasError = true;
       });
-
-      // Show error message using SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar os diários. Tente novamente."),
@@ -129,41 +113,37 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
-  // Function to navigate to the previous day
   void _goToPreviousDay() {
     setState(() {
       _selectedDate = _selectedDate.subtract(const Duration(days: 1));
     });
-    _fetchDiariesForSelectedDate(); // Fetch diaries for the new selected date
+    _fetchDiariesForSelectedDate();
   }
 
-  // Function to navigate to the next day
   void _goToNextDay() {
     setState(() {
       _selectedDate = _selectedDate.add(const Duration(days: 1));
     });
-    _fetchDiariesForSelectedDate(); // Fetch diaries for the new selected date
+    _fetchDiariesForSelectedDate();
   }
 
-  // Function to show a calendar for selecting a date
   Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2000), // Earliest selectable date
-      lastDate: DateTime(2100), // Latest selectable date
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFF0D1B2A), // Header background color
-            hintColor: const Color(0xFF0D1B2A), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A),
+            hintColor: const Color(0xFF0D1B2A),
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF0D1B2A), // Header text color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black, // Body text color
+              primary: Color(0xFF0D1B2A),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
-            dialogBackgroundColor:
-                Colors.white, // Background color of the calendar
+            dialogBackgroundColor: Colors.white,
           ),
           child: child!,
         );
@@ -174,11 +154,10 @@ class _DiaryPageState extends State<DiaryPage> {
       setState(() {
         _selectedDate = pickedDate;
       });
-      _fetchDiariesForSelectedDate(); // Fetch diaries for the newly selected date
+      _fetchDiariesForSelectedDate();
     }
   }
 
-  // Helper to get emoji for DiaryType (no dependency needed)
   String _getEmotionEmoji(DiaryType emotion) {
     switch (emotion) {
       case DiaryType.Love:
@@ -207,7 +186,6 @@ class _DiaryPageState extends State<DiaryPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Main content
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -225,7 +203,6 @@ class _DiaryPageState extends State<DiaryPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
                   const Center(
                     child: Text(
                       "Diário",
@@ -238,8 +215,6 @@ class _DiaryPageState extends State<DiaryPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Date Navigation
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -248,8 +223,7 @@ class _DiaryPageState extends State<DiaryPage> {
                         onPressed: _goToPreviousDay,
                       ),
                       GestureDetector(
-                        onTap:
-                            _selectDate, // Show calendar when the date is tapped
+                        onTap: _selectDate,
                         child: Text(
                           "${_selectedDate.toLocal().month}/${_selectedDate.toLocal().day}/${_selectedDate.toLocal().year}",
                           style: const TextStyle(
@@ -269,14 +243,11 @@ class _DiaryPageState extends State<DiaryPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Diary Entries List with Pull-to-Refresh
                   Expanded(
                     child: NotificationListener<ScrollNotification>(
                       onNotification: (ScrollNotification scrollInfo) {
-                        // Só faz novo pedido se _hasMoreData for true
                         if (!_isLoading &&
-                            _hasMoreData && // <-- Adicionado: só busca se ainda há mais dados
+                            _hasMoreData &&
                             scrollInfo.metrics.pixels ==
                                 scrollInfo.metrics.maxScrollExtent) {
                           _fetchDiariesForSelectedDate(isScrolling: true);
@@ -284,145 +255,138 @@ class _DiaryPageState extends State<DiaryPage> {
                         return false;
                       },
                       child: RefreshIndicator(
-                        onRefresh:
-                            () => _fetchDiariesForSelectedDate(
-                              isScrolling: false,
-                            ), // Reset on refresh
-                        child:
-                            _hasError
-                                ? const Center(
-                                  child: Text(
-                                    "Falha ao carregar os diários. Tente novamente.",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                    ),
+                        onRefresh: () => _fetchDiariesForSelectedDate(isScrolling: false),
+                        child: _hasError
+                            ? const Center(
+                                child: Text(
+                                  "Falha ao carregar os diários. Tente novamente.",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white70,
                                   ),
-                                )
-                                : _diaryEntries.isEmpty
-                                ? const Center(
-                                  child: Text(
-                                    "Não há diários para este dia.",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                )
-                                : ListView.builder(
-                                  padding: const EdgeInsets.only(bottom: 60),
-                                  itemCount: _diaryEntries.length,
-                                  itemBuilder: (context, index) {
-                                    final entry = _diaryEntries[index];
-                                    return GestureDetector(
-                                      onTap: () async {
-                                        final result = await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => DiaryDetailPage(
-                                              diary: entry,
-                                              createDiary: false,
-                                            ),
-                                          ),
-                                        );
-                                        if (result == true) {
-                                          _fetchDiariesForSelectedDate(isScrolling: false);
-                                        }
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(vertical: 8),
-                                        padding: const EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
-                                          borderRadius: BorderRadius.circular(20),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
-                                              blurRadius: 5,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            // Title
-                                            Text(
-                                              entry.title,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8), // Add spacing between title and description
-                                            // Description
-                                            Text(
-                                              entry.description,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white70,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                                vertical: 6,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.2),
-                                                borderRadius: BorderRadius.circular(20),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    _getEmotionEmoji(entry.emotion),
-                                                    style: const TextStyle(fontSize: 18),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    // Portuguese display for emotion
-                                                    () {
-                                                      switch (entry.emotion) {
-                                                        case DiaryType.Love:
-                                                          return "Amor";
-                                                        case DiaryType.Fantastic:
-                                                          return "Fantástico";
-                                                        case DiaryType.Happy:
-                                                          return "Feliz";
-                                                        case DiaryType.Neutral:
-                                                          return "Neutro";
-                                                        case DiaryType.Disappointed:
-                                                          return "Desapontado";
-                                                        case DiaryType.Sad:
-                                                          return "Triste";
-                                                        case DiaryType.Angry:
-                                                          return "Zangado";
-                                                        case DiaryType.Sick:
-                                                          return "Doente";
-                                                      }
-                                                    }(),
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
                                 ),
+                              )
+                            : _diaryEntries.isEmpty
+                                ? const Center(
+                                    child: Text(
+                                      "Não há diários para este dia.",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    padding: const EdgeInsets.only(bottom: 60),
+                                    itemCount: _diaryEntries.length,
+                                    itemBuilder: (context, index) {
+                                      final entry = _diaryEntries[index];
+                                      return GestureDetector(
+                                        onTap: () async {
+                                          final result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => DiaryDetailPage(
+                                                diary: entry,
+                                                createDiary: false,
+                                              ),
+                                            ),
+                                          );
+                                          if (result == true) {
+                                            _fetchDiariesForSelectedDate(isScrolling: false);
+                                          }
+                                        },
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(vertical: 8),
+                                          padding: const EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                                            borderRadius: BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                                                blurRadius: 5,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                entry.title,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                entry.description,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 6,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withOpacity(0.2),
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      _getEmotionEmoji(entry.emotion),
+                                                      style: const TextStyle(fontSize: 18),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      () {
+                                                        switch (entry.emotion) {
+                                                          case DiaryType.Love:
+                                                            return "Amor";
+                                                          case DiaryType.Fantastic:
+                                                            return "Fantástico";
+                                                          case DiaryType.Happy:
+                                                            return "Feliz";
+                                                          case DiaryType.Neutral:
+                                                            return "Neutro";
+                                                          case DiaryType.Disappointed:
+                                                            return "Desapontado";
+                                                          case DiaryType.Sad:
+                                                            return "Triste";
+                                                          case DiaryType.Angry:
+                                                            return "Zangado";
+                                                          case DiaryType.Sick:
+                                                            return "Doente";
+                                                        }
+                                                      }(),
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                       ),
                     ),
                   ),
@@ -430,8 +394,6 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ),
           ),
-
-          // Overlay to detect taps outside the filter panel and apply blur
           if (_isFilterPanelVisible)
             Positioned.fill(
               child: GestureDetector(
@@ -448,8 +410,6 @@ class _DiaryPageState extends State<DiaryPage> {
                 ),
               ),
             ),
-
-          // Sliding filter panel (should be above everything except FAB)
           if (_isFilterPanelVisible)
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
@@ -468,15 +428,13 @@ class _DiaryPageState extends State<DiaryPage> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 10,
-                      offset: const Offset(-5, 0), // Shadow on the left side
+                      offset: const Offset(-5, 0),
                     ),
                   ],
                 ),
                 child: Column(
                   children: [
-                    const SizedBox(
-                      height: 40,
-                    ), // Space between the arrow and text
+                    const SizedBox(height: 40),
                     Padding(
                       padding: const EdgeInsets.only(top: 20, left: 15),
                       child: Row(
@@ -508,103 +466,94 @@ class _DiaryPageState extends State<DiaryPage> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
-                            children:
-                                DiaryType.values.map((emotion) {
-                                  final isSelected = _selectedEmotions.contains(
-                                    emotion,
-                                  );
-                                  // Map DiaryType to Portuguese display names
-                                  String emotionDisplay;
-                                  switch (emotion) {
-                                    case DiaryType.Love:
-                                      emotionDisplay = "Amor";
-                                      break;
-                                    case DiaryType.Fantastic:
-                                      emotionDisplay = "Fantástico";
-                                      break;
-                                    case DiaryType.Happy:
-                                      emotionDisplay = "Feliz";
-                                      break;
-                                    case DiaryType.Neutral:
-                                      emotionDisplay = "Neutro";
-                                      break;
-                                    case DiaryType.Disappointed:
-                                      emotionDisplay = "Desapontado";
-                                      break;
-                                    case DiaryType.Sad:
-                                      emotionDisplay = "Triste";
-                                      break;
-                                    case DiaryType.Angry:
-                                      emotionDisplay = "Zangado";
-                                      break;
-                                    case DiaryType.Sick:
-                                      emotionDisplay = "Doente";
-                                      break;
-                                  }
-                                  return GestureDetector(
-                                    onTap: () {
-                                      _toggleEmotion(emotion);
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 200),
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color:
-                                              isSelected
-                                                  ? Colors.white
-                                                  : Colors.transparent,
-                                          width: 1.5,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        color:
-                                            isSelected
-                                                ? const Color(
-                                                  0xFF0D1B2A,
-                                                ) // Selected button color
-                                                : Colors
-                                                    .white, // Default button color
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
-                                        horizontal: 15,
-                                      ),
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 8,
-                                      ),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              _getEmotionEmoji(emotion),
-                                              style: const TextStyle(fontSize: 22),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              emotionDisplay,
-                                              style: TextStyle(
-                                                color: isSelected
-                                                    ? Colors.white
-                                                    : const Color(0xFF0D1B2A),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: "Poppins",
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                            children: DiaryType.values.map((emotion) {
+                              final isSelected = _selectedEmotions.contains(emotion);
+                              String emotionDisplay;
+                              switch (emotion) {
+                                case DiaryType.Love:
+                                  emotionDisplay = "Amor";
+                                  break;
+                                case DiaryType.Fantastic:
+                                  emotionDisplay = "Fantástico";
+                                  break;
+                                case DiaryType.Happy:
+                                  emotionDisplay = "Feliz";
+                                  break;
+                                case DiaryType.Neutral:
+                                  emotionDisplay = "Neutro";
+                                  break;
+                                case DiaryType.Disappointed:
+                                  emotionDisplay = "Desapontado";
+                                  break;
+                                case DiaryType.Sad:
+                                  emotionDisplay = "Triste";
+                                  break;
+                                case DiaryType.Angry:
+                                  emotionDisplay = "Zangado";
+                                  break;
+                                case DiaryType.Sick:
+                                  emotionDisplay = "Doente";
+                                  break;
+                              }
+                              return GestureDetector(
+                                onTap: () {
+                                  _toggleEmotion(emotion);
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                      width: 1.5,
                                     ),
-                                  );
-                                }).toList(),
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: isSelected
+                                        ? const Color(0xFF0D1B2A)
+                                        : Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 15,
+                                  ),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          _getEmotionEmoji(emotion),
+                                          style: const TextStyle(fontSize: 22),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          emotionDisplay,
+                                          style: TextStyle(
+                                            color: isSelected
+                                                ? Colors.white
+                                                : const Color(0xFF0D1B2A),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Poppins",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ),
@@ -614,8 +563,6 @@ class _DiaryPageState extends State<DiaryPage> {
                 ),
               ),
             ),
-
-          // Filter Button (move this BEFORE the filter panel in the stack)
           if (!_isFilterPanelVisible)
             Positioned(
               top: 58,
@@ -664,35 +611,24 @@ class _DiaryPageState extends State<DiaryPage> {
                 ),
               ),
             ),
-
-          // Floating Action Button Positioned Upwards
           Positioned(
-            bottom: 100, // Adjust the vertical position of the FAB
-            right:
-                _isFilterPanelVisible
-                    ? -80
-                    : 20, // Slide the FAB out when the filter panel is open
+            bottom: 100,
+            right: _isFilterPanelVisible ? -80 : 20,
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
-              opacity:
-                  _isFilterPanelVisible
-                      ? 0.0
-                      : 1.0, // Hide the FAB when the filter panel is open
+              opacity: _isFilterPanelVisible ? 0.0 : 1.0,
               child: FloatingActionButton(
                 onPressed: () async {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => DiaryDetailPage(
-                            diary: null, // Pass null for creating a new entry
-                            createDiary: true,
-                          ),
+                      builder: (context) => DiaryDetailPage(
+                        diary: null,
+                        createDiary: true,
+                      ),
                     ),
                   );
-
                   if (result == true) {
-                    // Refresh the search with the previously set parameters
                     _fetchDiariesForSelectedDate(isScrolling: false);
                   }
                 },

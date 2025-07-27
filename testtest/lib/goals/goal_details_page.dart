@@ -3,11 +3,9 @@ import 'package:mentara/services/goal/goal_service.dart';
 import 'package:mentara/services/goal/goal_model.dart';
 
 class GoalDetailPage extends StatefulWidget {
-  final GoalInfoCard?
-  goal; // Pass a goal for viewing/editing, or null for a new goal
-  final bool
-  createResource; // Indicates if the page is opened for creating a new goal
-  final VoidCallback? onSave; // Callback to refresh goals in GoalsPage
+  final GoalInfoCard? goal;
+  final bool createResource;
+  final VoidCallback? onSave;
 
   const GoalDetailPage({
     Key? key,
@@ -25,13 +23,13 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
 
   late TextEditingController titleController;
   late TextEditingController descriptionController;
-  DateTime? selectedDate; // Track the selected date
+  DateTime? selectedDate;
   GoalSubject? selectedSubject;
-  bool hasNotifications = false; // Local variable for notifications toggle
-  bool completed = false; // Local variable for completed toggle
-  late bool editMode; // Tracks if the user is editing
-  bool _isLoading = false; // Tracks if a save operation is in progress
-  bool _showFirstStarfish = true; // Randomly show one of the starfish images
+  bool hasNotifications = false;
+  bool completed = false;
+  late bool editMode;
+  bool _isLoading = false;
+  final bool _showFirstStarfish = true;
 
   @override
   void initState() {
@@ -44,29 +42,26 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     selectedSubject = widget.goal?.subject;
     hasNotifications = widget.goal?.hasNotifications ?? false;
     completed = widget.goal?.completed ?? false;
-    editMode =
-        widget
-            .createResource; // Automatically enable edit mode if creating a new goal
+    editMode = widget.createResource;
   }
 
   Future<void> _pickDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000), // Earliest selectable date
-      lastDate: DateTime(2100), // Latest selectable date
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFF0D1B2A), // Header background color
-            hintColor: const Color(0xFF0D1B2A), // Selected date color
+            primaryColor: const Color(0xFF0D1B2A),
+            hintColor: const Color(0xFF0D1B2A),
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF0D1B2A), // Header text color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black, // Body text color
+              primary: Color(0xFF0D1B2A),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
             ),
-            dialogBackgroundColor:
-                Colors.white, // Background color of the calendar
+            dialogBackgroundColor: Colors.white,
           ),
           child: child!,
         );
@@ -82,41 +77,32 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
 
   Future<void> _saveGoal() async {
     final updatedGoal = GoalInfoCard(
-      id:
-          widget.goal?.id ??
-          "", // Use the existing ID for updates or an empty ID for new goals
+      id: widget.goal?.id ?? "",
       title: titleController.text,
       description: descriptionController.text,
       goalDate: selectedDate ?? DateTime.now(),
       completedDate: completed ? DateTime.now() : null,
       completed: completed,
       hasNotifications: hasNotifications,
-      subject:
-          selectedSubject ??
-          GoalSubject.Personal, // Default to Personal if no subject is selected
+      subject: selectedSubject ?? GoalSubject.Personal,
       createdAt: widget.goal?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
     );
 
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true;
     });
 
     try {
       if (widget.createResource) {
-        // Call createGoal if creating a new goal
         await _goalService.createGoal(updatedGoal);
-        print('Meta criada com sucesso.');
       } else {
-        // Call updateGoal if editing an existing goal
         await _goalService.updateGoal(updatedGoal.id, updatedGoal);
-        print('Meta atualizada com sucesso.');
       }
       if (widget.onSave != null) {
-        widget.onSave!(); // Trigger the callback to refresh goals
+        widget.onSave!();
       }
     } catch (e) {
-      print('Error saving goal: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao salvar o meta. Tente novamente."),
@@ -125,7 +111,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       );
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
     }
   }
@@ -134,21 +120,16 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     if (widget.goal == null || widget.goal!.id.isEmpty) return;
 
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true;
     });
 
     try {
       await _goalService.deleteGoal(widget.goal!.id);
-      print('Meta eliminado com sucesso.');
-
       if (widget.onSave != null) {
-        widget.onSave!(); // Trigger the callback to refresh goals
+        widget.onSave!();
       }
-
-      // Navigate back and pass a flag to indicate deletion
       Navigator.pop(context, true);
     } catch (e) {
-      print('Error deleting goal: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao eliminar a meta. Tente novamente."),
@@ -157,7 +138,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       );
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
     }
   }
@@ -201,10 +182,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             );
           },
         ) ??
-        false; // Return false if the dialog is dismissed
+        false;
   }
 
-  // Helper to get the translated name and emoji for a GoalSubject
   String getSubjectDisplayName(GoalSubject subject) {
     switch (subject) {
       case GoalSubject.Personal:
@@ -215,7 +195,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         return "📚 Estudos";
       case GoalSubject.Family:
         return "👪 Família";
-      }
+    }
   }
 
   @override
@@ -223,7 +203,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -235,8 +214,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ),
             ),
           ),
-
-          // Randomly show one of the starfish images
           if (_showFirstStarfish)
             Positioned(
               right: 80,
@@ -244,7 +221,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               width: 400,
               height: 400,
               child: Opacity(
-              opacity: 0.05,
+                opacity: 0.05,
                 child: Transform.rotate(
                   angle: 0.7,
                   child: Image.asset(
@@ -261,7 +238,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               width: 400,
               height: 400,
               child: Opacity(
-              opacity: 0.05,
+                opacity: 0.05,
                 child: Transform.rotate(
                   angle: 0.5,
                   child: Image.asset(
@@ -271,8 +248,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 ),
               ),
             ),
-
-          // Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -281,16 +256,15 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   constraints: BoxConstraints(
                     minHeight: MediaQuery.of(context).size.height -
                         MediaQuery.of(context).padding.top -
-                        40, // adjust if needed
+                        40,
                   ),
                   child: IntrinsicHeight(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Back button
                         GestureDetector(
                           onTap: () {
-                            Navigator.pop(context); // Simply go back without saving
+                            Navigator.pop(context);
                           },
                           child: const Icon(
                             Icons.arrow_back,
@@ -299,12 +273,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Title
                         TextField(
                           controller: titleController,
                           enabled: editMode,
-                          maxLines: null, // Allow unlimited lines for title
+                          maxLines: null,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -317,8 +289,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
-                        // Subject Dropdown
                         if (editMode)
                           DropdownButton<GoalSubject>(
                             value: selectedSubject,
@@ -360,8 +330,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             ),
                           ),
                         const SizedBox(height: 20),
-
-                        // Goal Date Picker
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -399,8 +367,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             const SizedBox(height: 20),
                           ],
                         ),
-
-                        // Notifications Toggle
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -430,8 +396,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ],
                         ),
                         const SizedBox(height: 20),
-
-                        // Description
                         Expanded(
                           child: TextField(
                             controller: descriptionController,
@@ -452,55 +416,47 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ),
             ),
           ),
-          // Edit/Save Icons
           Positioned(
             top: 58,
             right: 30,
             child: GestureDetector(
               onTap: () async {
                 if (editMode) {
-                  // Validate fields when creating a new goal
                   if (widget.createResource &&
                       (titleController.text.isEmpty ||
                           descriptionController.text.isEmpty ||
                           selectedDate == null ||
                           selectedSubject == null)) {
-                    // Show a styled popup message warning of missing fields
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          backgroundColor: const Color(
-                            0xFF0D1B2A,
-                          ), // Match page background
+                          backgroundColor: const Color(0xFF0D1B2A),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              20,
-                            ), // Rounded corners
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           title: const Text(
                             "Campos ausentes",
                             style: TextStyle(
-                              color: Colors.white, // White text
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           content: const Text(
                             "Por favor preencha todos os campos antes de guardar.",
                             style: TextStyle(
-                              color: Colors.white70, // Subtle white text
+                              color: Colors.white70,
                             ),
                           ),
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
+                                Navigator.of(context).pop();
                               },
                               child: const Text(
                                 "OK",
                                 style: TextStyle(
-                                  color:
-                                      Colors.white, // White text for the button
+                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -509,37 +465,24 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                         );
                       },
                     );
-                    return; // Stop execution if fields are missing
+                    return;
                   }
-
-                  // Prevent multiple calls by disabling the button while saving
                   if (_isLoading) return;
-
-                  // Save the goal and close the page
                   setState(() {
-                    _isLoading = true; // Prevent duplicate calls
+                    _isLoading = true;
                   });
-
                   try {
                     await _saveGoal();
-
                     if (widget.onSave != null) {
-                      widget.onSave!(); // Trigger the callback to refresh goals
+                      widget.onSave!();
                     }
-
-                    Navigator.pop(
-                      context,
-                      true,
-                    ); // Return true to indicate success
-                  } catch (e) {
-                    print('Error saving goal: $e');
+                    Navigator.pop(context, true);
                   } finally {
                     setState(() {
-                      _isLoading = false; // Re-enable the button
+                      _isLoading = false;
                     });
                   }
                 } else {
-                  // Toggle edit mode
                   setState(() {
                     editMode = true;
                   });
@@ -554,8 +497,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ),
             ),
           ),
-          // Delete Button
-          if (!widget.createResource) // Show only when editing an existing goal
+          if (!widget.createResource)
             Positioned(
               bottom: 20,
               right: 20,

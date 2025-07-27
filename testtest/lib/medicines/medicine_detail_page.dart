@@ -139,7 +139,6 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
         Navigator.pop(context, true); // Return true to indicate success
       }
     } catch (e) {
-      print("Error saving medicine: $e");
       _showErrorSnackBar("Falha ao guardar o medicamento. Tente novamente.");
     } finally {
       setState(() {
@@ -157,12 +156,10 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
 
     try {
       await _medicineRepository.deleteMedicine(widget.medicine!.id);
-      print('Medicine deleted successfully.');
 
       // Navigate back and pass a flag to indicate deletion
       Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
-      print('Error deleting medicine: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao eliminar o medicamento. Tente novamente."),

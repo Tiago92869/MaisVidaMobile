@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mentara/services/diary/diary_model.dart';
 import 'package:mentara/services/diary/diary_service.dart';
-import 'dart:developer'; // Add this import for logging
 
 class DiaryDetailPage extends StatefulWidget {
-  final Diary?
-  diary; // Pass a diary entry if editing or viewing, null if creating
-  final bool createDiary; // Indicates if this is a new diary
+  final Diary? diary;
+  final bool createDiary;
 
   const DiaryDetailPage({Key? key, this.diary, this.createDiary = false})
     : super(key: key);
@@ -16,69 +14,62 @@ class DiaryDetailPage extends StatefulWidget {
 }
 
 class _DiaryDetailPageState extends State<DiaryDetailPage> {
-  bool editMode = false; // Tracks if the user is editing
+  bool editMode = false;
   late TextEditingController titleController;
   late TextEditingController descriptionController;
   late DateTime recordedAt;
   DiaryType? selectedEmotion;
-  final DiaryService _diaryService = DiaryService(); // Initialize DiaryService
+  final DiaryService _diaryService = DiaryService();
 
-  bool _showFirstStarfish = true; // Determines which starfish to show
+  bool _showFirstStarfish = true;
 
   @override
   void initState() {
     super.initState();
-    log("DiaryDetailPage initialized with createDiary: ${widget.createDiary}, diary: ${widget.diary}");
-    editMode = widget.createDiary; // Start in edit mode if creating a new diary
+    editMode = widget.createDiary;
     titleController = TextEditingController(text: widget.diary?.title ?? "");
     descriptionController = TextEditingController(
       text: widget.diary?.description ?? "",
     );
     recordedAt = widget.diary?.recordedAt ?? DateTime.now();
     selectedEmotion = widget.diary?.emotion;
-
-    // Randomly decide which starfish to show
     _showFirstStarfish = DateTime.now().millisecondsSinceEpoch % 2 == 0;
-    log("Initial state set: editMode=$editMode, recordedAt=$recordedAt, selectedEmotion=$selectedEmotion");
   }
 
   Future<void> saveDiary() async {
-    log("saveDiary called");
     if (titleController.text.isEmpty ||
         descriptionController.text.isEmpty ||
         selectedEmotion == null) {
-      log("Missing fields: title=${titleController.text}, description=${descriptionController.text}, selectedEmotion=$selectedEmotion");
-      // Show a styled popup message warning of missing fields
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: const Color(0xFF0D1B2A), // Match page background
+            backgroundColor: const Color(0xFF0D1B2A),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // Rounded corners
+              borderRadius: BorderRadius.circular(20),
             ),
             title: const Text(
               "Campos em falta",
               style: TextStyle(
-                color: Colors.white, // White text
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
             content: const Text(
               "Por favor preencha todos os campos antes de guardar.",
               style: TextStyle(
-                color: Colors.white70, // Subtle white text
+                color: Colors.white70,
               ),
             ),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.of(context).pop();
                 },
                 child: const Text(
                   "OK",
                   style: TextStyle(
-                    color: Colors.white, // White text for the button
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -87,7 +78,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
           );
         },
       );
-      return; // Stop execution if fields are missing
+      return;
     }
 
     final diary = Diary(
@@ -100,9 +91,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
       updatedAt: DateTime.now(),
     );
 
-    log("Diary object created: $diary");
-
-    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -113,22 +101,16 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
     try {
       if (widget.createDiary) {
-        log("Creating new diary");
         await _diaryService.createDiary(diary);
-        log("Diary created successfully");
-        Navigator.pop(context); // Close the loading dialog
-        Navigator.pop(context, true); // Return true to indicate success
+        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
-        log("Updating existing diary with id: ${widget.diary?.id}");
         await _diaryService.updateDiary(widget.diary!.id, diary);
-        log("Diary updated successfully");
-        Navigator.pop(context); // Close the loading dialog
-        Navigator.pop(context, true); // Return true to indicate success
+        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     } catch (e) {
-      log("Error saving diary: $e");
-      Navigator.pop(context); // Close the loading dialog
-      // Handle errors (e.g., show a snackbar)
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao guardar o diário. Tente novamente."),
@@ -139,7 +121,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   Future<bool> _showDeleteConfirmationDialog() async {
-    log("Delete confirmation dialog shown");
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
@@ -182,8 +163,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   Future<void> _deleteDiary() async {
-    log("Deleting diary with id: ${widget.diary?.id}");
-    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -194,13 +173,10 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
     try {
       await _diaryService.deleteDiary(widget.diary!.id);
-      log("Diary deleted successfully");
-      Navigator.pop(context); // Close the loading dialog
-      Navigator.pop(context, true); // Return true to indicate success
+      Navigator.pop(context);
+      Navigator.pop(context, true);
     } catch (e) {
-      log("Error deleting diary: $e");
-      Navigator.pop(context); // Close the loading dialog
-      // Handle errors (e.g., show a snackbar)
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao eliminar o diário. Tente novamente."),
@@ -211,35 +187,11 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   void toggleEditMode() {
-    log("Toggling edit mode. Current state: $editMode");
     setState(() {
       editMode = !editMode;
     });
-    log("Edit mode toggled. New state: $editMode");
   }
 
-  IconData _getEmotionIcon(DiaryType emotion) {
-    switch (emotion) {
-      case DiaryType.Love:
-        return Icons.favorite;
-      case DiaryType.Fantastic:
-        return Icons.star;
-      case DiaryType.Happy:
-        return Icons.sentiment_satisfied;
-      case DiaryType.Neutral:
-        return Icons.sentiment_neutral;
-      case DiaryType.Disappointed:
-        return Icons.sentiment_dissatisfied;
-      case DiaryType.Sad:
-        return Icons.sentiment_very_dissatisfied;
-      case DiaryType.Angry:
-        return Icons.mood_bad;
-      case DiaryType.Sick:
-        return Icons.sick;
-    }
-  }
-
-  // Adiciona esta função auxiliar para mostrar o nome em português
   String _emotionDisplayPt(DiaryType emotion) {
     switch (emotion) {
       case DiaryType.Love:
@@ -261,7 +213,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     }
   }
 
-  // Helper to get emoji for DiaryType (no dependency needed)
   String _getEmotionEmoji(DiaryType emotion) {
     switch (emotion) {
       case DiaryType.Love:
@@ -285,11 +236,9 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    log("Building DiaryDetailPage UI");
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -301,8 +250,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               ),
             ),
           ),
-
-          // Randomly show one of the starfish images
           if (_showFirstStarfish)
             Positioned(
               right: 80,
@@ -310,7 +257,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               width: 400,
               height: 400,
               child: Opacity(
-              opacity: 0.05,
+                opacity: 0.05,
                 child: Transform.rotate(
                   angle: 0.7,
                   child: Image.asset(
@@ -327,7 +274,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               width: 400,
               height: 400,
               child: Opacity(
-              opacity: 0.05,
+                opacity: 0.05,
                 child: Transform.rotate(
                   angle: 0.5,
                   child: Image.asset(
@@ -337,23 +284,20 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                 ),
               ),
             ),
-
-          // Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: SingleChildScrollView( // <-- Make the whole screen scrollable
+              child: SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: MediaQuery.of(context).size.height -
                         MediaQuery.of(context).padding.top -
-                        40, // adjust if needed
+                        40,
                   ),
                   child: IntrinsicHeight(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Back button
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: const Icon(
@@ -363,12 +307,10 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // Title
                         TextField(
                           controller: titleController,
                           enabled: editMode,
-                          maxLines: null, // Allow title to extend to multiple lines
+                          maxLines: null,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -381,8 +323,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
-                        // Emotion Dropdown
                         if (editMode)
                           DropdownButton<DiaryType>(
                             value: selectedEmotion,
@@ -436,12 +376,11 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             constraints: const BoxConstraints(
-                              // Remove width expansion, let it wrap content
                               minWidth: 0,
                               maxWidth: double.infinity,
                             ),
                             child: Row(
-                              mainAxisSize: MainAxisSize.min, // <-- Only as wide as content
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   _getEmotionEmoji(selectedEmotion!),
@@ -460,8 +399,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                             ),
                           ),
                         const SizedBox(height: 20),
-
-                        // Recorded At Date
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -475,51 +412,45 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                             ),
                             const SizedBox(height: 8),
                             GestureDetector(
-                              onTap:
-                                  editMode
-                                      ? () async {
-                                        final pickedDate = await showDatePicker(
-                                          context: context,
-                                          initialDate: recordedAt,
-                                          firstDate: DateTime(2000),
-                                          lastDate: DateTime.now(),
-                                          builder: (
-                                            BuildContext context,
-                                            Widget? child,
-                                          ) {
-                                            return Theme(
-                                              data: ThemeData.light().copyWith(
-                                                primaryColor: const Color(
-                                                  0xFF0D1B2A,
-                                                ), // Header background color
-                                                hintColor: const Color(
-                                                  0xFF0D1B2A,
-                                                ), // Selected date color
-                                                colorScheme: const ColorScheme.light(
-                                                  primary: Color(
-                                                    0xFF0D1B2A,
-                                                  ), // Header text color
-                                                  onPrimary:
-                                                      Colors
-                                                          .white, // Header text color
-                                                  onSurface:
-                                                      Colors.black, // Body text color
-                                                ),
-                                                dialogBackgroundColor:
-                                                    Colors
-                                                        .white, // Background color of the calendar
+                              onTap: editMode
+                                  ? () async {
+                                      final pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: recordedAt,
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime.now(),
+                                        builder: (
+                                          BuildContext context,
+                                          Widget? child,
+                                        ) {
+                                          return Theme(
+                                            data: ThemeData.light().copyWith(
+                                              primaryColor: const Color(
+                                                0xFF0D1B2A,
                                               ),
-                                              child: child!,
-                                            );
-                                          },
-                                        );
-                                        if (pickedDate != null) {
-                                          setState(() {
-                                            recordedAt = pickedDate;
-                                          });
-                                        }
+                                              hintColor: const Color(
+                                                0xFF0D1B2A,
+                                              ),
+                                              colorScheme: const ColorScheme.light(
+                                                primary: Color(
+                                                  0xFF0D1B2A,
+                                                ),
+                                                onPrimary: Colors.white,
+                                                onSurface: Colors.black,
+                                              ),
+                                              dialogBackgroundColor: Colors.white,
+                                            ),
+                                            child: child!,
+                                          );
+                                        },
+                                      );
+                                      if (pickedDate != null) {
+                                        setState(() {
+                                          recordedAt = pickedDate;
+                                        });
                                       }
-                                      : null,
+                                    }
+                                  : null,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
@@ -541,8 +472,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                           ],
                         ),
                         const SizedBox(height: 20),
-
-                        // Description
                         Expanded(
                           child: TextField(
                             controller: descriptionController,
@@ -563,19 +492,14 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               ),
             ),
           ),
-
-          // Save/Edit Icons
           Positioned(
             top: 58,
             right: 30,
             child: GestureDetector(
               onTap: () {
-                log("Save/Edit button tapped. createDiary=${widget.createDiary}, editMode=$editMode");
                 if (widget.createDiary || editMode) {
-                  // Save the diary if creating or in edit mode
                   saveDiary();
                 } else {
-                  // Toggle edit mode if viewing
                   toggleEditMode();
                 }
               },
@@ -588,28 +512,24 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
               ),
             ),
           ),
-
-          // Delete Button
-          if (!widget.createDiary) // Show only when editing an existing diary
+          if (!widget.createDiary)
             Positioned(
               bottom: 20,
-              right: 20, // Move the button to the right side
+              right: 20,
               child: GestureDetector(
                 onTap: () async {
-                  log("Delete button tapped");
                   final shouldDelete = await _showDeleteConfirmationDialog();
-                  log("Delete confirmation result: $shouldDelete");
                   if (shouldDelete) {
                     await _deleteDiary();
                   }
                 },
                 child: CircleAvatar(
-                  radius: 30, // Increase the size of the button
+                  radius: 30,
                   backgroundColor: Colors.red,
                   child: const Icon(
                     Icons.delete,
                     color: Colors.white,
-                    size: 28, // Increase the size of the icon
+                    size: 28,
                   ),
                 ),
               ),
@@ -619,4 +539,3 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     );
   }
 }
-

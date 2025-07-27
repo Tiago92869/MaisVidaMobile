@@ -1,4 +1,4 @@
-import 'dart:ui'; // For BackdropFilter
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:mentara/services/activity/activity_service.dart';
 import 'package:mentara/services/activity/activity_model.dart';
@@ -14,9 +14,8 @@ class ActivitiesPage extends StatefulWidget {
 
 class _ActivitiesPageState extends State<ActivitiesPage> {
   final ActivityService _activityService = ActivityService();
-  final FavoriteService _favoriteService = FavoriteService(); // Add FavoriteRepository
+  final FavoriteService _favoriteService = FavoriteService();
 
-  // State variables
   List<Activity> _activities = [];
   String _searchText = "";
   bool _isLoading = false;
@@ -24,13 +23,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   bool _isLastPage = false;
 
   final List<Color> _activityColors = [
-    const Color(0xFF9CC5FF),
-    const Color(0xFF6E6AE8),
-    const Color(0xFF005FE7),
-    const Color(0xFFBBA6FF),
+    Color(0xFF9CC5FF),
+    Color(0xFF6E6AE8),
+    Color(0xFF005FE7),
+    Color(0xFFBBA6FF),
   ];
 
-  // Variable to track the glowing state of the star icon
   bool _isStarGlowing = false;
 
   @override
@@ -55,19 +53,17 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
       setState(() {
         if (loadNextPage) {
-          _activities.addAll(activityPage.content); // Append new activities
+          _activities.addAll(activityPage.content);
         } else {
-          _activities = activityPage.content; // Replace activities
+          _activities = activityPage.content;
         }
         _isLastPage = activityPage.last;
-        _currentPage = activityPage.number + 1; // Increment page for next fetch
-        // Garantir que a lista vazia mostra o estado vazio
+        _currentPage = activityPage.number + 1;
         if (_activities.isEmpty) {
           _isLastPage = true;
         }
       });
     } catch (e) {
-      print('Error fetching activities: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar atividades. Tente novamente."),
@@ -93,17 +89,14 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
       final favoriteActivities = await _favoriteService.fetchFavoriteActivities();
       setState(() {
-        _activities = favoriteActivities; // Replace activities with favorites
-        _isLastPage = true; // Assume all favorite activities are loaded
+        _activities = favoriteActivities;
+        _isLastPage = true;
       });
     } catch (e) {
-      print('Error fetching favorite activities: $e');
-      // Show empty state if 404 or any error
       setState(() {
         _activities = [];
         _isLastPage = true;
       });
-      // Optionally, you can still show the snackbar for other errors
     } finally {
       setState(() {
         _isLoading = false;
@@ -124,7 +117,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   void _onScroll(ScrollController controller) {
     if (controller.position.pixels >=
         controller.position.maxScrollExtent - 200) {
-      _fetchActivities(loadNextPage: true); // Fetch the next page
+      _fetchActivities(loadNextPage: true);
     }
   }
 
@@ -135,14 +128,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       child: GestureDetector(
         onTap: () async {
           setState(() {
-            _isStarGlowing = !_isStarGlowing; // Toggle the glowing state
+            _isStarGlowing = !_isStarGlowing;
           });
 
           if (_isStarGlowing) {
-            // Fetch favorite activities when the star is glowing
             await _fetchFavoriteActivities();
           } else {
-            // Reset the activities list using the existing fetch logic
             setState(() {
               _activities.clear();
               _currentPage = 0;
@@ -161,10 +152,10 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               color: Colors.white,
             ),
             child: Icon(
-                  Icons.star,
-                  color: _isStarGlowing ? const Color.fromARGB(255, 255, 217, 0) : Colors.grey,
-                  size: 28,
-                ),
+              Icons.star,
+              color: _isStarGlowing ? Color.fromARGB(255, 255, 217, 0) : Colors.grey,
+              size: 28,
+            ),
           ),
         ),
       ),
@@ -173,23 +164,20 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
   Widget _buildActivityCard(Activity activity, Color backgroundColor) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
-      padding: const EdgeInsets.all(20),
+      constraints: BoxConstraints(maxWidth: 350, maxHeight: 350),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        // ignore: deprecated_member_use
         color: backgroundColor.withOpacity(0.65),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
             color: backgroundColor.withOpacity(0.3),
             blurRadius: 8,
-            offset: const Offset(0, 12),
+            offset: Offset(0, 12),
           ),
           BoxShadow(
-            // ignore: deprecated_member_use
             color: backgroundColor.withOpacity(0.3),
             blurRadius: 2,
-            offset: const Offset(0, 1),
+            offset: Offset(0, 1),
           ),
         ],
         borderRadius: BorderRadius.circular(20),
@@ -197,74 +185,61 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title with a maximum of 2 lines
           Text(
             activity.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontFamily: "Poppins",
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
-            maxLines: 2, // Limit the title to a maximum of 2 lines
-            overflow: TextOverflow.ellipsis, // Add ellipsis if it overflows
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(
-            height: 30,
-          ), // Increased spacing between title and description
-          // Description with a maximum of 3 lines
+          SizedBox(height: 30),
           Text(
             activity.description,
             overflow: TextOverflow.ellipsis,
-            maxLines: 4, // Limit the description to a maximum of 3 lines
+            maxLines: 4,
             style: TextStyle(
-              // ignore: deprecated_member_use
               color: Colors.white.withOpacity(0.9),
               fontSize: 16,
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ), // Increased spacing between description and resources
+          SizedBox(height: 20),
           Text(
             "Recursos: ${activity.resources?.length ?? 0}",
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               fontFamily: "Inter",
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
           ),
-          const Spacer(),
+          Spacer(),
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                // Navigate to ActivityDetailsPage and wait for the result
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ActivityDetailsPage(activity: activity),
                   ),
                 );
-
-                // Refresh the activities list when returning
                 if (_isStarGlowing) {
-                  // If the star icon is glowing, fetch favorite activities
                   await _fetchFavoriteActivities();
                 } else {
-                  // Otherwise, refresh the default activities list
                   _onSearch(_searchText);
                 }
               },
               style: ElevatedButton.styleFrom(
-                // ignore: deprecated_member_use
                 foregroundColor: backgroundColor.withOpacity(0.65),
                 backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 "Iniciar",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -283,10 +258,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
@@ -295,12 +269,11 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               ),
             ),
           ),
-          // Main content
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 60),
-              const Center(
+              SizedBox(height: 60),
+              Center(
                 child: Text(
                   "Atividades",
                   style: TextStyle(
@@ -311,56 +284,55 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: TextField(
                   onChanged: _onSearch,
                   decoration: InputDecoration(
                     labelText: "Pesquisar atividades",
-                    labelStyle: const TextStyle(
+                    labelStyle: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
                       color: Colors.white,
                       size: 20,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: Colors.white),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: Colors.white),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Colors.white),
+                      borderSide: BorderSide(color: Colors.white),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 10,
                     ),
                   ),
-                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                  style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               Expanded(
                 child: Stack(
                   children: [
                     RefreshIndicator(
                       onRefresh: () async {
-                        await _fetchActivities(); // Refresh the list
+                        await _fetchActivities();
                       },
                       child: _activities.isEmpty
                           ? Center(
                               child: Text(
                                 "Nenhuma atividade encontrada",
                                 style: TextStyle(
-                                  // ignore: deprecated_member_use
                                   color: Colors.white.withOpacity(0.8),
                                   fontSize: 18,
                                 ),
@@ -369,17 +341,16 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                             )
                           : ListView.builder(
                               controller: scrollController,
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              itemCount:
-                                  _activities.length + 1, // Add 1 for the SizedBox
+                              physics: AlwaysScrollableScrollPhysics(),
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              itemCount: _activities.length + 1,
                               itemBuilder: (context, index) {
                                 if (index < _activities.length) {
                                   final activity = _activities[index];
                                   final backgroundColor =
                                       _activityColors[index % _activityColors.length];
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(
+                                    padding: EdgeInsets.symmetric(
                                       vertical: 15,
                                       horizontal: 20,
                                     ),
@@ -389,21 +360,20 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                     ),
                                   );
                                 } else {
-                                  return const SizedBox(
+                                  return SizedBox(
                                     height: 60,
-                                  ); // Add spacing at the end
+                                  );
                                 }
                               },
                             ),
                     ),
                     if (_isLoading)
-                      const Center(child: CircularProgressIndicator()),
+                      Center(child: CircularProgressIndicator()),
                   ],
                 ),
               ),
             ],
           ),
-          // Star Icon
           _buildStarIcon(),
         ],
       ),

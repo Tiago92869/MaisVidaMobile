@@ -68,8 +68,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
         }
       });
     } catch (e) {
-      print("Error fetching notifications: $e");
-
       // Show error message using SnackBar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -137,7 +135,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
           }
         });
       } catch (e) {
-        print("Error marking notification as read: $e");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Falha ao marcar a notificação como lida."),

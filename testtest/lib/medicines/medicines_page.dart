@@ -81,7 +81,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
         _totalPages = medicinePage.totalPages; // Update the total pages
       });
     } catch (e) {
-      print('Error fetching medicines: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar medicamentos. Tente novamente."),
@@ -118,7 +117,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
         ); // Add medicines from the response
       });
     } catch (e) {
-      print('Error fetching medicines for the day: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar medicamentos para o dia selecionado."),
@@ -157,7 +155,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
         _totalPages = medicinePage.totalPages; // Update the total pages
       });
     } catch (e) {
-      print('Error fetching more medicines: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar mais medicamentos. Tente novamente."),

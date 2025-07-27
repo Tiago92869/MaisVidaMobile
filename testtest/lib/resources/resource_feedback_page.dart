@@ -30,7 +30,7 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
   bool _isSubmitting = false;
   String? _feedbackId;
   String? _userId;
-  bool _showFirstStarfish = Random().nextBool(); // Randomly decide which starfish to show
+// Randomly decide which starfish to show
 
   @override
   void initState() {
@@ -51,7 +51,6 @@ class _ResourceFeedbackPageState extends State<ResourceFeedbackPage> {
         _feedbackId = feedback.id;
       });
     } catch (e) {
-      print('No existing feedback found or error occurred: $e');
     }
   }
 

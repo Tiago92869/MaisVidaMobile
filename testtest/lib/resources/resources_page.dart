@@ -17,7 +17,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
   final FavoriteService _favoriteService = FavoriteService();
 
   // Set to store selected resource types
-  Set<ResourceType> _selectedResourceTypes = {};
+  final Set<ResourceType> _selectedResourceTypes = {};
 
   // List of all available resource types for the filter
   final List<ResourceType> _resourceTypes = ResourceTypeExtension.getFilterableTypes();
@@ -40,9 +40,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
 
   // Set to track if the star icon is glowing
   bool _isStarGlowing = false;
-
-  // Track the state of the favorite icon
-  bool _isFavoriteFilterEnabled = false;
 
   // Define resource colors (same as _activityColors)
   final List<Color> _resourceColors = [
@@ -82,7 +79,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
         _currentPage++; // Increment the page number for the next fetch
       });
     } catch (e) {
-      print('Error fetching resources: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao procurar recursos. Tente novamente."),
@@ -105,7 +101,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
         _isLastPage = true; // Assume all favorite resources are loaded
       });
     } catch (e) {
-      print('Error fetching favorite resources: $e');
       // If error (e.g., 404), clear the resources list
       setState(() {
         _resources.clear();
@@ -168,8 +163,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ScrollController _scrollController = ScrollController();
-    _scrollController.addListener(() => _onScroll(_scrollController));
+    final ScrollController scrollController = ScrollController();
+    scrollController.addListener(() => _onScroll(scrollController));
 
     return Scaffold(
       body: Stack(
@@ -265,7 +260,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                                 ),
                             )
                           : ListView.builder(
-                              controller: _scrollController,
+                              controller: scrollController,
                               physics: const AlwaysScrollableScrollPhysics(),
                               padding: const EdgeInsets.symmetric(horizontal: 20),
                               itemCount: _resources.length,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mentara/services/journey/journey_model.dart';
 import 'dart:math';
-import 'package:mentara/journey/journey_feeling.dart'; // Import JourneyFeelingPage
+import 'package:mentara/journey/journey_feeling.dart';
 import 'package:mentara/services/image/image_service.dart';
 import 'dart:convert';
 import 'dart:ui'; // For BackdropFilter
@@ -61,7 +61,6 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
         },
       );
     } catch (e) {
-      print('Error fetching prize image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Falha ao carregar a imagem do prémio.')),
       );
@@ -151,27 +150,23 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                         const SizedBox(height: 10),
                         // Progress bar with star icon
                         Row(
-                          children: [
+                            children: [
                             Expanded(
                               child: LinearProgressIndicator(
-                                value: progress,
-                                backgroundColor: Colors.white.withOpacity(0.2),
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  isComplete ? Colors.yellow : Colors.blueAccent,
-                                ),
+                              value: progress,
+                              backgroundColor: Colors.white.withOpacity(0.2),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isComplete ? Colors.yellow : Colors.blueAccent,
+                              ),
                               ),
                             ),
                             const SizedBox(width: 10),
                             GestureDetector(
-                              onTap: isComplete
-                                  ? () {
-                                      print("Random message: ${Random().nextInt(100)}");
-                                    }
-                                  : null,
+                              onTap: isComplete ? () {} : null,
                               child: Icon(
-                                Icons.star,
-                                color: isComplete ? Colors.yellow : Colors.white,
-                                size: 28,
+                              Icons.star,
+                              color: isComplete ? Colors.yellow : Colors.white,
+                              size: 28,
                               ),
                             ),
                           ],
@@ -220,7 +215,6 @@ class _JourneyDetailPageState extends State<JourneyDetailPage> {
                             return GestureDetector(
                               onTap: resource.unlocked
                                   ? () {
-                                      print('Navigating to JourneyFeelingPage for resource order: ${resource.order}');
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

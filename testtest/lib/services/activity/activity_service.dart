@@ -16,21 +16,8 @@ class ActivityService {
   String? _userId;
 
   Future<void> _loadStoredCredentials() async {
-    print('Loading stored credentials...');
     _accessToken = await _storage.read(key: 'accessToken');
     _userId = await _storage.read(key: 'userId');
-
-    if (_accessToken != null) {
-      print('Access token loaded: $_accessToken');
-    } else {
-      print('No access token found');
-    }
-
-    if (_userId != null) {
-      print('User ID loaded: $_userId');
-    } else {
-      print('No User ID found');
-    }
   }
 
   Future<ActivityPage> fetchActivities({
@@ -40,7 +27,6 @@ class ActivityService {
   }) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl?page=$page&size=$size&search=$searchQuery';
-    print('Request URL for fetchActivities: $url'); // Log the request URL
 
     try {
       final response = await http
@@ -54,30 +40,20 @@ class ActivityService {
           .timeout(
             _timeoutDuration,
             onTimeout: () {
-              print('Request to $url timed out.');
               throw TimeoutException(
                 'The connection has timed out, please try again later.',
               );
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
-        // Use utf8.decode para garantir o encoding correto
         final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
         final activityPage = ActivityPage.fromJson(jsonResponse);
-        print(
-          'Successfully fetched ${activityPage.content.length} activities.',
-        );
         return activityPage;
       } else {
-        print('Failed to load activities. Status Code: ${response.statusCode}');
         throw Exception('Failed to load activities');
       }
     } catch (e) {
-      print('Error fetching activities: $e');
       rethrow;
     }
   }
@@ -85,7 +61,6 @@ class ActivityService {
   Future<Activity> fetchActivityById(String id) async {
     await _loadStoredCredentials();
     final String url = '$_baseUrl/$id';
-    print('Request URL for fetchActivityById: $url'); // Log the request URL
 
     try {
       final response = await http
@@ -99,27 +74,19 @@ class ActivityService {
           .timeout(
             _timeoutDuration,
             onTimeout: () {
-              print('Request to $url timed out.');
               throw TimeoutException(
                 'The connection has timed out, please try again later.',
               );
             },
           );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
-        // Use utf8.decode para garantir o encoding correto
         final activity = Activity.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-        print('Successfully fetched activity: ${activity.toJson()}');
         return activity;
       } else {
-        print('Failed to load activity. Status Code: ${response.statusCode}');
         throw Exception('Failed to load activity');
       }
     } catch (e) {
-      print('Error fetching activity: $e');
       rethrow;
     }
   }

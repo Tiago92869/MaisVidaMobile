@@ -21,9 +21,6 @@ class ImageService {
   Future<ImageFile> uploadImage(File file) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/upload';
-    print('ImageService: Starting uploadImage...');
-    print('ImageService: Request URL: $requestUrl');
-    print('ImageService: File path: ${file.path}');
 
     final request = http.MultipartRequest('POST', Uri.parse(requestUrl))
       ..headers['Authorization'] = 'Bearer $_accessToken'
@@ -33,23 +30,17 @@ class ImageService {
       final response = await request.send().timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('ImageService: Upload request to $requestUrl timed out.');
           throw TimeoutException('The connection has timed out, please try again later.');
         },
       );
 
-      print('ImageService: Upload response status code: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print('ImageService: Upload response body: $responseBody');
         return ImageFile.fromJson(json.decode(responseBody));
       } else {
-        print('ImageService: Failed to upload image. Status Code: ${response.statusCode}');
         throw Exception('Failed to upload image');
       }
     } catch (e) {
-      print('ImageService: Error during uploadImage: $e');
       rethrow;
     }
   }
@@ -57,9 +48,6 @@ class ImageService {
   Future<File> downloadImage(String id, String savePath) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/download/$id';
-    print('ImageService: Starting downloadImage...');
-    print('ImageService: Request URL: $requestUrl');
-    print('ImageService: Save path: $savePath');
 
     try {
       final response = await http.get(
@@ -68,24 +56,18 @@ class ImageService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('ImageService: Download request to $requestUrl timed out.');
           throw TimeoutException('The connection has timed out, please try again later.');
         },
       );
 
-      print('ImageService: Download response status code: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final file = File(savePath);
         await file.writeAsBytes(response.bodyBytes);
-        print('ImageService: Image downloaded and saved to: ${file.path}');
         return file;
       } else {
-        print('ImageService: Failed to download image. Status Code: ${response.statusCode}');
         throw Exception('Failed to download image');
       }
     } catch (e) {
-      print('ImageService: Error during downloadImage: $e');
       rethrow;
     }
   }
@@ -93,8 +75,6 @@ class ImageService {
   Future<String> getImageBase64(String id) async {
     await _loadStoredCredentials();
     final requestUrl = '$_baseUrl/info/$id';
-    print('ImageService: Starting getImageBase64...');
-    print('ImageService: Request URL: $requestUrl');
 
     try {
       final response = await http.get(
@@ -103,33 +83,25 @@ class ImageService {
       ).timeout(
         _timeoutDuration,
         onTimeout: () {
-          print('ImageService: Request to $requestUrl timed out.');
           throw TimeoutException('The connection has timed out, please try again later.');
         },
       );
 
-      print('ImageService: Response status code: ${response.statusCode}');
-      print('Response Headers: ${response.headers}'); // Log para verificar o Content-Type
-
       if (response.statusCode == 200) {
-        final decodedBody = utf8.decode(response.bodyBytes); // Decodifica explicitamente em UTF-8
-        print('Response Body: $decodedBody');
+        final decodedBody = utf8.decode(response.bodyBytes);
         final responseBody = json.decode(decodedBody);
         final imageInfo = ImageInfoDTO.fromJson(responseBody);
 
         String base64Image = imageInfo.data;
         if (base64Image.startsWith('data:image')) {
           base64Image = base64Image.split(',').last;
-          print('ImageService: Removed Base64 prefix.');
         }
 
         return base64Image;
       } else {
-        print('ImageService: Failed to fetch image Base64. Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch image Base64');
       }
     } catch (e) {
-      print('ImageService: Error during getImageBase64: $e');
       rethrow;
     }
   }

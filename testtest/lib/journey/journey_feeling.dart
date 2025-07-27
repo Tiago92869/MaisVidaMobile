@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math'; // Import for Random
+// Import for Random
 import 'package:mentara/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
 import 'package:mentara/resources/resource_detail_page.dart';
 import 'package:mentara/services/resource/resource_service.dart';
@@ -26,9 +26,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   @override
   void initState() {
     super.initState();
-    debugPrint('Full resourceProgress object: ${widget.resourceProgress}'); // Log the entire resourceProgress object
-    debugPrint('rewardId: ${widget.resourceProgress.rewardId}'); // Log rewardId specifically
-    debugPrint('completed: ${widget.resourceProgress.completed}'); // Log completed specifically
     _initializeSelectedFeeling(); // Initialize the selected feeling
     _fetchRewardImage(); // Fetch the reward image
     if (!widget.resourceProgress.completed && widget.resourceProgress.rewardId != null) {
@@ -50,12 +47,13 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   }
 
   Future<void> _fetchRewardImage() async {
-    if (widget.resourceProgress.rewardId != null) { // Fix the condition to check if rewardId is not null
+    if (widget.resourceProgress.rewardId != null) {
       try {
-        setState(() {
-        });
+        // This function currently does nothing except call setState with no changes.
+        // If you intend to fetch and store the image for later use, you should add logic here.
+        setState(() {});
       } catch (e) {
-        print('Error fetching reward image: $e');
+        // Optionally handle errors here
       }
     }
   }
@@ -95,7 +93,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         },
       );
     } catch (e) {
-      print('Error fetching reward image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Falha ao carregar a imagem do prémio.')),
       );
@@ -302,7 +299,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
-      print('Error handling continue: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Falha ao prosseguir. Tente novamente.')),

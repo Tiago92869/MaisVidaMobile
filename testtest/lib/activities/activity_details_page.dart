@@ -6,7 +6,6 @@ import 'package:mentara/services/resource/resource_model.dart';
 import 'dart:convert';
 import 'package:video_player/video_player.dart';
 import 'package:mentara/services/image/image_service.dart';
-import 'package:mentara/services/audio/audio_repository.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ActivityDetailsPage extends StatefulWidget {
@@ -29,7 +28,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   final Map<String, String> _imageCache = {};
   VideoPlayerController? _videoController;
   String? _selectedYesNo;
-  Set<String> _selectedOptions = {};
+  final Set<String> _selectedOptions = {};
   final Map<String, String?> _selectedOptionsByContent = {};
 
   @override
@@ -49,7 +48,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         _isFavorite = isFavorite;
       });
     } catch (e) {
-      print('Error checking favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Falha ao verificar o estado dos favoritos. Tente novamente."),
@@ -70,30 +68,12 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         _isFavorite = !_isFavorite;
       });
     } catch (e) {
-      print('Error updating favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Falha ao atualizar o estado favorito.')),
       );
     }
   }
 
-  void _nextResource() {
-    setState(() {
-      if (_currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1) {
-        _currentResourceIndex++;
-      }
-    });
-  }
-
-  void _previousResource() {
-    setState(() {
-      if (_currentResourceIndex > 0) {
-        _currentResourceIndex--;
-      }
-    });
-  }
-
-  // Função para obter o emoji do tipo de recurso
   String _getResourceEmoji(ResourceType type) {
     switch (type) {
       case ResourceType.ARTICLE:
@@ -123,7 +103,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     }
   }
 
-  // Função para traduzir tipos de recurso para português
   String _translateResourceType(ResourceType type) {
     switch (type) {
       case ResourceType.ARTICLE:
@@ -177,17 +156,13 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
       orElse: () => null,
     );
     if (videoContent == null || videoContent.contentId == null) {
-      setState(() {
-      });
+      setState(() {});
       return;
     }
     try {
-      // Use your own logic to get the video file, here just set as not initialized
-      setState(() {
-      });
+      setState(() {});
     } catch (_) {
-      setState(() {
-      });
+      setState(() {});
     }
   }
 
@@ -206,7 +181,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     final resources = activity.resources ?? [];
     final currentResource = resources.isNotEmpty ? resources[_currentResourceIndex] : null;
 
-    // Agrupa os tipos de recurso únicos para mostrar apenas um de cada
     final uniqueResourceTypes = <ResourceType, Resource>{};
     for (final resource in resources) {
       uniqueResourceTypes.putIfAbsent(resource.type, () => resource);
@@ -215,7 +189,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background gradient
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -272,7 +245,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Back button
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: const Icon(
@@ -282,7 +254,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          // Título e estrela
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -315,7 +286,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          // Temas dos recursos (emoji + nome) - apenas um de cada tipo
                           if (uniqueResourceTypes.isNotEmpty)
                             Wrap(
                               spacing: 8,
@@ -349,7 +319,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                                   .toList(),
                             ),
                           const SizedBox(height: 10),
-                          // Descrição da atividade
                           Text(
                             activity.description,
                             style: const TextStyle(
@@ -360,13 +329,11 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          // Linha branca divisória
                           const Divider(
                             color: Colors.white24,
                             thickness: 1,
                           ),
                           const SizedBox(height: 20),
-                          // Conteúdo do recurso atual
                           if (currentResource == null)
                             const Center(
                               child: Text(
@@ -377,7 +344,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                           else
                             _buildResourceContents(currentResource),
                           const SizedBox(height: 30),
-                          // Navegação entre recursos
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -436,12 +402,10 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                             ],
                           ),
                           const SizedBox(height: 30),
-                          // Criado em, Terminar, Recursos (scrollable, como no journey_details_page)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              // Criado em (esquerda)
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -462,7 +426,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                                   ),
                                 ],
                               ),
-                              // Botão Terminar (centro, só no último recurso)
                               if (resources.isNotEmpty && _currentResourceIndex == resources.length - 1)
                                 ElevatedButton(
                                   onPressed: () {
@@ -485,8 +448,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                                   ),
                                 )
                               else
-                                const SizedBox(width: 120), // Espaço reservado para alinhar
-                              // Recursos (direita)
+                                const SizedBox(width: 120),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -939,7 +901,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   }
 
   Widget _buildSoundContent(Content content) {
-    final audioPlayer = _audioPlayers.putIfAbsent(content.id, () => AudioPlayer());
+    _audioPlayers.putIfAbsent(content.id, () => AudioPlayer());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -953,9 +915,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         ),
         const SizedBox(height: 16),
         ElevatedButton(
-          onPressed: () async {
-            // Implement audio loading logic if needed
-          },
+          onPressed: () async {},
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
@@ -970,7 +930,6 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   }
 
   Widget _buildVideoContent(Content content) {
-    // Placeholder for video content, as video loading logic is not implemented here
     return const Center(
       child: Text(
         "Conteúdo de vídeo",
@@ -980,11 +939,9 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   }
 }
 
-// Extension to capitalize the first letter of a string
 extension StringCapitalization on String {
   String capitalizeFirstLetter() {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }
-

@@ -10,7 +10,6 @@ class VideoRepository {
     try {
       return await _videoService.uploadVideo(file);
     } catch (e) {
-      print('VideoRepository: Failed to upload video. Error: $e');
       rethrow;
     }
   }
@@ -19,7 +18,6 @@ class VideoRepository {
     try {
       return await _videoService.getVideoBase64(id);
     } catch (e) {
-      print('VideoRepository: Failed to fetch video Base64. Error: $e');
       rethrow;
     }
   }
@@ -28,7 +26,6 @@ class VideoRepository {
     try {
       return await _videoService.streamVideo(id);
     } catch (e) {
-      print('VideoRepository: Failed to stream video. Error: $e');
       rethrow;
     }
   }
@@ -37,7 +34,6 @@ class VideoRepository {
     try {
       return await _videoService.downloadVideoFile(id);
     } catch (e) {
-      print('VideoRepository: Failed to download video file. Error: $e');
       return null;
     }
   }

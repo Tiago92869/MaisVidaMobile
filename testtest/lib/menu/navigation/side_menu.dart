@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mentara/menu/components/menu_row.dart';
 import 'package:mentara/menu/models/menu_item.dart';
@@ -62,7 +61,7 @@ class _SideMenuState extends State<SideMenu> {
 
   String _limitString(String text, int maxLength) {
     if (text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
+      return "${text.substring(0, maxLength)}...";
     }
     return text;
   }
@@ -71,15 +70,12 @@ class _SideMenuState extends State<SideMenu> {
     setState(() {
       _selectedMenu = menu.title;
     });
-    if (widget.onMenuPress != null) {
-      widget.onMenuPress(menu.title);
+    widget.onMenuPress(menu.title);
     }
-  }
 
   @override
   Widget build(BuildContext context) {
     // Debug: Print all menu titles to check if Notificações and SOS are present
-    print("Menu lateral: ${_browseMenuIcons.map((e) => e.title).toList()}");
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top,
@@ -191,12 +187,12 @@ class _SideMenuState extends State<SideMenu> {
 
 class MenuButtonSection extends StatelessWidget {
   const MenuButtonSection({
-    Key? key,
+    super.key,
     required this.title,
     required this.menuIcons,
     this.selectedMenu = "Home",
     this.onMenuPress,
-  }) : super(key: key);
+  });
 
   final String title;
   final String selectedMenu;

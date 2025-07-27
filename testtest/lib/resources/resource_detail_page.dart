@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mentara/resources/fullscreen_video_page.dart';
 import 'package:video_player/video_player.dart';
@@ -45,7 +44,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   VideoPlayerController? _videoController;
   bool _isVideoInitialized = false;
   String? _selectedYesNo; // Track the selected option for YESNO content
-  Set<String> _selectedOptions = {}; // Track the selected options for SELECTMULTI content
+  final Set<String> _selectedOptions = {}; // Track the selected options for SELECTMULTI content
   int _currentContentIndex = 0; // Track the currently displayed content
 
   @override
@@ -65,27 +64,21 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         _isFavorite = isFavorite;
       });
     } catch (e) {
-      print('Error checking favorite status: $e');
     }
   }
 
   Future<void> _initializeVideoPlayer() async {
-    print('ResourceDetailPage: Initializing video player...');
     final Content? videoContent = widget.resource.contents.cast<Content?>().firstWhere(
       (content) => content?.type.toLowerCase() == 'video',
       orElse: () => null,
     );
 
     if (videoContent == null || videoContent.contentId == null) {
-      print('ResourceDetailPage: No valid video content found.');
       setState(() {
         _isVideoInitialized = false;
       });
       return;
     }
-
-    print('ResourceDetailPage: Video content found. ID: ${videoContent.contentId}');
-
     try {
       final file = await _videoRepository.downloadVideoFile(videoContent.contentId!);
 
@@ -96,19 +89,16 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               _isVideoInitialized = true;
             });
           }).catchError((error) {
-            print('ResourceDetailPage: Error during video player initialization: $error');
             setState(() {
               _isVideoInitialized = false;
             });
           });
       } else {
-        print('ResourceDetailPage: Video file does not exist or is not readable.');
         setState(() {
           _isVideoInitialized = false;
         });
       }
     } catch (e) {
-      print('ResourceDetailPage: Error initializing video player: $e');
       setState(() {
         _isVideoInitialized = false;
       });
@@ -116,7 +106,6 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
   }
 
   Future<void> _initializeImages() async {
-    print('ResourceDetailPage: Initializing images...');
     final imageContents = widget.resource.contents
         .where((content) => content.type.toLowerCase() == 'image' && content.contentId != null)
         .toList();
@@ -125,9 +114,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       try {
         final base64Image = await _imageService.getImageBase64(content.contentId!);
         _imageCache[content.contentId!] = base64Image; // Cache the image
-        print('ResourceDetailPage: Image cached for content ID: ${content.contentId}');
       } catch (e) {
-        print('ResourceDetailPage: Error fetching image for content ID: ${content.contentId}: $e');
       }
     }
   }
@@ -155,13 +142,8 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
       // Call modifyFavorite with the appropriate `add` value
       await _favoriteService.modifyFavorite(favoriteInput, _isFavorite);
-      print(
-        _isFavorite
-            ? 'Recurso adicionado aos favoritos.'
-            : 'Recurso removido dos favoritos.',
-      );
+
     } catch (e) {
-      print('Error updating favorite status: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Falha ao atualizar o estado favorito.')),
       );
@@ -205,7 +187,6 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('ResourceDetailPage: Building UI...');
     return Scaffold(
       body: Stack(
         children: [

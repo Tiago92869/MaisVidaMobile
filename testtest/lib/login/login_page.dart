@@ -42,8 +42,6 @@ class _LoginPageState extends State<LoginPage> {
       await _storage.write(key: 'accessToken', value: token.accessToken);
       await _storage.write(key: 'userId', value: userId);
 
-      print('Access token and user ID saved successfully.');
-
       // Fetch the user's simple data
       final user = await _userService.getSimpleUser();
 
@@ -56,11 +54,8 @@ class _LoginPageState extends State<LoginPage> {
         value: user.emergencyContact,
       );
 
-      print('User simple data saved successfully.');
-
       // Navigate to the LoadingScreen which will handle the transition to MenuScreen
       if (mounted) {
-        print('Navigating to LoadingScreen...');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoadingScreen()),

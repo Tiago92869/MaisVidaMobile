@@ -85,8 +85,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   late rive.SMIBool _menuBtn;
 
-  bool _showOnBoarding = false;
-  bool _isDarkMode = false; // Default value for dark mode
+  final bool _showOnBoarding = false;
+// Default value for dark mode
 
   // Reference to HomeTabView
   late HomeTabView _homeTabView;
@@ -121,7 +121,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
             _tabBody = _screens[tabIndex];
             _currentTabIndex = tabIndex;
           } else {
-            print('Invalid tab index: $tabIndex');
           }
         });
       },
@@ -174,10 +173,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   // Load the saved theme mode from SharedPreferences
   Future<void> _loadThemeMode() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isDarkMode =
-          prefs.getBool('isDarkMode') ?? false; // Default to light mode
+// Default to light mode
     });
   }
 
@@ -207,11 +204,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   }
 
   void _updateTabBody(String menuTitle) {
-    print('Updating tab body for menu title: $menuTitle'); // Debugging print
-
     // Handle "User" menu title explicitly
     if (menuTitle == "User") {
-      print('Menu title is "User", setting index to 8'); // Debugging print
       setState(() {
         _tabBody = _screens[9]; // Index for "User"
         _currentTabIndex = 9; // Update the current tab index
@@ -225,13 +219,11 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     );
 
     if (index != -1) {
-      print('Menu title found at index: $index'); // Debugging print
       setState(() {
         _tabBody = _screens[index];
         _currentTabIndex = index; // Update the current tab index
       });
     } else {
-      print('Error: Invalid menu title or index');
       setState(() {
         _tabBody = Container(
           color: Colors.red,
@@ -305,7 +297,6 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       final images = await _userService.getAllImagePreviewsBase64();
       _showImagePreviews(images);
     } catch (e) {
-      print('Error fetching image previews: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Falha ao carregar imagens')),
       );

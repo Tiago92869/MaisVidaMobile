@@ -9,7 +9,6 @@ class ImageRepository {
     try {
       return await _imageService.uploadImage(file);
     } catch (e) {
-      print('ImageRepository: Failed to upload image. Error: $e');
       rethrow;
     }
   }
@@ -18,7 +17,6 @@ class ImageRepository {
     try {
       return await _imageService.downloadImage(id, savePath);
     } catch (e) {
-      print('ImageRepository: Failed to download image. Error: $e');
       rethrow;
     }
   }

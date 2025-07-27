@@ -618,8 +618,6 @@ String getSubjectDisplayName(GoalSubject subject) {
                         );
                         try {
                           await _goalService.updateGoal(goal.id, updatedGoal);
-                          // Instead of mutating the existing goal (which is immutable),
-                          // refresh the list from backend to get the updated state.
                           if (_selectedDay != null) {
                             await _fetchGoalsForDay(_selectedDay!);
                           } else {
@@ -652,59 +650,6 @@ String getSubjectDisplayName(GoalSubject subject) {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
           child: Container(color: Colors.black.withOpacity(0.2)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterIcon() {
-    final bool hasFilters =
-        _selectedSubjects.isNotEmpty; // Check if filters are selected
-
-    return Positioned(
-      top: 58,
-      right: 20,
-      child: GestureDetector(
-        onTap: _toggleFilterPanel,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: Stack(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.filter_alt,
-                  color: Color(0xFF0D1B2A),
-                  size: 28,
-                ),
-              ),
-              if (hasFilters) // Show the small circle only if filters are selected
-                Positioned(
-                  top: 3,
-                  right: 4,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF0D1B2A), // Red color for the indicator
-                    ),
-                  ),
-                ),
-            ],
-          ),
         ),
       ),
     );
@@ -824,7 +769,7 @@ String getSubjectDisplayName(GoalSubject subject) {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),
