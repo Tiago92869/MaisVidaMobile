@@ -556,7 +556,16 @@ String getSubjectDisplayName(GoalSubject subject) {
               style: const TextStyle(fontSize: 14, color: Colors.white70),
             ),
             const SizedBox(height: 8),
-
+            // Goal Date
+            Text(
+              "Data: ${goal.goalDate.day.toString().padLeft(2, '0')}-${goal.goalDate.month.toString().padLeft(2, '0')}-${goal.goalDate.year}",
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.white70,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
             // Subject and Completed Toggle
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
