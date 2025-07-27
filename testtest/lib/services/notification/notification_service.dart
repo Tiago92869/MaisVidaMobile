@@ -41,7 +41,7 @@ class NotificationService {
     await _loadStoredCredentials();
     try {
       final requestUrl =
-          '$_baseUrl?userId=$_userId&page=$page&size=$size&sort=read,DESC'; // Added sort parameter
+          '$_baseUrl?userId=$_userId&page=$page&size=$size&sort=read,ASC'; // Alterado para ASC para mostrar não lidas primeiro
       print('Request URL for fetchNotifications: $requestUrl'); // Log the request URL
 
       final response = await http

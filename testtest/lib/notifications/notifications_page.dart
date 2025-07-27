@@ -20,52 +20,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
   bool _isFetchingNextPage = false;
   int _currentPage = 0;
   bool _hasMore = true;
-  Timer? _pollingTimer;
-  List<String> _seenNotificationIds = [];
 
   @override
   void initState() {
     super.initState();
     _fetchNotifications();
     _scrollController.addListener(_onScroll);
-    _startPolling();
   }
 
-  void _startPolling() {
-    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      _checkForNewNotifications();
-    });
-  }
-
-  Future<void> _checkForNewNotifications() async {
-    try {
-      final notifications = await _notificationService.fetchNotifications(page: 0, size: 1);
-      if (notifications.isNotEmpty) {
-        final latest = notifications.first;
-        if (!_seenNotificationIds.contains(latest.id)) {
-          _seenNotificationIds.add(latest.id);
-          _showPopup(latest.title, latest.description);
-        }
-      }
-    } catch (e) {
-      print("Polling error: $e");
-    }
-  }
-
-  void _showPopup(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Dispensar'),
-          ),
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchNotifications({bool isNextPage = false}) async {
