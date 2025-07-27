@@ -277,47 +277,53 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Back button
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context); // Simply go back without saving
-                      },
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        40, // adjust if needed
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Back button
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context); // Simply go back without saving
+                          },
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
 
-                    // Title
-                    TextField(
-                      controller: titleController,
-                      enabled: editMode,
-                      maxLines: null, // Allow unlimited lines for title
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "Insira o título da meta",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                        // Title
+                        TextField(
+                          controller: titleController,
+                          enabled: editMode,
+                          maxLines: null, // Allow unlimited lines for title
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: "Insira o título da meta",
+                            hintStyle: TextStyle(color: Colors.white70),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
 
-                    // Subject Dropdown
-                    if (editMode)
-                      DropdownButton<GoalSubject>(
-                        value: selectedSubject,
-                        dropdownColor: const Color(0xFF0D1B2A),
-                        items:
-                            GoalSubject.values.map((subject) {
+                        // Subject Dropdown
+                        if (editMode)
+                          DropdownButton<GoalSubject>(
+                            value: selectedSubject,
+                            dropdownColor: const Color(0xFF0D1B2A),
+                            items: GoalSubject.values.map((subject) {
                               return DropdownMenuItem(
                                 value: subject,
                                 child: Text(
@@ -326,142 +332,154 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                 ),
                               );
                             }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedSubject = value!;
-                          });
-                        },
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          selectedSubject != null
-                              ? getSubjectDisplayName(selectedSubject!)
-                              : "Sem Assunto",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-
-                    // Goal Date Picker
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Data da meta",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: editMode ? _pickDate : null,
-                          child: Container(
+                            onChanged: (value) {
+                              setState(() {
+                                selectedSubject = value!;
+                              });
+                            },
+                          )
+                        else
+                          Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
-                              vertical: 10,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              selectedDate != null
-                                  ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}"
-                                  : "Seleciona uma data",
+                              selectedSubject != null
+                                  ? getSubjectDisplayName(selectedSubject!)
+                                  : "Sem Assunto",
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                           ),
-                        ),
                         const SizedBox(height: 20),
-                      ],
-                    ),
 
-                    // Completed Toggle
-                    if (!widget.createResource) // Show only when editing
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Concluídas",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
+                        // Goal Date Picker
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Data da meta",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
                             ),
-                          ),
-                          Switch(
-                            value: completed,
-                            onChanged:
-                                editMode
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: editMode ? _pickDate : null,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  selectedDate != null
+                                      ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}"
+                                      : "Seleciona uma data",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+
+                        // Completed Toggle
+                        if (!widget.createResource) // Show only when editing
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Concluídas",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Checkbox(
+                                value: completed,
+                                onChanged: editMode
                                     ? (value) {
+                                        setState(() {
+                                          completed = value ?? false;
+                                        });
+                                      }
+                                    : null,
+                                activeColor: Colors.green,
+                                checkColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 20),
+
+                        // Notifications Toggle
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Notificações",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            Checkbox(
+                              value: hasNotifications,
+                              onChanged: editMode
+                                  ? (value) {
                                       setState(() {
-                                        completed = value;
+                                        hasNotifications = value ?? false;
                                       });
                                     }
-                                    : null,
-                          ),
-                        ],
-                      ),
-                    const SizedBox(height: 20),
-
-                    // Notifications Toggle
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Notificações",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
-                          ),
-                        ),
-                        Switch(
-                          value: hasNotifications,
-                          onChanged:
-                              editMode
-                                  ? (value) {
-                                    setState(() {
-                                      hasNotifications = value;
-                                    });
-                                  }
                                   : null,
+                              activeColor: Colors.green,
+                              checkColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Description
+                        Expanded(
+                          child: TextField(
+                            controller: descriptionController,
+                            enabled: editMode,
+                            maxLines: null,
+                            style: const TextStyle(fontSize: 16, color: Colors.white),
+                            decoration: const InputDecoration(
+                              hintText: "Insira a descrição da meta",
+                              hintStyle: TextStyle(color: Colors.white70),
+                              border: InputBorder.none,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Description
-                    TextField(
-                      controller: descriptionController,
-                      enabled: editMode,
-                      maxLines: null,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: "Insira a descrição da meta",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -572,7 +590,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           if (!widget.createResource) // Show only when editing an existing goal
             Positioned(
               bottom: 20,
-              right: 20, // Move the button to the right side
+              right: 20,
               child: GestureDetector(
                 onTap: () async {
                   final shouldDelete = await _showDeleteConfirmationDialog();
@@ -581,12 +599,12 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   }
                 },
                 child: CircleAvatar(
-                  radius: 30, // Increase the size of the button
+                  radius: 30,
                   backgroundColor: Colors.red,
                   child: const Icon(
                     Icons.delete,
                     color: Colors.white,
-                    size: 28, // Increase the size of the icon
+                    size: 28,
                   ),
                 ),
               ),
