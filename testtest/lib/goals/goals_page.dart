@@ -200,10 +200,15 @@ class _GoalsPageState extends State<GoalsPage> {
           ),
           if (_isFilterPanelVisible) _buildBlurEffect(),
           _buildFilterIcon(),
+          // Move FAB before filter panel so the panel covers it
+          Positioned(
+            bottom: 10,
+            right: 0,
+            child: _buildFloatingActionButton(),
+          ),
           _buildFilterPanel(),
         ],
       ),
-      floatingActionButton: _buildFloatingActionButton(),
     );
   }
 
@@ -265,6 +270,14 @@ class _GoalsPageState extends State<GoalsPage> {
         _selectedDay?.month == day.month &&
         _selectedDay?.year == day.year;
 
+    // Dias da semana em português (segunda a domingo)
+    const weekDaysPt = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+    // Meses em português (jan a dez)
+    const monthsPt = [
+      "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+      "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+    ];
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -282,7 +295,7 @@ class _GoalsPageState extends State<GoalsPage> {
       child: Column(
         children: [
           Text(
-            ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"][day.weekday - 1],
+            weekDaysPt[day.weekday - 1],
             style: const TextStyle(fontSize: 14, color: Colors.white),
           ),
           const SizedBox(height: 4),
@@ -306,20 +319,7 @@ class _GoalsPageState extends State<GoalsPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            [
-              "Jan",
-              "Feb",
-              "Mar",
-              "Abr",
-              "Mai",
-              "Jun",
-              "Jul",
-              "Aug",
-              "Set",
-              "Out",
-              "Nov",
-              "Dez",
-            ][day.month - 1],
+            monthsPt[day.month - 1],
             style: const TextStyle(fontSize: 12, color: Colors.white),
           ),
         ],
@@ -521,9 +521,14 @@ String getSubjectDisplayName(GoalSubject subject) {
   }
 
   Widget _buildBlurEffect() {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-      child: Container(color: Colors.black.withOpacity(0.2)),
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: _closeFilterPanel, // Fecha o painel ao clicar no fundo desfocado
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: Container(color: Colors.black.withOpacity(0.2)),
+        ),
+      ),
     );
   }
 
@@ -619,7 +624,7 @@ String getSubjectDisplayName(GoalSubject subject) {
                   ),
                   const SizedBox(width: 30),
                   const Text(
-                    "Filtrar por tema",
+                    "Tema", // Título alterado para "Tema"
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
