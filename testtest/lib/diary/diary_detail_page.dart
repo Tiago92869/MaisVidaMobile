@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:testtest/services/diary/diary_model.dart';
 import 'package:testtest/services/diary/diary_service.dart';
 import 'dart:developer'; // Add this import for logging
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart'; // <-- Add this import
 
 class DiaryDetailPage extends StatefulWidget {
   final Diary?
@@ -261,6 +262,28 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     }
   }
 
+  // Helper to get emoji for DiaryType
+  String _getEmotionEmoji(DiaryType emotion) {
+    switch (emotion) {
+      case DiaryType.Love:
+        return "❤️";
+      case DiaryType.Fantastic:
+        return "🤩";
+      case DiaryType.Happy:
+        return "😊";
+      case DiaryType.Neutral:
+        return "😐";
+      case DiaryType.Disappointed:
+        return "😞";
+      case DiaryType.Sad:
+        return "😢";
+      case DiaryType.Angry:
+        return "😡";
+      case DiaryType.Sick:
+        return "🤒";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     log("Building DiaryDetailPage UI");
@@ -338,6 +361,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   TextField(
                     controller: titleController,
                     enabled: editMode,
+                    maxLines: null, // Allow title to extend to multiple lines
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -360,9 +384,18 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                           DiaryType.values.map((emotion) {
                             return DropdownMenuItem(
                               value: emotion,
-                              child: Text(
-                                _emotionDisplayPt(emotion),
-                                style: const TextStyle(color: Colors.white),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _getEmotionEmoji(emotion),
+                                    style: const TextStyle(fontSize: 22),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _emotionDisplayPt(emotion),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
                               ),
                             );
                           }).toList(),
@@ -375,10 +408,9 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                   else if (selectedEmotion != null)
                     Row(
                       children: [
-                        Icon(
-                          _getEmotionIcon(selectedEmotion!),
-                          color: Colors.white,
-                          size: 28,
+                        Text(
+                          _getEmotionEmoji(selectedEmotion!),
+                          style: const TextStyle(fontSize: 22),
                         ),
                         const SizedBox(width: 10),
                         Text(

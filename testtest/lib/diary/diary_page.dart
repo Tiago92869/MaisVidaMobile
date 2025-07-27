@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:testtest/services/diary/diary_service.dart'; // Import DiaryService
 import 'package:testtest/services/diary/diary_model.dart'; // Import DiaryModel
 import 'diary_detail_page.dart'; // Import the new page
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart'; // <-- Add this import
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({Key? key}) : super(key: key);
@@ -177,6 +178,28 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
+  // Helper to get emoji for DiaryType
+  String _getEmotionEmoji(DiaryType emotion) {
+    switch (emotion) {
+      case DiaryType.Love:
+        return "❤️";
+      case DiaryType.Fantastic:
+        return "🤩";
+      case DiaryType.Happy:
+        return "😊";
+      case DiaryType.Neutral:
+        return "😐";
+      case DiaryType.Disappointed:
+        return "😞";
+      case DiaryType.Sad:
+        return "😢";
+      case DiaryType.Angry:
+        return "😡";
+      case DiaryType.Sick:
+        return "🤒";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _getEntriesForSelectedDate();
@@ -296,19 +319,22 @@ class _DiaryPageState extends State<DiaryPage> {
                                         vertical: 8,
                                       ),
                                       child: ListTile(
-                                        title: Text(entry.title),
+                                        title: Text(
+                                          entry.title,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                         subtitle: Text(
                                           entry.description,
-                                          maxLines: 2,
+                                          maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             color: Colors.black54,
                                           ),
                                         ),
-                                        trailing: Icon(
-                                          _getEmotionIcon(entry.emotion),
-                                          color: const Color(0xFF0D1B2A),
-                                          size: 32,
+                                        trailing: Text(
+                                          _getEmotionEmoji(entry.emotion),
+                                          style: const TextStyle(fontSize: 32),
                                         ),
                                         onTap: () async {
                                           final result = await Navigator.push(
@@ -401,7 +427,6 @@ class _DiaryPageState extends State<DiaryPage> {
                           ),
                           const SizedBox(width: 30),
                           const Text(
-                            //"Filtrar por emoção",
                             "Emoções",
                             style: TextStyle(
                               fontSize: 18,
@@ -491,16 +516,26 @@ class _DiaryPageState extends State<DiaryPage> {
                                         vertical: 8,
                                       ),
                                       child: Center(
-                                        child: Text(
-                                          emotionDisplay,
-                                          style: TextStyle(
-                                            color: isSelected
-                                                ? Colors.white
-                                                : const Color(0xFF0D1B2A),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: "Poppins",
-                                          ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              _getEmotionEmoji(emotion),
+                                              style: const TextStyle(fontSize: 22),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              emotionDisplay,
+                                              style: TextStyle(
+                                                color: isSelected
+                                                    ? Colors.white
+                                                    : const Color(0xFF0D1B2A),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: "Poppins",
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -608,23 +643,3 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 }
 
-IconData _getEmotionIcon(DiaryType emotion) {
-  switch (emotion) {
-    case DiaryType.Love:
-      return Icons.favorite;
-    case DiaryType.Fantastic:
-      return Icons.star;
-    case DiaryType.Happy:
-      return Icons.sentiment_satisfied;
-    case DiaryType.Neutral:
-      return Icons.sentiment_neutral;
-    case DiaryType.Disappointed:
-      return Icons.sentiment_dissatisfied;
-    case DiaryType.Sad:
-      return Icons.sentiment_very_dissatisfied;
-    case DiaryType.Angry:
-      return Icons.mood_bad;
-    case DiaryType.Sick:
-      return Icons.sick;
-  }
-}
