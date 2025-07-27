@@ -23,8 +23,8 @@ class _NotificationDetailsPageState extends State<NotificationDetailsPage> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color.fromRGBO(72, 85, 204, 1), // Start color (darker blue)
-            Color.fromRGBO(123, 144, 255, 1), // End color (lighter blue)
+            Color(0xFF0D1B2A), // Start color (escuro igual ao SOS)
+            Color(0xFF1B263B), // End color (igual ao SOS)
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -121,7 +121,7 @@ class _NotificationDetailsPageState extends State<NotificationDetailsPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildDateInfo("Criado em", widget.notification.createdAt),
-                        _buildDateInfo("Última atualização em", widget.notification.updatedAt),
+                        _buildDateInfo("Atualização em", widget.notification.updatedAt),
                       ],
                     ),
                   ],
