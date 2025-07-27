@@ -99,7 +99,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               width: 400,
               height: 400,
               child: Opacity(
-                opacity: 0.1,
+              opacity: 0.05,
                 child: Transform.rotate(
                   angle: 0.7,
                   child: Image.asset(
@@ -116,7 +116,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               width: 400,
               height: 400,
               child: Opacity(
-                opacity: 0.1,
+              opacity: 0.05,
                 child: Transform.rotate(
                   angle: 0.5,
                   child: Image.asset(
