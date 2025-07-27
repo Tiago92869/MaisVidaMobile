@@ -517,7 +517,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _medications,
                   _isLoadingMedications,
                   (medicine) {
-                    // Novo modelo igual ao medicines_page.dart
+                    // Fundo: const Color(0xFF9CC5FF) com opacidade 0.3
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -534,11 +534,11 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                          color: const Color(0xFF9CC5FF).withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                              color: const Color(0xFF9CC5FF).withOpacity(0.3),
                               blurRadius: 5,
                               offset: const Offset(0, 3),
                             ),
@@ -619,7 +619,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _goals,
                   _isLoadingGoals,
                   (goal) {
-                    // Novo modelo igual ao goals_page.dart
+                    // Fundo: const Color(0xFF005FE7) com opacidade 0.3
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -636,11 +636,11 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                          color: const Color(0xFF005FE7).withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                              color: const Color(0xFF005FE7).withOpacity(0.3),
                               blurRadius: 5,
                               offset: const Offset(0, 3),
                             ),
@@ -737,7 +737,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _diaries,
                   _isLoadingDiaries,
                   (diary) {
-                    // Novo modelo igual ao diary_page.dart
+                    // Fundo: const Color(0xFFBBA6FF) com opacidade 0.3
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -754,11 +754,11 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                          color: const Color(0xFFBBA6FF).withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                              color: const Color(0xFFBBA6FF).withOpacity(0.3),
                               blurRadius: 5,
                               offset: const Offset(0, 3),
                             ),
