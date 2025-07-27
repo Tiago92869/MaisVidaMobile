@@ -410,13 +410,89 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 60), // Espaço para o rodapé
                         ],
                       ),
                     ),
                   ),
                 );
               },
+            ),
+          ),
+          // Rodapé apenas com texto, sem container
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 16,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Criado em (esquerda)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Criado em",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      activity.createdAt != null
+                          ? "${activity.createdAt!.day.toString().padLeft(2, '0')}-${activity.createdAt!.month.toString().padLeft(2, '0')}-${activity.createdAt!.year}"
+                          : "-",
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                  ],
+                ),
+                // Botão Terminar (centro, só no último recurso)
+                if (resources.isNotEmpty && _currentResourceIndex == resources.length - 1)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF0D1B2A),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Terminar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 120), // Espaço reservado para alinhar
+                // Recursos (direita)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      "Recursos",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${resources.isEmpty ? 0 : _currentResourceIndex + 1} de ${resources.length}",
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
