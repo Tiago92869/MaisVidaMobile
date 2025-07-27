@@ -619,6 +619,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _goals,
                   _isLoadingGoals,
                   (goal) {
+                    // Novo modelo igual ao goals_page.dart
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -635,20 +636,27 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFFCE93D8,
-                          ).withOpacity(0.3), // Lighter purple
+                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
                           borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               goal.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white, // White text
+                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -656,51 +664,62 @@ class _HomeTabViewState extends State<HomeTabView> {
                               goal.description,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 14, color: Colors.white70),
+                            ),
+                            const SizedBox(height: 8),
+                            // Goal Date
+                            Text(
+                              "Data: ${goal.goalDate.day.toString().padLeft(2, '0')}-${goal.goalDate.month.toString().padLeft(2, '0')}-${goal.goalDate.year}",
                               style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70, // Subtle white text
+                                fontSize: 13,
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w800,
                               ),
                             ),
                             const SizedBox(height: 8),
+                            // Subject and Completed Toggle
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                // Subject
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFCE93D8,
-                                    ).withOpacity(0.2), // Lighter purple
+                                    color: Colors.white.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
-                                    goal.subject.toString().split('.').last,
+                                    _getSubjectDisplayName(goal.subject),
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white, // White text
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
+                                // Completed Checkbox (disabled)
                                 Row(
                                   children: [
                                     Text(
-                                      goal.completed
-                                          ? "Completadas"
-                                          : "Por Completar",
-                                      style: const TextStyle(
+                                      "Completado",
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white70,
+                                        color: goal.completed ? Colors.green[200] : Colors.white70,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    Switch(
+                                    Checkbox(
                                       value: goal.completed,
-                                      onChanged: null, // Disable toggle in this view
+                                      onChanged: null,
+                                      activeColor: Colors.green,
+                                      checkColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -973,5 +992,19 @@ IconData _getEmotionIcon(DiaryType emotion) {
       return Icons.mood_bad;
     case DiaryType.Sick:
       return Icons.sick;
+  }
+}
+
+// Adicione esta função utilitária ao final da classe _HomeTabViewState:
+String _getSubjectDisplayName(GoalSubject subject) {
+  switch (subject) {
+    case GoalSubject.Personal:
+      return "👤 Pessoal";
+    case GoalSubject.Work:
+      return "💼 Trabalho";
+    case GoalSubject.Studies:
+      return "📚 Estudos";
+    case GoalSubject.Family:
+      return "👪 Família";
   }
 }
