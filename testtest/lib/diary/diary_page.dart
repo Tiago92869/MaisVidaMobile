@@ -314,108 +314,111 @@ class _DiaryPageState extends State<DiaryPage> {
                                   itemCount: _diaryEntries.length,
                                   itemBuilder: (context, index) {
                                     final entry = _diaryEntries[index];
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 8),
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
-                                            blurRadius: 5,
-                                            offset: const Offset(0, 3),
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DiaryDetailPage(
+                                              diary: entry,
+                                              createDiary: false,
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          ListTile(
-                                            contentPadding: EdgeInsets.zero,
-                                            title: Text(
-                                              entry.title,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
+                                        );
+                                        if (result == true) {
+                                          _fetchDiariesForSelectedDate(isScrolling: false);
+                                        }
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(vertical: 8),
+                                        padding: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                                              blurRadius: 5,
+                                              offset: const Offset(0, 3),
                                             ),
-                                            subtitle: Text(
-                                              entry.description,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white70,
-                                              ),
-                                            ),
-                                            trailing: Text(
-                                              _getEmotionEmoji(entry.emotion),
-                                              style: const TextStyle(fontSize: 32),
-                                            ),
-                                            onTap: () async {
-                                              final result = await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (context) => DiaryDetailPage(
-                                                        diary: entry,
-                                                        createDiary: false,
-                                                      ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              title: Text(
+                                                entry.title,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
                                                 ),
-                                              );
-
-                                              if (result == true) {
-                                                // Refresh the search with the previously set parameters
-                                                _fetchDiariesForSelectedDate(
-                                                  isScrolling: false,
-                                                );
-                                              }
-                                            },
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              // Portuguese display for emotion
-                                              () {
-                                                switch (entry.emotion) {
-                                                  case DiaryType.Love:
-                                                    return "Amor";
-                                                  case DiaryType.Fantastic:
-                                                    return "Fantástico";
-                                                  case DiaryType.Happy:
-                                                    return "Feliz";
-                                                  case DiaryType.Neutral:
-                                                    return "Neutro";
-                                                  case DiaryType.Disappointed:
-                                                    return "Desapontado";
-                                                  case DiaryType.Sad:
-                                                    return "Triste";
-                                                  case DiaryType.Angry:
-                                                    return "Zangado";
-                                                  case DiaryType.Sick:
-                                                    return "Doente";
-                                                }
-                                              }(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                              ),
+                                              subtitle: Text(
+                                                entry.description,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white70,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(height: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 6,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(0.2),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    _getEmotionEmoji(entry.emotion),
+                                                    style: const TextStyle(fontSize: 18),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    // Portuguese display for emotion
+                                                    () {
+                                                      switch (entry.emotion) {
+                                                        case DiaryType.Love:
+                                                          return "Amor";
+                                                        case DiaryType.Fantastic:
+                                                          return "Fantástico";
+                                                        case DiaryType.Happy:
+                                                          return "Feliz";
+                                                        case DiaryType.Neutral:
+                                                          return "Neutro";
+                                                        case DiaryType.Disappointed:
+                                                          return "Desapontado";
+                                                        case DiaryType.Sad:
+                                                          return "Triste";
+                                                        case DiaryType.Angry:
+                                                          return "Zangado";
+                                                        case DiaryType.Sick:
+                                                          return "Doente";
+                                                      }
+                                                    }(),
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   },
