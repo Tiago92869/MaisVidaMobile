@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:testtest/services/favorite/favorite_service.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:testtest/services/activity/activity_model.dart';
-import 'dart:math';
 import 'package:testtest/services/resource/resource_model.dart';
 import 'dart:convert';
-import 'package:testtest/resources/fullscreen_video_page.dart';
 import 'package:video_player/video_player.dart';
 import 'package:testtest/services/image/image_service.dart';
 import 'package:testtest/services/audio/audio_repository.dart';
@@ -27,11 +25,9 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   bool _isFavorite = false;
   int _currentResourceIndex = 0;
   final ImageService _imageService = ImageService();
-  final AudioRepository _audioRepository = AudioRepository();
   final Map<String, AudioPlayer> _audioPlayers = {};
   final Map<String, String> _imageCache = {};
   VideoPlayerController? _videoController;
-  bool _isVideoInitialized = false;
   String? _selectedYesNo;
   Set<String> _selectedOptions = {};
   final Map<String, String?> _selectedOptionsByContent = {};
@@ -182,18 +178,15 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     );
     if (videoContent == null || videoContent.contentId == null) {
       setState(() {
-        _isVideoInitialized = false;
       });
       return;
     }
     try {
       // Use your own logic to get the video file, here just set as not initialized
       setState(() {
-        _isVideoInitialized = false;
       });
     } catch (_) {
       setState(() {
-        _isVideoInitialized = false;
       });
     }
   }
@@ -410,89 +403,85 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 60), // Espaço para o rodapé
+                          const SizedBox(height: 30),
+                          // Criado em, Terminar, Recursos (scrollable, como no journey_details_page)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // Criado em (esquerda)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Criado em",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    activity.createdAt != null
+                                        ? "${activity.createdAt!.day.toString().padLeft(2, '0')}-${activity.createdAt!.month.toString().padLeft(2, '0')}-${activity.createdAt!.year}"
+                                        : "-",
+                                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              // Botão Terminar (centro, só no último recurso)
+                              if (resources.isNotEmpty && _currentResourceIndex == resources.length - 1)
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).popUntil((route) => route.isFirst);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: const Color(0xFF0D1B2A),
+                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Terminar',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                )
+                              else
+                                const SizedBox(width: 120), // Espaço reservado para alinhar
+                              // Recursos (direita)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    "Recursos",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "${resources.isEmpty ? 0 : _currentResourceIndex + 1} de ${resources.length}",
+                                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
                   ),
                 );
               },
-            ),
-          ),
-          // Rodapé apenas com texto, sem container
-          Positioned(
-            left: 24,
-            right: 24,
-            bottom: 16,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Criado em (esquerda)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Criado em",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      activity.createdAt != null
-                          ? "${activity.createdAt!.day.toString().padLeft(2, '0')}-${activity.createdAt!.month.toString().padLeft(2, '0')}-${activity.createdAt!.year}"
-                          : "-",
-                      style: const TextStyle(fontSize: 14, color: Colors.white),
-                    ),
-                  ],
-                ),
-                // Botão Terminar (centro, só no último recurso)
-                if (resources.isNotEmpty && _currentResourceIndex == resources.length - 1)
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF0D1B2A),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Terminar',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                else
-                  const SizedBox(width: 120), // Espaço reservado para alinhar
-                // Recursos (direita)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text(
-                      "Recursos",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "${resources.isEmpty ? 0 : _currentResourceIndex + 1} de ${resources.length}",
-                      style: const TextStyle(fontSize: 14, color: Colors.white),
-                    ),
-                  ],
-                ),
-              ],
             ),
           ),
         ],
@@ -966,3 +955,4 @@ extension StringCapitalization on String {
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }
+
