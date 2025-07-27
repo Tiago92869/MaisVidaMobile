@@ -343,184 +343,195 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+              child: SingleChildScrollView( // <-- Make the whole screen scrollable
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        40, // adjust if needed
                   ),
-                  const SizedBox(height: 20),
-
-                  // Title
-                  TextField(
-                    controller: titleController,
-                    enabled: editMode,
-                    maxLines: null, // Allow title to extend to multiple lines
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: "Introduza o título do diário",
-                      hintStyle: TextStyle(color: Colors.white70),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Emotion Dropdown
-                  if (editMode)
-                    DropdownButton<DiaryType>(
-                      value: selectedEmotion,
-                      dropdownColor: const Color(0xFF0D1B2A),
-                      items:
-                          DiaryType.values.map((emotion) {
-                            return DropdownMenuItem(
-                              value: emotion,
-                              child: Row(
-                                children: [
-                                  Text(
-                                    _getEmotionEmoji(emotion),
-                                    style: const TextStyle(fontSize: 22),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _emotionDisplayPt(emotion),
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedEmotion = value;
-                        });
-                      },
-                    )
-                  else if (selectedEmotion != null)
-                    Row(
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _getEmotionEmoji(selectedEmotion!),
-                          style: const TextStyle(fontSize: 22),
+                        // Back button
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 28,
+                          ),
                         ),
-                        const SizedBox(width: 10),
-                        Text(
-                          _emotionDisplayPt(selectedEmotion!),
+                        const SizedBox(height: 20),
+
+                        // Title
+                        TextField(
+                          controller: titleController,
+                          enabled: editMode,
+                          maxLines: null, // Allow title to extend to multiple lines
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: "Introduza o título do diário",
+                            hintStyle: TextStyle(color: Colors.white70),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Emotion Dropdown
+                        if (editMode)
+                          DropdownButton<DiaryType>(
+                            value: selectedEmotion,
+                            dropdownColor: const Color(0xFF0D1B2A),
+                            items:
+                                DiaryType.values.map((emotion) {
+                                  return DropdownMenuItem(
+                                    value: emotion,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          _getEmotionEmoji(emotion),
+                                          style: const TextStyle(fontSize: 22),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          _emotionDisplayPt(emotion),
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedEmotion = value;
+                              });
+                            },
+                          )
+                        else if (selectedEmotion != null)
+                          Row(
+                            children: [
+                              Text(
+                                _getEmotionEmoji(selectedEmotion!),
+                                style: const TextStyle(fontSize: 22),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                _emotionDisplayPt(selectedEmotion!),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 20),
+
+                        // Recorded At Date
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Gravado em",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap:
+                                  editMode
+                                      ? () async {
+                                        final pickedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: recordedAt,
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime.now(),
+                                          builder: (
+                                            BuildContext context,
+                                            Widget? child,
+                                          ) {
+                                            return Theme(
+                                              data: ThemeData.light().copyWith(
+                                                primaryColor: const Color(
+                                                  0xFF0D1B2A,
+                                                ), // Header background color
+                                                hintColor: const Color(
+                                                  0xFF0D1B2A,
+                                                ), // Selected date color
+                                                colorScheme: const ColorScheme.light(
+                                                  primary: Color(
+                                                    0xFF0D1B2A,
+                                                  ), // Header text color
+                                                  onPrimary:
+                                                      Colors
+                                                          .white, // Header text color
+                                                  onSurface:
+                                                      Colors.black, // Body text color
+                                                ),
+                                                dialogBackgroundColor:
+                                                    Colors
+                                                        .white, // Background color of the calendar
+                                              ),
+                                              child: child!,
+                                            );
+                                          },
+                                        );
+                                        if (pickedDate != null) {
+                                          setState(() {
+                                            recordedAt = pickedDate;
+                                          });
+                                        }
+                                      }
+                                      : null,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  "${recordedAt.day.toString().padLeft(2, '0')}-${recordedAt.month.toString().padLeft(2, '0')}-${recordedAt.year}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Description
+                        Expanded(
+                          child: TextField(
+                            controller: descriptionController,
+                            enabled: editMode,
+                            maxLines: null,
+                            style: const TextStyle(fontSize: 16, color: Colors.white),
+                            decoration: const InputDecoration(
+                              hintText: "Introduza a descrição do diário",
+                              hintStyle: TextStyle(color: Colors.white70),
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  const SizedBox(height: 20),
-
-                  // Recorded At Date
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Gravado em",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap:
-                            editMode
-                                ? () async {
-                                  final pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: recordedAt,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime.now(),
-                                    builder: (
-                                      BuildContext context,
-                                      Widget? child,
-                                    ) {
-                                      return Theme(
-                                        data: ThemeData.light().copyWith(
-                                          primaryColor: const Color(
-                                            0xFF0D1B2A,
-                                          ), // Header background color
-                                          hintColor: const Color(
-                                            0xFF0D1B2A,
-                                          ), // Selected date color
-                                          colorScheme: const ColorScheme.light(
-                                            primary: Color(
-                                              0xFF0D1B2A,
-                                            ), // Header text color
-                                            onPrimary:
-                                                Colors
-                                                    .white, // Header text color
-                                            onSurface:
-                                                Colors.black, // Body text color
-                                          ),
-                                          dialogBackgroundColor:
-                                              Colors
-                                                  .white, // Background color of the calendar
-                                        ),
-                                        child: child!,
-                                      );
-                                    },
-                                  );
-                                  if (pickedDate != null) {
-                                    setState(() {
-                                      recordedAt = pickedDate;
-                                    });
-                                  }
-                                }
-                                : null,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            "${recordedAt.day.toString().padLeft(2, '0')}-${recordedAt.month.toString().padLeft(2, '0')}-${recordedAt.year}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
-                  const SizedBox(height: 20),
-
-                  // Description
-                  Expanded(
-                    child: TextField(
-                      controller: descriptionController,
-                      enabled: editMode,
-                      maxLines: null,
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: "Introduza a descrição do diário",
-                        hintStyle: TextStyle(color: Colors.white70),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

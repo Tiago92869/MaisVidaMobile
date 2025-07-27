@@ -313,23 +313,39 @@ class _DiaryPageState extends State<DiaryPage> {
                                   itemCount: _diaryEntries.length,
                                   itemBuilder: (context, index) {
                                     final entry = _diaryEntries[index];
-                                    return Card(
-                                      elevation: 4,
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 8,
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 8),
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
                                       ),
                                       child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
                                         title: Text(
                                           entry.title,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         subtitle: Text(
                                           entry.description,
                                           maxLines: 3,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
-                                            color: Colors.black54,
+                                            fontSize: 14,
+                                            color: Colors.white70,
                                           ),
                                         ),
                                         trailing: Text(
