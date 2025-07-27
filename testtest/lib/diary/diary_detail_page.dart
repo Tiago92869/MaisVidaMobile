@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:testtest/services/diary/diary_model.dart';
 import 'package:testtest/services/diary/diary_service.dart';
 import 'dart:developer'; // Add this import for logging
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart'; // <-- Add this import
 
 class DiaryDetailPage extends StatefulWidget {
   final Diary?
@@ -262,7 +261,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     }
   }
 
-  // Helper to get emoji for DiaryType
+  // Helper to get emoji for DiaryType (no dependency needed)
   String _getEmotionEmoji(DiaryType emotion) {
     switch (emotion) {
       case DiaryType.Love:
@@ -620,3 +619,4 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
     );
   }
 }
+
