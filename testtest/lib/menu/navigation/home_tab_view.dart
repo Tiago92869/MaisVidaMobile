@@ -517,16 +517,16 @@ class _HomeTabViewState extends State<HomeTabView> {
                   _medications,
                   _isLoadingMedications,
                   (medicine) {
+                    // Novo modelo igual ao medicines_page.dart
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => MedicineDetailPage(
-                                  medicine: medicine,
-                                  isEditing: false,
-                                ),
+                            builder: (context) => MedicineDetailPage(
+                              medicine: medicine,
+                              isEditing: false,
+                            ),
                           ),
                         );
                       },
@@ -534,48 +534,75 @@ class _HomeTabViewState extends State<HomeTabView> {
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFFB3E5FC,
-                          ).withOpacity(0.3), // Lighter blue
+                          color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
                           borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Medicine Name
                             Text(
                               medicine.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white, // White text
+                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 8),
+                            // Medicine Description
                             Text(
                               medicine.description,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white70, // Subtle white text
-                              ),
+                              style: const TextStyle(fontSize: 14, color: Colors.white70),
                             ),
                             const SizedBox(height: 8),
+                            // Start and End Dates
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Começa: ${medicine.startedAt.toLocal().toString().split(' ')[0]}",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white70, // Subtle white text
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      const TextSpan(
+                                        text: "Inicio: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: medicine.startedAt.toLocal().toString().split(' ')[0],
+                                        style: const TextStyle(color: Colors.white70),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  "Termina: ${medicine.endedAt.toLocal().toString().split(' ')[0]}",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white70, // Subtle white text
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      const TextSpan(
+                                        text: "Fim: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: medicine.endedAt.toLocal().toString().split(' ')[0],
+                                        style: const TextStyle(color: Colors.white70),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
