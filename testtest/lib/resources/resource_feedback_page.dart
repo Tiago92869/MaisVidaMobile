@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // Import for Random
-import 'package:testtest/services/feedback/feedback_model.dart' as feedback_model;
-import 'package:testtest/services/feedback/feedback_service.dart';
+import 'package:mentara/services/feedback/feedback_model.dart' as feedback_model;
+import 'package:mentara/services/feedback/feedback_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ResourceFeedbackPage extends StatefulWidget {

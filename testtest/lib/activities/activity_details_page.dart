@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/services/favorite/favorite_service.dart';
-import 'package:testtest/services/favorite/favorite_model.dart';
-import 'package:testtest/services/activity/activity_model.dart';
-import 'package:testtest/services/resource/resource_model.dart';
+import 'package:mentara/services/favorite/favorite_service.dart';
+import 'package:mentara/services/favorite/favorite_model.dart';
+import 'package:mentara/services/activity/activity_model.dart';
+import 'package:mentara/services/resource/resource_model.dart';
 import 'dart:convert';
 import 'package:video_player/video_player.dart';
-import 'package:testtest/services/image/image_service.dart';
-import 'package:testtest/services/audio/audio_repository.dart';
+import 'package:mentara/services/image/image_service.dart';
+import 'package:mentara/services/audio/audio_repository.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ActivityDetailsPage extends StatefulWidget {

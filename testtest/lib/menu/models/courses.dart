@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/assets.dart' as app_assets;
-import 'package:testtest/services/resource/resource_model.dart';
+import 'package:mentara/menu/assets.dart' as app_assets;
+import 'package:mentara/services/resource/resource_model.dart';
 
 class CourseModel {
   CourseModel({

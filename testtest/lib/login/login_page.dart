@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart'; // Import the jwt_decoder package
-import 'package:testtest/login/loading_screen.dart';
+import 'package:mentara/login/loading_screen.dart';
 import 'create_account_page.dart';
 import 'reset_password_page.dart';
-import 'package:testtest/services/user/user_service.dart';
+import 'package:mentara/services/user/user_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

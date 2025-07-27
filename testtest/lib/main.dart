@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:testtest/login/login_page.dart';
-import 'package:testtest/menu/menu.dart';
+import 'package:mentara/login/login_page.dart';
+import 'package:mentara/menu/menu.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; // Adicionado
 
 void main() {

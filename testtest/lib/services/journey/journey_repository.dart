@@ -1,5 +1,5 @@
-import 'package:testtest/services/journey/journey_service.dart';
-import 'package:testtest/services/journey/journey_model.dart';
+import 'package:mentara/services/journey/journey_service.dart';
+import 'package:mentara/services/journey/journey_model.dart';
 
 class JourneyRepository {
   final JourneyService _journeyService = JourneyService();

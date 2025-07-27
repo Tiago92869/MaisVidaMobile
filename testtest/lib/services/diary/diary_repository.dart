@@ -1,4 +1,4 @@
-import 'package:testtest/services/diary/diary_service.dart';
+import 'package:mentara/services/diary/diary_service.dart';
 
 import 'diary_model.dart';
 

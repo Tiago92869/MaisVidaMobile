@@ -1,5 +1,5 @@
-import 'package:testtest/services/user/user_model.dart';
-import 'package:testtest/services/user/user_service.dart';
+import 'package:mentara/services/user/user_model.dart';
+import 'package:mentara/services/user/user_service.dart';
 
 class UserRepository {
   final UserService userService;

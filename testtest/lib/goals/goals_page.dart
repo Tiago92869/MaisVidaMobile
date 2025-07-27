@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:testtest/goals/goal_details_page.dart';
-import 'package:testtest/services/goal/goal_service.dart';
-import 'package:testtest/services/goal/goal_model.dart';
+import 'package:mentara/goals/goal_details_page.dart';
+import 'package:mentara/services/goal/goal_service.dart';
+import 'package:mentara/services/goal/goal_model.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({Key? key}) : super(key: key);

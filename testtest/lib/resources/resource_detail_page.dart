@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:testtest/resources/fullscreen_video_page.dart';
+import 'package:mentara/resources/fullscreen_video_page.dart';
 import 'package:video_player/video_player.dart';
-import 'package:testtest/services/resource/resource_model.dart';
-import 'package:testtest/services/favorite/favorite_service.dart';
-import 'package:testtest/services/favorite/favorite_model.dart';
-import 'package:testtest/resources/resource_feedback_page.dart';
-import 'package:testtest/services/image/image_service.dart';
-import 'package:testtest/services/video/video_repository.dart';
-import 'package:testtest/services/audio/audio_repository.dart';
+import 'package:mentara/services/resource/resource_model.dart';
+import 'package:mentara/services/favorite/favorite_service.dart';
+import 'package:mentara/services/favorite/favorite_model.dart';
+import 'package:mentara/resources/resource_feedback_page.dart';
+import 'package:mentara/services/image/image_service.dart';
+import 'package:mentara/services/video/video_repository.dart';
+import 'package:mentara/services/audio/audio_repository.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ResourceDetailPage extends StatefulWidget {

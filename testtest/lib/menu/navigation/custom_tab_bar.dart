@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
-import 'package:testtest/menu/models/tab_item.dart';
-import 'package:testtest/menu/theme.dart';
-import 'package:testtest/menu/assets.dart' as app_assets;
+import 'package:mentara/menu/models/tab_item.dart';
+import 'package:mentara/menu/theme.dart';
+import 'package:mentara/menu/assets.dart' as app_assets;
 
 class CustomTabBar extends StatefulWidget {
   const CustomTabBar({Key? key, required this.onTabChange}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/services/medicine/medicine_repository.dart';
-import 'package:testtest/services/medicine/medicine_model.dart';
+import 'package:mentara/services/medicine/medicine_repository.dart';
+import 'package:mentara/services/medicine/medicine_model.dart';
 
 import 'medicine_detail_page.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:testtest/services/favorite/favorite_model.dart';
-import 'package:testtest/services/resource/resource_model.dart';
+import 'package:mentara/services/favorite/favorite_model.dart';
+import 'package:mentara/services/resource/resource_model.dart';
 
 class ActivityPage {
   final int totalElements;

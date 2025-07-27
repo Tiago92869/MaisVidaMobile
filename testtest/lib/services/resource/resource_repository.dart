@@ -1,5 +1,5 @@
-import 'package:testtest/services/resource/resource_model.dart';
-import 'package:testtest/services/resource/resource_service.dart';
+import 'package:mentara/services/resource/resource_model.dart';
+import 'package:mentara/services/resource/resource_service.dart';
 
 class ResourceRepository {
   final ResourceService _resourceService = ResourceService();

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:testtest/config/config.dart';
-import 'package:testtest/services/activity/activity_model.dart';
+import 'package:mentara/config/config.dart';
+import 'package:mentara/services/activity/activity_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const Duration _timeoutDuration = Duration(seconds: 10);

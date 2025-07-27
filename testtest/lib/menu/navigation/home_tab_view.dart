@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/activities/activity_details_page.dart';
-import 'package:testtest/diary/diary_detail_page.dart';
-import 'package:testtest/goals/goal_details_page.dart';
-import 'package:testtest/medicines/medicine_detail_page.dart';
-import 'package:testtest/resources/resource_detail_page.dart';
-import 'package:testtest/services/activity/activity_service.dart';
-import 'package:testtest/services/resource/resource_service.dart';
-import 'package:testtest/services/medicine/medicine_service.dart';
-import 'package:testtest/services/goal/goal_service.dart';
-import 'package:testtest/services/diary/diary_service.dart';
-import 'package:testtest/services/activity/activity_model.dart';
-import 'package:testtest/services/resource/resource_model.dart';
-import 'package:testtest/services/medicine/medicine_model.dart';
-import 'package:testtest/services/goal/goal_model.dart';
-import 'package:testtest/services/diary/diary_model.dart';
+import 'package:mentara/activities/activity_details_page.dart';
+import 'package:mentara/diary/diary_detail_page.dart';
+import 'package:mentara/goals/goal_details_page.dart';
+import 'package:mentara/medicines/medicine_detail_page.dart';
+import 'package:mentara/resources/resource_detail_page.dart';
+import 'package:mentara/services/activity/activity_service.dart';
+import 'package:mentara/services/resource/resource_service.dart';
+import 'package:mentara/services/medicine/medicine_service.dart';
+import 'package:mentara/services/goal/goal_service.dart';
+import 'package:mentara/services/diary/diary_service.dart';
+import 'package:mentara/services/activity/activity_model.dart';
+import 'package:mentara/services/resource/resource_model.dart';
+import 'package:mentara/services/medicine/medicine_model.dart';
+import 'package:mentara/services/goal/goal_model.dart';
+import 'package:mentara/services/diary/diary_model.dart';
 
 class HomeTabView extends StatefulWidget {
   final Function(int tabIndex) onTabChange; // Change callback to use tab index

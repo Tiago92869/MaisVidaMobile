@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/models/tab_item.dart';
+import 'package:mentara/menu/models/tab_item.dart';
 
 class MenuItemModel {
   MenuItemModel({this.id, this.title = "", required this.riveIcon});

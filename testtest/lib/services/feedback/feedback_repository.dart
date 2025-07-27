@@ -1,5 +1,5 @@
-import 'package:testtest/services/feedback/feedback_model.dart';
-import 'package:testtest/services/feedback/feedback_service.dart';
+import 'package:mentara/services/feedback/feedback_model.dart';
+import 'package:mentara/services/feedback/feedback_service.dart';
 
 class FeedbackRepository {
   final FeedbackService _feedbackService = FeedbackService();

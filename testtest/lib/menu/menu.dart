@@ -4,25 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart' as rive hide LinearGradient;
-import 'package:testtest/activities/activities_page.dart';
-import 'package:testtest/diary/diary_page.dart';
-import 'package:testtest/goals/goals_page.dart';
-import 'package:testtest/medicines/medicines_page.dart';
-import 'package:testtest/menu/models/menu_item.dart';
+import 'package:mentara/activities/activities_page.dart';
+import 'package:mentara/diary/diary_page.dart';
+import 'package:mentara/goals/goals_page.dart';
+import 'package:mentara/medicines/medicines_page.dart';
+import 'package:mentara/menu/models/menu_item.dart';
 import 'dart:math' as math;
-import 'package:testtest/menu/navigation/custom_tab_bar.dart';
-import 'package:testtest/menu/navigation/home_tab_view.dart';
-import 'package:testtest/menu/navigation/side_menu.dart';
-import 'package:testtest/notifications/notifications_page.dart';
-import 'package:testtest/resources/resources_page.dart';
-import 'package:testtest/sos/sos_details_page.dart';
-import 'package:testtest/menu/theme.dart';
-import 'package:testtest/menu/assets.dart' as app_assets;
-import 'package:testtest/profile/user_profile.dart'; // Import the user_profile.dart
+import 'package:mentara/menu/navigation/custom_tab_bar.dart';
+import 'package:mentara/menu/navigation/home_tab_view.dart';
+import 'package:mentara/menu/navigation/side_menu.dart';
+import 'package:mentara/notifications/notifications_page.dart';
+import 'package:mentara/resources/resources_page.dart';
+import 'package:mentara/sos/sos_details_page.dart';
+import 'package:mentara/menu/theme.dart';
+import 'package:mentara/menu/assets.dart' as app_assets;
+import 'package:mentara/profile/user_profile.dart'; // Import the user_profile.dart
 import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
-import 'package:testtest/journey/journey_page.dart';
-import 'package:testtest/services/user/user_service.dart'; // Import UserService
-import 'package:testtest/services/user/user_model.dart'; // Import UserModel
+import 'package:mentara/journey/journey_page.dart';
+import 'package:mentara/services/user/user_service.dart'; // Import UserService
+import 'package:mentara/services/user/user_model.dart'; // Import UserModel
 
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {

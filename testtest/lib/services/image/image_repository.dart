@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:testtest/services/image/image_model.dart';
-import 'package:testtest/services/image/image_service.dart';
+import 'package:mentara/services/image/image_model.dart';
+import 'package:mentara/services/image/image_service.dart';
 
 class ImageRepository {
   final ImageService _imageService = ImageService();

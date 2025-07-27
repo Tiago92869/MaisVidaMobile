@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:testtest/services/video/video_model.dart';
-import 'package:testtest/services/video/video_service.dart';
+import 'package:mentara/services/video/video_model.dart';
+import 'package:mentara/services/video/video_service.dart';
 
 class VideoRepository {
   final VideoService _videoService = VideoService();

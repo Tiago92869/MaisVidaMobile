@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/services/journey/journey_model.dart';
+import 'package:mentara/services/journey/journey_model.dart';
 import 'dart:math';
-import 'package:testtest/journey/journey_feeling.dart'; // Import JourneyFeelingPage
-import 'package:testtest/services/image/image_service.dart';
+import 'package:mentara/journey/journey_feeling.dart'; // Import JourneyFeelingPage
+import 'package:mentara/services/image/image_service.dart';
 import 'dart:convert';
 import 'dart:ui'; // For BackdropFilter
 

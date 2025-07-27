@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/models/courses.dart';
+import 'package:mentara/menu/models/courses.dart';
 
 class VCard extends StatefulWidget {
   const VCard({Key? key, required this.course}) : super(key: key);

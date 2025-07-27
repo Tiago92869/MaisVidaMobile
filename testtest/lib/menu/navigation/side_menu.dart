@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/components/menu_row.dart';
-import 'package:testtest/menu/models/menu_item.dart';
-import 'package:testtest/menu/theme.dart';
+import 'package:mentara/menu/components/menu_row.dart';
+import 'package:mentara/menu/models/menu_item.dart';
+import 'package:mentara/menu/theme.dart';
 import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:testtest/services/user/user_service.dart'; // Import the log function
+import 'package:mentara/services/user/user_service.dart'; // Import the log function
 
 class SideMenu extends StatefulWidget {
   const SideMenu({Key? key, required this.onMenuPress}) : super(key: key);

@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:testtest/services/journey/journey_service.dart';
-import 'package:testtest/services/journey/journey_model.dart';
+import 'package:mentara/services/journey/journey_service.dart';
+import 'package:mentara/services/journey/journey_model.dart';
 import 'journey_detail_page.dart';
 
 class JourneyPage extends StatefulWidget {

@@ -1,5 +1,5 @@
-import 'package:testtest/services/goal/goal_service.dart';
-import 'package:testtest/services/goal/goal_model.dart';
+import 'package:mentara/services/goal/goal_service.dart';
+import 'package:mentara/services/goal/goal_model.dart';
 
 class GoalRepository {
   final GoalService _goalService = GoalService();

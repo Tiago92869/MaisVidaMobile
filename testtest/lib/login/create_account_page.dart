@@ -1,7 +1,7 @@
 // create_account_page.dart
 import 'package:flutter/material.dart';
-import 'package:testtest/services/user/user_service.dart';
-import 'package:testtest/services/user/user_model.dart';
+import 'package:mentara/services/user/user_service.dart';
+import 'package:mentara/services/user/user_model.dart';
 
 class CreateAccountPage extends StatefulWidget {
   @override

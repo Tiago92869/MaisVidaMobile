@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/profile/change_password.dart';
-import 'package:testtest/services/user/user_repository.dart';
-import 'package:testtest/services/user/user_service.dart';
-import 'package:testtest/services/user/user_model.dart';
+import 'package:mentara/profile/change_password.dart';
+import 'package:mentara/services/user/user_repository.dart';
+import 'package:mentara/services/user/user_service.dart';
+import 'package:mentara/services/user/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 

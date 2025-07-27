@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testtest/menu/models/courses.dart';
+import 'package:mentara/menu/models/courses.dart';
 
 class HCard extends StatefulWidget {
   const HCard({Key? key, required this.section}) : super(key: key);

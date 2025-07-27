@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // Import for Random
-import 'package:testtest/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
-import 'package:testtest/resources/resource_detail_page.dart';
-import 'package:testtest/services/resource/resource_service.dart';
-import 'package:testtest/services/journey/journey_service.dart';
-import 'package:testtest/services/image/image_service.dart'; // Import for ImageService
+import 'package:mentara/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
+import 'package:mentara/resources/resource_detail_page.dart';
+import 'package:mentara/services/resource/resource_service.dart';
+import 'package:mentara/services/journey/journey_service.dart';
+import 'package:mentara/services/image/image_service.dart'; // Import for ImageService
 import 'dart:convert'; // Import for base64Decode
 
 class JourneyFeelingPage extends StatefulWidget {

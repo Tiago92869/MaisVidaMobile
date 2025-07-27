@@ -1,9 +1,9 @@
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:testtest/services/favorite/favorite_service.dart';
-import 'package:testtest/services/resource/resource_service.dart';
-import 'package:testtest/services/resource/resource_model.dart';
-import 'package:testtest/resources/resource_detail_page.dart';
+import 'package:mentara/services/favorite/favorite_service.dart';
+import 'package:mentara/services/resource/resource_service.dart';
+import 'package:mentara/services/resource/resource_model.dart';
+import 'package:mentara/resources/resource_detail_page.dart';
 
 class ResourcesPage extends StatefulWidget {
   const ResourcesPage({Key? key}) : super(key: key);

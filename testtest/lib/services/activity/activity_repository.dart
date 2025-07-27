@@ -1,5 +1,5 @@
-import 'package:testtest/services/activity/activity_service.dart';
-import 'package:testtest/services/activity/activity_model.dart';
+import 'package:mentara/services/activity/activity_service.dart';
+import 'package:mentara/services/activity/activity_model.dart';
 
 class ActivityRepository {
   final ActivityService _activityService = ActivityService();

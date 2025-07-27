@@ -1,7 +1,7 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:testtest/services/diary/diary_service.dart'; // Import DiaryService
-import 'package:testtest/services/diary/diary_model.dart'; // Import DiaryModel
+import 'package:mentara/services/diary/diary_service.dart'; // Import DiaryService
+import 'package:mentara/services/diary/diary_model.dart'; // Import DiaryModel
 import 'diary_detail_page.dart'; // Import the new page
 
 class DiaryPage extends StatefulWidget {

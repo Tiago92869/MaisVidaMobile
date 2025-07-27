@@ -1,5 +1,5 @@
-import 'package:testtest/services/medicine/medicine_service.dart';
-import 'package:testtest/services/medicine/medicine_model.dart';
+import 'package:mentara/services/medicine/medicine_service.dart';
+import 'package:mentara/services/medicine/medicine_model.dart';
 
 class MedicineRepository {
   final MedicineService _medicineService = MedicineService();

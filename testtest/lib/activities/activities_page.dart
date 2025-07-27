@@ -1,8 +1,8 @@
 import 'dart:ui'; // For BackdropFilter
 import 'package:flutter/material.dart';
-import 'package:testtest/services/activity/activity_service.dart';
-import 'package:testtest/services/activity/activity_model.dart';
-import 'package:testtest/services/favorite/favorite_service.dart';
+import 'package:mentara/services/activity/activity_service.dart';
+import 'package:mentara/services/activity/activity_model.dart';
+import 'package:mentara/services/favorite/favorite_service.dart';
 import 'activity_details_page.dart';
 
 class ActivitiesPage extends StatefulWidget {
