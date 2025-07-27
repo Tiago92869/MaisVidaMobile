@@ -345,7 +345,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                             ),
                                             subtitle: Text(
                                               entry.description,
-                                              maxLines: 3,
+                                              maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 fontSize: 14,

@@ -405,7 +405,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             // Medicine Description
             Text(
               medicine.description,
-              maxLines: 3,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 14, color: Colors.white70),
             ),
