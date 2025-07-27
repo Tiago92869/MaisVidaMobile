@@ -27,9 +27,15 @@ class _GoalsPageState extends State<GoalsPage> {
   int _currentPage = 0; // Current page
   int _totalPages = 1; // Total pages (default to 1)
 
+  // Returns the Monday of the week for a given date
+  DateTime _getMondayOfWeek(DateTime date) {
+    return date.subtract(Duration(days: date.weekday - 1));
+  }
+
   @override
   void initState() {
     super.initState();
+    _currentWeekStart = _getMondayOfWeek(DateTime.now()); // Start at current week (Monday)
     _fetchGoalsForWeek();
     _scrollController.addListener(_onScroll);
   }
@@ -155,8 +161,9 @@ class _GoalsPageState extends State<GoalsPage> {
     );
   }
 
-  List<DateTime> _getWeekDays(DateTime start) {
-    return List.generate(7, (index) => start.add(Duration(days: index)));
+  // Returns a list of 7 days from Monday to Sunday for the current week
+  List<DateTime> _getWeekDays(DateTime weekStart) {
+    return List.generate(7, (index) => weekStart.add(Duration(days: index)));
   }
 
   @override
@@ -339,7 +346,6 @@ class _GoalsPageState extends State<GoalsPage> {
                 "Nenhuma meta encontrada",
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
                   color: Colors.white70,
                 ),
               ),
