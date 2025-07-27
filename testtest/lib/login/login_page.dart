@@ -157,10 +157,10 @@ class _LoginPageState extends State<LoginPage> {
                             margin: const EdgeInsets.only(top: 50),
                             child: const Center(
                               child: Text(
-                                "Login",
+                                "Mentara",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 40,
+                                  fontSize: 48,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

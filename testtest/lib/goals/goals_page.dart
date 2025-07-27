@@ -540,7 +540,7 @@ String getSubjectDisplayName(GoalSubject subject) {
           children: [
             Text(
               goal.title,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 18,

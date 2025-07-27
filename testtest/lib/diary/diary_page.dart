@@ -346,26 +346,26 @@ class _DiaryPageState extends State<DiaryPage> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            ListTile(
-                                              contentPadding: EdgeInsets.zero,
-                                              title: Text(
-                                                entry.title,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
+                                            // Title
+                                            Text(
+                                              entry.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
                                               ),
-                                              subtitle: Text(
-                                                entry.description,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.white70,
-                                                ),
+                                            ),
+                                            const SizedBox(height: 8), // Add spacing between title and description
+                                            // Description
+                                            Text(
+                                              entry.description,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white70,
                                               ),
                                             ),
                                             const SizedBox(height: 8),

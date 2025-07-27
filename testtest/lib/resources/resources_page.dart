@@ -651,7 +651,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),

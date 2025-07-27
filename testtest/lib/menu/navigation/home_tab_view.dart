@@ -361,7 +361,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                                 Text(
                                   activity.title,
                                   style: const TextStyle(
-                                    fontSize: 24,
+                                    fontSize: 20,
                                     fontFamily: "Poppins",
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -376,7 +376,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: Colors.white.withOpacity(0.9),
-                                    fontSize: 16,
+                                    fontSize: 14,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -550,7 +550,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                             // Medicine Name
                             Text(
                               medicine.name,
-                              maxLines: 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 18,
@@ -651,7 +651,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                           children: [
                             Text(
                               goal.title,
-                              maxLines: 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 18,
@@ -767,26 +767,26 @@ class _HomeTabViewState extends State<HomeTabView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(
-                                diary.title,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                            // Title
+                            Text(
+                              diary.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
-                              subtitle: Text(
-                                diary.description,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white70,
-                                ),
+                            ),
+                            const SizedBox(height: 8), // Add spacing between title and description
+                            // Description
+                            Text(
+                              diary.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -933,7 +933,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
