@@ -388,25 +388,38 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                           DropdownButton<DiaryType>(
                             value: selectedEmotion,
                             dropdownColor: const Color(0xFF0D1B2A),
-                            items:
-                                DiaryType.values.map((emotion) {
-                                  return DropdownMenuItem(
-                                    value: emotion,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          _getEmotionEmoji(emotion),
-                                          style: const TextStyle(fontSize: 22),
+                            items: DiaryType.values.map((emotion) {
+                              return DropdownMenuItem(
+                                value: emotion,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        _getEmotionEmoji(emotion),
+                                        style: const TextStyle(fontSize: 22),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _emotionDisplayPt(emotion),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          _emotionDisplayPt(emotion),
-                                          style: const TextStyle(color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                             onChanged: (value) {
                               setState(() {
                                 selectedEmotion = value;
@@ -414,22 +427,38 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                             },
                           )
                         else if (selectedEmotion != null)
-                          Row(
-                            children: [
-                              Text(
-                                _getEmotionEmoji(selectedEmotion!),
-                                style: const TextStyle(fontSize: 22),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                _emotionDisplayPt(selectedEmotion!),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            constraints: const BoxConstraints(
+                              // Remove width expansion, let it wrap content
+                              minWidth: 0,
+                              maxWidth: double.infinity,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min, // <-- Only as wide as content
+                              children: [
+                                Text(
+                                  _getEmotionEmoji(selectedEmotion!),
+                                  style: const TextStyle(fontSize: 22),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 10),
+                                Text(
+                                  _emotionDisplayPt(selectedEmotion!),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         const SizedBox(height: 20),
 
