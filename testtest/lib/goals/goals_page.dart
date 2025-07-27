@@ -482,9 +482,7 @@ String getSubjectDisplayName(GoalSubject subject) {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(
-                      0.2,
-                    ), // Slightly lighter background
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -492,24 +490,56 @@ String getSubjectDisplayName(GoalSubject subject) {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, // White text for subject
+                      color: Colors.white,
                     ),
                   ),
                 ),
-
-                // Status Toggle
+                // Completed Checkbox (toggle both ways)
                 Row(
                   children: [
                     Text(
-                      goal.completed ? "Completadas" : "Por Completar",
-                      style: const TextStyle(
+                      "Completado",
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white70, // Subtle white text for status
+                        color: goal.completed ? Colors.green[200] : Colors.white70,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Switch(value: goal.completed ?? false, onChanged: null),
+                    Checkbox(
+                      value: goal.completed,
+                      onChanged: (value) async {
+                        final updatedGoal = GoalInfoCard(
+                          id: goal.id,
+                          title: goal.title,
+                          description: goal.description,
+                          goalDate: goal.goalDate,
+                          completedDate: value == true ? DateTime.now() : null,
+                          completed: value ?? false,
+                          hasNotifications: goal.hasNotifications,
+                          subject: goal.subject,
+                          createdAt: goal.createdAt,
+                          updatedAt: DateTime.now(),
+                        );
+                        try {
+                          await _goalService.updateGoal(goal.id, updatedGoal);
+                          // Instead of mutating the existing goal (which is immutable),
+                          // refresh the list from backend to get the updated state.
+                          if (_selectedDay != null) {
+                            await _fetchGoalsForDay(_selectedDay!);
+                          } else {
+                            await _fetchGoalsForWeek();
+                          }
+                        } catch (e) {
+                          _showErrorSnackbar("Erro ao atualizar o estado da meta.");
+                        }
+                      },
+                      activeColor: Colors.green,
+                      checkColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -780,4 +810,5 @@ String getSubjectDisplayName(GoalSubject subject) {
     );
   }
 }
+
 
