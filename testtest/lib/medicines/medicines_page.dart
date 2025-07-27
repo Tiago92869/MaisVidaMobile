@@ -12,7 +12,7 @@ class MedicinesPage extends StatefulWidget {
 }
 
 class _MedicinesPageState extends State<MedicinesPage> {
-  DateTime _currentWeekStart = DateTime.now();
+  DateTime _currentWeekStart = _getMondayOfWeek(DateTime.now());
   DateTime? _selectedDay; // Track the selected day
   bool _isFilterPanelVisible = false; // Filter panel visibility
   bool _isLoading = false; // Track loading state
@@ -185,19 +185,25 @@ class _MedicinesPageState extends State<MedicinesPage> {
     });
   }
 
+  // Helper to get the Monday of the week for a given date
+  static DateTime _getMondayOfWeek(DateTime date) {
+    // In Dart, weekday: 1=Monday, 7=Sunday
+    return date.subtract(Duration(days: date.weekday - 1));
+  }
+
   void _moveWeek(int direction) {
     setState(() {
-      // Move the current week start by 7 days in the specified direction
-      _currentWeekStart = _currentWeekStart.add(Duration(days: 7 * direction));
-      // Deselect the selected day when moving to a different week
+      // Move the current week start by 7 days in the specified direction, always landing on a Monday
+      _currentWeekStart = _getMondayOfWeek(_currentWeekStart.add(Duration(days: 7 * direction)));
       _selectedDay = null;
     });
-    // Fetch medicines for the new week
     _fetchMedicines();
   }
 
   List<DateTime> _getWeekDays(DateTime start) {
-    return List.generate(7, (index) => start.add(Duration(days: index)));
+    // Always return Monday to Sunday for the week containing 'start'
+    final monday = _getMondayOfWeek(start);
+    return List.generate(7, (index) => monday.add(Duration(days: index)));
   }
 
   void _closeFilterPanel() {
@@ -311,7 +317,6 @@ class _MedicinesPageState extends State<MedicinesPage> {
                 "Nenhum medicamento encontrado",
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
                   color: Colors.white70,
                 ),
               ),
@@ -388,6 +393,8 @@ class _MedicinesPageState extends State<MedicinesPage> {
             // Medicine Name
             Text(
               medicine.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -398,7 +405,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
             // Medicine Description
             Text(
               medicine.description,
-              maxLines: 2,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 14, color: Colors.white70),
             ),
@@ -411,7 +418,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                   TextSpan(
                     children: [
                       const TextSpan(
-                        text: "Começa: ",
+                        text: "Inicio: ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -431,7 +438,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                   TextSpan(
                     children: [
                       const TextSpan(
-                        text: "Termina: ",
+                        text: "Fim: ",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -481,7 +488,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: _showArchived ? 26 : 20,
+                    vertical: _showArchived ? 20 : 20,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,11 +496,11 @@ class _MedicinesPageState extends State<MedicinesPage> {
                       // Title
                       Center(
                         child: Text(
-                          _showArchived ? "Medicamentos arquivados" : "Medicamentos",
+                          _showArchived ? "Arquivados" : "Medicação",
                           style: TextStyle(
                             fontSize:
                                 _showArchived
-                                    ? 24
+                                    ? 28
                                     : 28, // Reduce font size for Archived Medicines
                             fontWeight: FontWeight.bold,
                             fontFamily: "Poppins",
@@ -527,7 +534,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
               child: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(
-                  _showArchived ? Icons.folder_open : Icons.archive,
+                  _showArchived ? Icons.history : Icons.archive,
                   color: const Color(0xFF0D1B2A),
                 ),
               ),
