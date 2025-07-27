@@ -342,7 +342,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
               child: Text(
                 resource.title,
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   fontFamily: "Poppins",
                   color: Colors.white,

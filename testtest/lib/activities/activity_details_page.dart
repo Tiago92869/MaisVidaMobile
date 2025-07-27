@@ -170,7 +170,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
                         child: Text(
                           activity.title,
                           style: const TextStyle(
-                            fontSize: 28,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             fontFamily: "Poppins",
                             color: Colors.white,

@@ -137,7 +137,7 @@ class _JourneyPageState extends State<JourneyPage> {
       constraints: const BoxConstraints(maxWidth: 350, maxHeight: 350),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor.withOpacity(0.65),
         boxShadow: [
           BoxShadow(
             color: backgroundColor.withOpacity(0.3),
@@ -174,9 +174,9 @@ class _JourneyPageState extends State<JourneyPage> {
           Text(
             journey.description,
             overflow: TextOverflow.ellipsis,
-            maxLines: 3, // Limit the description to a maximum of 3 lines
+            maxLines: 4, // Limit the description to a maximum of 3 lines
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withOpacity(0.9),
               fontSize: 16,
             ),
           ),
