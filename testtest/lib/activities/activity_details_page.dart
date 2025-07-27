@@ -3,12 +3,19 @@ import 'package:testtest/services/favorite/favorite_service.dart';
 import 'package:testtest/services/favorite/favorite_model.dart';
 import 'package:testtest/services/activity/activity_model.dart';
 import 'dart:math';
+import 'package:testtest/services/resource/resource_model.dart';
+import 'dart:convert';
+import 'package:testtest/resources/fullscreen_video_page.dart';
+import 'package:video_player/video_player.dart';
+import 'package:testtest/services/image/image_service.dart';
+import 'package:testtest/services/audio/audio_repository.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ActivityDetailsPage extends StatefulWidget {
   final Activity activity;
 
   const ActivityDetailsPage({Key? key, required this.activity})
-    : super(key: key);
+      : super(key: key);
 
   @override
   _ActivityDetailsPageState createState() => _ActivityDetailsPageState();
@@ -18,15 +25,23 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
   final FavoriteService _favoriteService = FavoriteService();
 
   bool _isFavorite = false;
-  bool _hasFavoriteChanged = false; // Track if the favorite status has changed
   int _currentResourceIndex = 0;
-  bool _isViewingResources = false;
-  bool _showFirstStarfish = Random().nextBool();
+  final ImageService _imageService = ImageService();
+  final AudioRepository _audioRepository = AudioRepository();
+  final Map<String, AudioPlayer> _audioPlayers = {};
+  final Map<String, String> _imageCache = {};
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
+  String? _selectedYesNo;
+  Set<String> _selectedOptions = {};
+  final Map<String, String?> _selectedOptionsByContent = {};
 
   @override
   void initState() {
     super.initState();
-    _checkIfFavorite(); // Check if the activity is marked as favorite
+    _checkIfFavorite();
+    _initializeImages();
+    _initializeVideoPlayer();
   }
 
   Future<void> _checkIfFavorite() async {
@@ -54,13 +69,9 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         activities: [widget.activity.id],
         resources: [],
       );
-
-      // Call modifyFavorite with the appropriate add/remove flag
       await _favoriteService.modifyFavorite(favoriteInput, !_isFavorite);
-
       setState(() {
-        _isFavorite = !_isFavorite; // Toggle the favorite status
-        _hasFavoriteChanged = true; // Mark that the favorite status has changed
+        _isFavorite = !_isFavorite;
       });
     } catch (e) {
       print('Error updating favorite status: $e');
@@ -70,30 +81,143 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void _startActivity() async {
-    setState(() {
-      _isViewingResources = true;
-      _currentResourceIndex = 0;
-    });
-  }
-
   void _nextResource() {
     setState(() {
-      if (_currentResourceIndex < widget.activity.resources!.length - 1) {
+      if (_currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1) {
         _currentResourceIndex++;
-        _showFirstStarfish = Random().nextBool();
       }
     });
+  }
+
+  void _previousResource() {
+    setState(() {
+      if (_currentResourceIndex > 0) {
+        _currentResourceIndex--;
+      }
+    });
+  }
+
+  // Função para obter o emoji do tipo de recurso
+  String _getResourceEmoji(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return "📖";
+      case ResourceType.VIDEO:
+        return "🎬";
+      case ResourceType.PODCAST:
+        return "🎧";
+      case ResourceType.PHRASE:
+        return "💬";
+      case ResourceType.CARE:
+        return "💚";
+      case ResourceType.EXERCISE:
+        return "🏋️";
+      case ResourceType.RECIPE:
+        return "🍲";
+      case ResourceType.MUSIC:
+        return "🎵";
+      case ResourceType.SOS:
+        return "🚨";
+      case ResourceType.OTHER:
+        return "🗂️";
+      case ResourceType.TIVA:
+        return "🧠";
+      default:
+        return "❓";
+    }
+  }
+
+  // Função para traduzir tipos de recurso para português
+  String _translateResourceType(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return "Artigo";
+      case ResourceType.VIDEO:
+        return "Vídeo";
+      case ResourceType.PODCAST:
+        return "Podcast";
+      case ResourceType.PHRASE:
+        return "Frase";
+      case ResourceType.CARE:
+        return "Cuidado";
+      case ResourceType.EXERCISE:
+        return "Exercício";
+      case ResourceType.RECIPE:
+        return "Receita";
+      case ResourceType.MUSIC:
+        return "Música";
+      case ResourceType.SOS:
+        return "SOS";
+      case ResourceType.OTHER:
+        return "Outro";
+      case ResourceType.TIVA:
+        return "TIVA";
+      default:
+        return type.toString().split('.').last;
+    }
+  }
+
+  Future<void> _initializeImages() async {
+    final resources = widget.activity.resources ?? [];
+    if (_currentResourceIndex >= resources.length) return;
+    final resource = resources[_currentResourceIndex];
+    final imageContents = resource.contents
+        .where((content) => content.type.toLowerCase() == 'image' && content.contentId != null)
+        .toList();
+    for (final content in imageContents) {
+      try {
+        final base64Image = await _imageService.getImageBase64(content.contentId!);
+        _imageCache[content.contentId!] = base64Image;
+      } catch (_) {}
+    }
+  }
+
+  Future<void> _initializeVideoPlayer() async {
+    final resources = widget.activity.resources ?? [];
+    if (_currentResourceIndex >= resources.length) return;
+    final resource = resources[_currentResourceIndex];
+    final Content? videoContent = resource.contents.cast<Content?>().firstWhere(
+      (content) => content?.type.toLowerCase() == 'video',
+      orElse: () => null,
+    );
+    if (videoContent == null || videoContent.contentId == null) {
+      setState(() {
+        _isVideoInitialized = false;
+      });
+      return;
+    }
+    try {
+      // Use your own logic to get the video file, here just set as not initialized
+      setState(() {
+        _isVideoInitialized = false;
+      });
+    } catch (_) {
+      setState(() {
+        _isVideoInitialized = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final player in _audioPlayers.values) {
+      player.dispose();
+    }
+    _videoController?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final activity = widget.activity;
+    final resources = activity.resources ?? [];
+    final currentResource = resources.isNotEmpty ? resources[_currentResourceIndex] : null;
+
+    // Agrupa os tipos de recurso únicos para mostrar apenas um de cada
+    final uniqueResourceTypes = <ResourceType, Resource>{};
+    for (final resource in resources) {
+      uniqueResourceTypes.putIfAbsent(resource.type, () => resource);
+    }
 
     return Scaffold(
       body: Stack(
@@ -110,183 +234,189 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
               ),
             ),
           ),
-          // Randomly show one of the starfish images
-          if (_showFirstStarfish)
-            Positioned(
-              right: 80,
-              top: 320,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.7,
-                  child: Image.asset(
-                    'assets/images/starfish2.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            )
-          else
-            Positioned(
-              left: 100,
-              top: 250,
-              width: 400,
-              height: 400,
-              child: Opacity(
-                opacity: 0.1,
-                child: Transform.rotate(
-                  angle: 0.5,
-                  child: Image.asset(
-                    'assets/images/starfish1.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-          // Content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Title and Favorite Icon
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          activity.title,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Poppins",
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: _toggleFavoriteStatus,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color:
-                                _isFavorite
-                                    ? Colors.yellow
-                                    : Colors.transparent,
-                            border: Border.all(color: Colors.yellow, width: 2),
-                          ),
-                          child: Icon(
-                            _isFavorite ? Icons.star : Icons.star_border,
-                            color: _isFavorite ? Colors.white : Colors.yellow,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  // Resource Types (in activity details)
-                  if (!_isViewingResources)
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children:
-                          activity.resources?.map((resource) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                resource.type
-                                    .toString()
-                                    .split('.')
-                                    .last
-                                    .capitalizeFirstLetter(),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            );
-                          }).toList() ??
-                          [],
-                    ),
-                  const SizedBox(height: 20),
-                  // Description or Resource View
-                  Expanded(
-                    child:
-                        _isViewingResources
-                            ? _buildResourceView()
-                            : SingleChildScrollView(
-                              child: Text(
-                                activity.description,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: "Inter",
-                                  color: Colors.white,
-                                  height: 1.5,
-                                ),
-                              ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Back button
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 28,
                             ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Created At
-                  if (!_isViewingResources)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildDateInfo("Criado em", activity.createdAt),
-                        _buildDateInfo(
-                          "Recursos",
-                          activity.resources?.length.toString() ?? "0",
-                        ),
-                      ],
-                    ),
-                  const SizedBox(height: 20),
-                  // Start or Next Button
-                  if (!_isViewingResources)
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: _startActivity,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: const Color(0xFF0D1B2A),
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                        child: const Text(
-                          "Iniciar",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 20),
+                          // Título e estrela
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  activity.title,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Poppins",
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: _toggleFavoriteStatus,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _isFavorite ? Colors.yellow : Colors.transparent,
+                                    border: Border.all(color: Colors.yellow, width: 2),
+                                  ),
+                                  child: Icon(
+                                    _isFavorite ? Icons.star : Icons.star_border,
+                                    color: _isFavorite ? Colors.white : Colors.yellow,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          // Temas dos recursos (emoji + nome) - apenas um de cada tipo
+                          if (uniqueResourceTypes.isNotEmpty)
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: uniqueResourceTypes.values
+                                  .map((resource) => Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              _getResourceEmoji(resource.type),
+                                              style: const TextStyle(fontSize: 18),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              _translateResourceType(resource.type),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
+                            ),
+                          const SizedBox(height: 10),
+                          // Descrição da atividade
+                          Text(
+                            activity.description,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontFamily: "Inter",
+                              color: Colors.white,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Linha branca divisória
+                          const Divider(
+                            color: Colors.white24,
+                            thickness: 1,
+                          ),
+                          const SizedBox(height: 20),
+                          // Conteúdo do recurso atual
+                          if (currentResource == null)
+                            const Center(
+                              child: Text(
+                                "Nenhum recurso disponível",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          else
+                            _buildResourceContents(currentResource),
+                          const SizedBox(height: 30),
+                          // Navegação entre recursos
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (_currentResourceIndex > 0)
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentResourceIndex--;
+                                      _initializeImages();
+                                      _initializeVideoPlayer();
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Anterior',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                )
+                              else
+                                const Spacer(),
+                              if (_currentResourceIndex < resources.length - 1)
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentResourceIndex++;
+                                      _initializeImages();
+                                      _initializeVideoPlayer();
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Próximo',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                        ],
                       ),
-                    )
-                  else
-                    _buildNavigationButtons(),
-                ],
-              ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -294,100 +424,460 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
     );
   }
 
-  Widget _buildDateInfo(String label, dynamic value) {
+  Widget _buildResourceContents(Resource resource) {
+    final sortedContents = List.of(resource.contents)
+      ..sort((a, b) => a.order.compareTo(b.order));
+    if (sortedContents.isEmpty) {
+      return const Center(
+        child: Text(
+          "Sem conteúdos neste recurso.",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
+      children: sortedContents.map((content) {
+        switch (content.type.toLowerCase()) {
+          case 'text':
+            return _buildTextContent(content.contentValue);
+          case 'image':
+            return _buildCachedImage(content.contentId);
+          case 'phrase':
+            return _buildPhraseContent(content.contentValue);
+          case 'yesno':
+            return _buildYesNoContent(content);
+          case 'selectone':
+            return _buildSelectOneContent(content);
+          case 'selectmulti':
+            return _buildSelectMultiContent(content);
+          case 'sound':
+            return _buildSoundContent(content);
+          case 'video':
+            return _buildVideoContent(content);
+          default:
+            return const SizedBox.shrink();
+        }
+      }).toList(),
+    );
+  }
+
+  Widget _buildTextContent(String? value) {
+    if (value == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        value,
+        style: const TextStyle(
+          fontSize: 18,
+          color: Colors.white,
+        ),
+        textAlign: TextAlign.left,
+      ),
+    );
+  }
+
+  Widget _buildCachedImage(String? contentId) {
+    if (contentId == null) return const SizedBox.shrink();
+    if (_imageCache.containsKey(contentId)) {
+      final base64Image = _imageCache[contentId]!;
+      return Center(
+        child: SizedBox(
+          width: 150,
+          height: 150,
+          child: Image.memory(
+            base64Decode(base64Image),
+            fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(height: 4),
+      );
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
+  }
+
+  Widget _buildPhraseContent(String? contentValue) {
+    if (contentValue == null) return const SizedBox.shrink();
+    final parts = contentValue.split('\n');
+    final upperText = parts.isNotEmpty ? parts[0] : '';
+    final lowerText = parts.length > 1 ? parts[1] : '';
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '"$upperText"',
+            style: const TextStyle(
+              fontStyle: FontStyle.italic,
+              color: Colors.white,
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            lowerText,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildYesNoContent(Content content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
         Text(
-          value is DateTime
-              ? "${value.day.toString().padLeft(2, '0')}-${value.month.toString().padLeft(2, '0')}-${value.year}"
-              : value.toString(),
-          style: const TextStyle(fontSize: 14, color: Colors.white),
+          content.contentValue ?? '',
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedYesNo = _selectedYesNo == 'yes' ? null : 'yes';
+                });
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: _selectedYesNo == 'yes'
+                      ? Colors.green
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Sim',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedYesNo = _selectedYesNo == 'no' ? null : 'no';
+                });
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: _selectedYesNo == 'no'
+                      ? Colors.red
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Não',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        AnimatedOpacity(
+          opacity: _selectedYesNo == null ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: Text(
+            _selectedYesNo == 'yes'
+                ? (content.answerYes ?? '')
+                : _selectedYesNo == 'no'
+                    ? (content.answerNo ?? '')
+                    : '',
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildResourceView() {
-    final resource = widget.activity.resources?[_currentResourceIndex];
-
-    return resource == null
-        ? const Center(
-          child: Text(
-            "Nenhum recurso disponível",
-            style: TextStyle(color: Colors.white),
-          ),
-        )
-        : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              resource.title,
+  Widget _buildSelectOneContent(Content content) {
+    final textSizes = content.multipleValue?.map((option) {
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: option,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
               ),
             ),
-            const SizedBox(height: 10),
-            // Resource Type
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                resource.type
-                    .toString()
-                    .split('.')
-                    .last
-                    .capitalizeFirstLetter(),
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            textDirection: TextDirection.ltr,
+          )..layout();
+          return textPainter.size;
+        }).toList() ?? [];
+    final maxWidth = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.width).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+    final maxHeight = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.height).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+    if (content.multipleValue == null || content.multipleValue!.isEmpty) {
+      final isSelected = _selectedOptionsByContent[content.id] == content.contentValue;
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedOptionsByContent[content.id] =
+                      isSelected ? null : content.contentValue;
+                });
+              },
+              child: Container(
+                width: 180,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.blue
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  content.contentValue ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              resource.description,
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            ),
+            if (isSelected && content.answerYes != null)
+              Text(
+                content.answerYes!,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
           ],
-        );
+        ),
+      );
+    }
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            content.contentValue ?? '',
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: content.multipleValue?.map((option) {
+                  final isSelected = _selectedOptionsByContent[content.id] == option;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedOptionsByContent[content.id] =
+                            isSelected ? null : option;
+                      });
+                    },
+                    child: Container(
+                      width: maxWidth + 40,
+                      height: maxHeight + 40,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.blue
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }).toList() ??
+                [],
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildSelectMultiContent(Content content) {
+    final textSizes = content.multipleValue?.map((option) {
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: option,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          return textPainter.size;
+        }).toList() ?? [];
+    final maxWidth = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.width).reduce((a, b) => a > b ? a : b)
+        : 0.0;
+    final maxHeight = textSizes.isNotEmpty
+        ? textSizes.map((size) => size.height).reduce((a, b) => a > b ? a : b)
+        : 0.0;
     return Center(
-      child: ElevatedButton(
-        onPressed:
-            _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
-                ? _nextResource
-                : () => Navigator.pop(context),
-        style: ElevatedButton.styleFrom(
-          foregroundColor: const Color(0xFF0D1B2A),
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            content.contentValue ?? '',
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: content.multipleValue?.map((option) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_selectedOptions.contains(option)) {
+                          _selectedOptions.remove(option);
+                        } else {
+                          _selectedOptions.add(option);
+                        }
+                      });
+                    },
+                    child: Container(
+                      width: maxWidth + 40,
+                      height: maxHeight + 40,
+                      decoration: BoxDecoration(
+                        color: _selectedOptions.contains(option)
+                            ? Colors.blue
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }).toList() ??
+                [],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSoundContent(Content content) {
+    final audioPlayer = _audioPlayers.putIfAbsent(content.id, () => AudioPlayer());
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          content.contentValue ?? '',
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () async {
+            // Implement audio loading logic if needed
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text(
+            'Carregar áudio',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
-        child: Text(
-          _currentResourceIndex < (widget.activity.resources?.length ?? 0) - 1
-              ? "Próximo"
-              : "Terminar",
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+      ],
+    );
+  }
+
+  Widget _buildVideoContent(Content content) {
+    // Placeholder for video content, as video loading logic is not implemented here
+    return const Center(
+      child: Text(
+        "Conteúdo de vídeo",
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
