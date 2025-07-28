@@ -303,6 +303,120 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _showInfoDialog() async {
+    final ScrollController scrollController = ScrollController();
+    bool atBottom = false;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            scrollController.addListener(() {
+              if (!scrollController.hasClients) return;
+              final maxScroll = scrollController.position.maxScrollExtent;
+              final currentScroll = scrollController.offset;
+              final isAtBottom = (currentScroll >= maxScroll - 2);
+              if (isAtBottom != atBottom) {
+                setState(() {
+                  atBottom = isAtBottom;
+                });
+              }
+            });
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0D1B2A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Informação",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: SizedBox(
+                height: 340,
+                width: 400,
+                child: Stack(
+                  children: [
+                    SingleChildScrollView(
+                      controller: scrollController,
+                      child: const Text(
+                        "Neste ecrã encontra tudo o que é importante para o seu dia-a-dia.\n\n"
+                        "No topo, tem dois botões principais:\n"
+                        "  - Três traços (≡): Abre o menu principal, com acesso às várias áreas da aplicação.\n"
+                        "  - Troféu (🏆): Mostra as recompensas que ganhou ao completar atividades e jornadas.\n\n"
+                        "Mais abaixo, pode consultar várias secções:\n"
+                        "  - Atividades: As tarefas que pode fazer ao longo do dia.\n"
+                        "  - Recursos: Ferramentas e informações úteis da aplicação.\n"
+                        "  - Medicamentos: Os medicamentos que deve tomar e respetivos horários.\n"
+                        "  - Metas: Os seus objectivos e o progresso em cada um.\n"
+                        "  - Diário: Um registo simples do que fez em cada dia.\n",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    if (!atBottom) ...[
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 30,
+                        child: IgnorePointer(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Color(0xFF0D1B2A),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 6,
+                        child: IgnorePointer(
+                          child: Center(
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.white54,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    "OK",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -478,7 +592,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   children: [
                     _tabBody,
                     // Show the DayNightSwitch only when the user is on the MenuPage (index 0)
-                    if (_currentTabIndex == 0)
+                    if (_currentTabIndex == 0) ...[
                       Positioned(
                         top: 50,
                         right: 20,
@@ -488,6 +602,30 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                           onPressed: _onTrophyIconPressed,
                         ),
                       ),
+                      // Info icon on the left side
+                      Positioned(
+                        top: 58,
+                        left: 70,
+                        child: GestureDetector(
+                          onTap: _showInfoDialog,
+                          child: Container(
+                            width: 37,
+                            height: 37,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.info_outline,
+                                color: Color(0xFF0D1B2A),
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -638,3 +776,4 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     );
   }
 }
+

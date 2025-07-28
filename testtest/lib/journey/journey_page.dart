@@ -224,6 +224,116 @@ class _JourneyPageState extends State<JourneyPage> {
     );
   }
 
+  Future<void> _showInfoDialog() async {
+    final ScrollController scrollController = ScrollController();
+    bool atBottom = false;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            scrollController.addListener(() {
+              if (!scrollController.hasClients) return;
+              final maxScroll = scrollController.position.maxScrollExtent;
+              final currentScroll = scrollController.offset;
+              final isAtBottom = (currentScroll >= maxScroll - 2);
+              if (isAtBottom != atBottom) {
+                setState(() {
+                  atBottom = isAtBottom;
+                });
+              }
+            });
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0D1B2A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Informação",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: SizedBox(
+                height: 340,
+                width: 400,
+                child: Stack(
+                  children: [
+                    SingleChildScrollView(
+                      controller: scrollController,
+                      child: const Text(
+                        "Neste ecrã pode consultar e iniciar jornadas.\n\n"
+                        "Cada jornada apresenta:\n"
+                        "  - Título e descrição\n"
+                        "  - Progresso (% concluído)\n"
+                        "  - Botão para começar ou continuar a jornada\n\n"
+                        "Toque numa jornada para ver mais detalhes e avançar no seu percurso.",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    if (!atBottom) ...[
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 30,
+                        child: IgnorePointer(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Color(0xFF0D1B2A),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 6,
+                        child: IgnorePointer(
+                          child: Center(
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.white54,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    "OK",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,6 +347,29 @@ class _JourneyPageState extends State<JourneyPage> {
                   colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
+                ),
+              ),
+            ),
+          ),
+          // Info icon on the left side (same position as in menu)
+          Positioned(
+            top: 58,
+            left: 70,
+            child: GestureDetector(
+              onTap: _showInfoDialog,
+              child: Container(
+                width: 37,
+                height: 37,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.info_outline,
+                    color: Color(0xFF0D1B2A),
+                    size: 24,
+                  ),
                 ),
               ),
             ),
