@@ -209,6 +209,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         _tabBody = _screens[9]; // Index for "User"
         _currentTabIndex = 9; // Update the current tab index
       });
+      onMenuPress(); // Fecha o menu e anima o botão
       return;
     }
 
@@ -222,6 +223,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         _tabBody = _screens[index];
         _currentTabIndex = index; // Update the current tab index
       });
+      onMenuPress(); // Fecha o menu e anima o botão
     } else {
       setState(() {
         _tabBody = Container(
@@ -233,6 +235,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
           ),
         );
       });
+      onMenuPress(); // Fecha o menu e anima o botão mesmo em erro
     }
   }
 
