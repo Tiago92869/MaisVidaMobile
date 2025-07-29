@@ -223,11 +223,11 @@ class _DiaryPageState extends State<DiaryPage> {
                       child: const Text(
                         "Este é o ecrã do Diário, onde pode escrever sobre o seu dia e como se sentiu.\n\n"
                         "Na parte de cima do ecrã, tem:\n"
-                        "  - Um botão de filtro: Serve para escolher ver apenas os dias em que se sentiu de certa forma — por exemplo: Feliz 😊, Neutro 😐 ou Triste 😔.\n"
+                        "  - Um botão de filtro: Serve para escolher ver apenas os dias em que se sentiu de certa forma — por exemplo: Feliz, Neutro ou Triste.\n"
                         "  - A data: Mostra o dia que está a ver. Ao lado da data, há duas setas. Uma para ir para o dia anterior e outra para o dia seguinte. Se carregar na própria data, pode escolher outro dia no calendário.\n\n"
                         "Cada registo do diário pode ter:\n"
                         "  - Um título: Uma frase curta que resume o que viveu ou sentiu.\n"
-                        "  - Uma emoção: Que mostra como se sentiu nesse dia (Feliz 😊, Neutro 😐 ou Triste 😔).\n"
+                        "  - Uma emoção: Que mostra como se sentiu nesse dia (Feliz, Neutro ou Triste).\n"
                         "  - Uma descrição: Um espaço onde pode escrever com mais detalhe sobre o seu dia, como correu e como se sentiu.",
                         style: TextStyle(
                           color: Colors.white70,

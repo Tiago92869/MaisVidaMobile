@@ -206,17 +206,18 @@ class _GoalsPageState extends State<GoalsPage> {
                     SingleChildScrollView(
                       controller: scrollController,
                       child: const Text(
-                        "Neste ecrã pode consultar, criar e acompanhar as suas metas.\n\n"
-                        "No topo, pode navegar entre semanas e selecionar um dia específico.\n\n"
-                        "Botões disponíveis:\n"
-                        "  - Filtro: Permite filtrar as metas por tema (Pessoal, Trabalho, Estudos, Família).\n"
-                        "  - Caixa de seleção: Alterna entre metas por completar e completadas.\n\n"
-                        "Cada meta apresenta:\n"
-                        "  - Título e descrição\n"
-                        "  - Data da meta\n"
-                        "  - Tema (Pessoal, Trabalho, Estudos, Família)\n"
-                        "  - Estado de completado (pode marcar/desmarcar)\n\n"
-                        "Use o botão '+' para adicionar uma nova meta.",
+                      "Este é o ecrã das Metas, onde pode organizar os seus objetivos.\n\n"
+                      "No topo do ecrã, pode:\n"
+                      "  - Escolher ver metas completadas ou por completar.\n"
+                      "  - Filtrar as metas pelo tema (Pessoal, Trabalho, Estudos).\n\n"
+                      "Tem um mapa semanal com os dias de segunda a domingo, onde pode:\n"
+                      "  - Ver as metas da semana.\n"
+                      "  - Filtrar para ver as metas de um dia específico.\n\n"
+                      "Para adicionar uma nova meta, pode:\n"
+                      "  - Dar um título.\n"
+                      "  - Escolher um tema (Pessoal, Trabalho ou Estudos).\n"
+                      "  - Optar por receber notificações.\n"
+                      "  - Escrever uma descrição detalhada da meta.",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 15,
@@ -838,7 +839,7 @@ String getSubjectDisplayName(GoalSubject subject) {
                   ),
                   const SizedBox(width: 30),
                   const Text(
-                    "Tema", // Título alterado para "Tema"
+                    "Tema",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -858,6 +859,26 @@ String getSubjectDisplayName(GoalSubject subject) {
                       // Subject Filters
                       ...GoalSubject.values.map((subject) {
                         final isSelected = _selectedSubjects.contains(subject);
+                        String subjectDisplay;
+                        String emoji;
+                        switch (subject) {
+                          case GoalSubject.Personal:
+                            emoji = "👤";
+                            subjectDisplay = "Pessoal";
+                            break;
+                          case GoalSubject.Work:
+                            emoji = "💼";
+                            subjectDisplay = "Trabalho";
+                            break;
+                          case GoalSubject.Studies:
+                            emoji = "📚";
+                            subjectDisplay = "Estudos";
+                            break;
+                          case GoalSubject.Family:
+                            emoji = "👪";
+                            subjectDisplay = "Família";
+                            break;
+                        }
                         return GestureDetector(
                           onTap: () {
                             setState(() {
@@ -874,17 +895,15 @@ String getSubjectDisplayName(GoalSubject subject) {
                             width: double.infinity,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color:
-                                    isSelected
-                                        ? Colors.white
-                                        : Colors.transparent,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.transparent,
                                 width: 1.5,
                               ),
                               borderRadius: BorderRadius.circular(12),
-                              color:
-                                  isSelected
-                                      ? const Color(0xFF0D1B2A)
-                                      : Colors.white,
+                              color: isSelected
+                                  ? const Color(0xFF0D1B2A)
+                                  : Colors.white,
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.1),
@@ -899,16 +918,26 @@ String getSubjectDisplayName(GoalSubject subject) {
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             child: Center(
-                              child: Text(
-                                getSubjectDisplayName(subject),
-                                style: TextStyle(
-                                  color:
-                                      isSelected
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    emoji,
+                                    style: const TextStyle(fontSize: 22),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    subjectDisplay,
+                                    style: TextStyle(
+                                      color: isSelected
                                           ? Colors.white
                                           : const Color(0xFF0D1B2A),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "Poppins",
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

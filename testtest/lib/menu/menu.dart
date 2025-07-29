@@ -19,7 +19,6 @@ import 'package:mentara/sos/sos_details_page.dart';
 import 'package:mentara/menu/theme.dart';
 import 'package:mentara/menu/assets.dart' as app_assets;
 import 'package:mentara/profile/user_profile.dart'; // Import the user_profile.dart
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import 'package:mentara/journey/journey_page.dart';
 import 'package:mentara/services/user/user_service.dart'; // Import UserService
 import 'package:mentara/services/user/user_model.dart'; // Import UserModel

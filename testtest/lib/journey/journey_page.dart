@@ -263,13 +263,14 @@ class _JourneyPageState extends State<JourneyPage> {
                   children: [
                     SingleChildScrollView(
                       controller: scrollController,
-                      child: const Text(
-                        "Neste ecrã pode consultar e iniciar jornadas.\n\n"
-                        "Cada jornada apresenta:\n"
-                        "  - Título e descrição\n"
-                        "  - Progresso (% concluído)\n"
-                        "  - Botão para começar ou continuar a jornada\n\n"
-                        "Toque numa jornada para ver mais detalhes e avançar no seu percurso.",
+child: const Text(
+  "Esta é a janela das Jornadas, onde pode ver as jornadas criadas para o ajudar.\n\n"
+  "Em cada jornada, há vários recursos para realizar, organizados por dia.\n"
+  "  - O primeiro dia está disponível para começar.\n"
+  "  - Ao completar um dia, o dia seguinte será desbloqueado para o dia seguinte.\n"
+  "  - Cada dia que completar, receberá um prémio na forma de uma imagem.\n\n"
+  "Quando terminar toda a jornada, receberá um prémio final.\n"
+  "Pode consultar este prémio no canto superior esquerdo do ecrã.",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 15,
@@ -354,7 +355,7 @@ class _JourneyPageState extends State<JourneyPage> {
           // Info icon on the left side (same position as in menu)
           Positioned(
             top: 58,
-            left: 70,
+            right: 30,
             child: GestureDetector(
               onTap: _showInfoDialog,
               child: Container(

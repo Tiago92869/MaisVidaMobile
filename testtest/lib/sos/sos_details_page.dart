@@ -258,10 +258,12 @@ void _showLaunchError() {
                     SingleChildScrollView(
                       controller: scrollController,
                       child: const Text(
-                        "Neste ecrã encontra contactos e recursos de emergência.\n\n"
-                        "No topo, pode ligar diretamente para o 112 ou para o seu contacto de emergência.\n\n"
-                        "Abaixo, encontra uma lista de recursos SOS úteis.\n\n"
-                        "Toque num recurso para ver mais detalhes.",
+  "Esta é a página SOS, onde pode encontrar ajuda rápida em situações de emergência.\n\n"
+  "Aqui, pode aceder a dois canais importantes:\n"
+  "  - O contacto do SNS24, para falar com profissionais de saúde em caso de urgência.\n"
+  "  - O contacto de emergência que guardou, para chamar alguém próximo quando precisar.\n\n"
+  "Além disso, pode consultar os Recursos SOS, que são informações e dicas úteis para lidar com várias situações de emergência.\n\n"
+  "Esta página foi pensada para estar sempre ao seu alcance, para que possa agir rapidamente quando mais precisar, com segurança e tranquilidade.",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 15,
@@ -492,10 +494,10 @@ void _showLaunchError() {
               ),
             ),
           ),
-          // Info icon on the left side (same position as in menu)
+          // Info icon moved to the right side
           Positioned(
             top: 58,
-            left: 70,
+            right: 30,
             child: GestureDetector(
               onTap: _showInfoDialog,
               child: Container(

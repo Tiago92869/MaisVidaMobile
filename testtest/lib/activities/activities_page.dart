@@ -290,13 +290,14 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     SingleChildScrollView(
                       controller: scrollController,
                       child: const Text(
-                        "Neste ecrã pode consultar, pesquisar e iniciar atividades.\n\n"
-                        "No topo, pode pesquisar atividades pelo nome ou descrição.\n\n"
-                        "Botão estrela: Mostra apenas as atividades marcadas como favoritas.\n\n"
-                        "Cada atividade apresenta:\n"
-                        "  - Título e descrição\n"
-                        "  - Número de recursos associados\n\n"
-                        "Use o botão 'Iniciar' para ver mais detalhes e começar a atividade.",
+  "Este é o ecrã das Atividades, onde pode aceder a várias atividades educacionais.\n\n"
+  "Neste ecrã, pode:\n"
+  "  - Filtrar para ver só as atividades que marcou como favoritas.\n"
+  "  - Pesquisar atividades pelo nome, para encontrar facilmente o que procura.\n"
+  "  - Selecionar atividades que contêm os conteúdos que deseja estudar.\n\n"
+  "Ao escolher uma atividade, pode:\n"
+  "  - Ver o conteúdo completo da atividade.\n"
+  "  - Marcar a atividade como favorita para guardar e consultar depois.",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 15,

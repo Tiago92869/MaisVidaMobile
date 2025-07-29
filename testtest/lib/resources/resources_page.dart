@@ -202,14 +202,15 @@ class _ResourcesPageState extends State<ResourcesPage> {
                     SingleChildScrollView(
                       controller: scrollController,
                       child: const Text(
-                        "Neste ecrã pode consultar, pesquisar e aceder a vários recursos úteis.\n\n"
-                        "No topo, pode pesquisar recursos pelo nome ou descrição.\n\n"
-                        "Botão estrela: Mostra apenas os recursos marcados como favoritos.\n"
-                        "Botão filtro: Permite filtrar os recursos por tipo (Artigo, Vídeo, Podcast, etc).\n\n"
-                        "Cada recurso apresenta:\n"
-                        "  - Título e descrição\n"
-                        "  - Tipo de recurso (com emoji)\n\n"
-                        "Toque num recurso para ver mais detalhes.",
+  "Este é o ecrã dos Recursos, onde pode encontrar todo o material educativo disponível.\n\n"
+  "Neste ecrã, pode:\n"
+  "  - Ver os recursos que já marcou como favoritos para aceder mais rápido.\n"
+  "  - Pesquisar recursos pelo nome, para encontrar facilmente o que procura.\n"
+  "  - Filtrar os recursos pelo tipo, como artigo, podcast ou vídeo, conforme preferir.\n\n"
+  "Ao escolher um recurso, pode:\n"
+  "  - Ver o conteúdo completo para aprender sobre o tema.\n"
+  "  - Marcar o recurso como favorito para guardar e consultar mais tarde.\n"
+  "  - Dar o seu feedback, dizendo o que achou do recurso e ajudando a melhorar.",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 15,

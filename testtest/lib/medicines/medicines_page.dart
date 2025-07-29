@@ -497,14 +497,20 @@ class _MedicinesPageState extends State<MedicinesPage> {
                     SingleChildScrollView(
                       controller: scrollController,
                       child: const Text(
-                        "Neste ecrã pode consultar, adicionar e acompanhar a sua medicação.\n\n"
-                        "No topo, pode navegar entre semanas e selecionar um dia específico.\n\n"
-                        "Botões disponíveis:\n"
-                        "  - Arquivo: Alterna entre medicamentos ativos e arquivados.\n\n"
-                        "Cada medicamento apresenta:\n"
-                        "  - Nome e descrição\n"
-                        "  - Data de início e fim\n\n"
-                        "Use o botão '+' para adicionar um novo medicamento.",
+  "Este é o ecrã da Medicação, onde pode ver os medicamentos que deve tomar.\n\n"
+  "No topo do ecrã, pode:\n"
+  "  - Filtrar entre medicamentos ativos e arquivados.\n\n"
+  "Tem um mapa semanal com os dias de segunda a domingo, onde pode:\n"
+  "  - Ver os medicamentos da semana.\n"
+  "  - Filtrar para ver os medicamentos de um dia específico.\n\n"
+  "Para adicionar um novo medicamento, pode:\n"
+  "  - Introduzir o nome.\n"
+  "  - Escolher a data de início e a data de fim.\n"
+  "  - Ativar notificações.\n"
+  "  - Escrever uma descrição.\n\n"
+  "Depois de criar o medicamento, pode:\n"
+  "  - Selecionar o medicamento criado.\n"
+  "  - Adicionar os dias e horários para tomar o medicamento.",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 15,
