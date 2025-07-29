@@ -54,7 +54,6 @@ class _SideMenuState extends State<SideMenu> {
         _userEmail = limitedEmail;
       });
     } catch (e) {
-      print("Error fetching user data: $e");
       // Optionally, show a fallback or error message
     }
   }

@@ -753,6 +753,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(20),
+                        width: double.infinity, // <-- faz o container ocupar toda a largura
                         decoration: BoxDecoration(
                           color: const Color(0xFFBBA6FF).withOpacity(0.3),
                           borderRadius: BorderRadius.circular(20),
