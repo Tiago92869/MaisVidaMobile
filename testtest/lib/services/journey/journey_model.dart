@@ -20,7 +20,6 @@ class Journey {
   });
 
   factory Journey.fromJson(Map<String, dynamic> json) {
-    print('Parsing Journey JSON: $json');
     return Journey(
       id: json['id'] ?? '',
       title: json['title'] ?? 'Untitled Journey',
@@ -59,7 +58,6 @@ class JourneyResource {
   });
 
   factory JourneyResource.fromJson(Map<String, dynamic> json) {
-    print('Parsing JourneyResource JSON: $json');
     return JourneyResource(
       id: json['id'] ?? '',
       resourceId: json['resourceId'] ?? '',

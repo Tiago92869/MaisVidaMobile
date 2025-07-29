@@ -242,11 +242,9 @@ class MenuButtonSection extends StatelessWidget {
                   menu: menu,
                   selectedMenu: selectedMenu,
                   onMenuPress: () {
-                    print('MenuRow pressed: ${menu.title}');
                     if (onMenuPress != null) {
                       onMenuPress!(menu);
                     } else {
-                      print('Error: onMenuPress is null in MenuRow');
                     }
                   },
                 ),

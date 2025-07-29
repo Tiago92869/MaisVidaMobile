@@ -113,7 +113,6 @@ class _HomeTabViewState extends State<HomeTabView> {
             medicinePage.content; // Use the content from MedicinePage
       });
     } catch (e) {
-      print('Error fetching medications: $e');
       _showErrorSnackBar("Falha ao procurar medicamentos.");
     } finally {
       setState(() {
