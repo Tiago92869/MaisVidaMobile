@@ -107,7 +107,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     const SizedBox(height: 100),
                     const Center(
                       child: Text(
-                        "Create Account",
+                        "Criar Conta",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 30,

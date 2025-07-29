@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Falha ao efetuar login: ${e.toString()}",
+              "Falha ao efetuar login, as credenciais não estão corretas",
               style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,

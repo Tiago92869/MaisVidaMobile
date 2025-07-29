@@ -57,7 +57,8 @@ class DiaryService {
           );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
+        final decodedBody = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = jsonDecode(decodedBody);
         return data.map((json) => DiaryDay.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load diaries');
@@ -80,7 +81,7 @@ class DiaryService {
               'Authorization': 'Bearer $_accessToken',
               'Content-Type': 'application/json; charset=utf-8',
             },
-            body: utf8.encode(jsonEncode(diary.toJson())),
+            body: requestBody,
           )
           .timeout(
             _timeoutDuration,
@@ -92,7 +93,8 @@ class DiaryService {
           );
 
       if (response.statusCode == 200) {
-        return Diary.fromJson(jsonDecode(response.body));
+        final decodedBody = utf8.decode(response.bodyBytes);
+        return Diary.fromJson(jsonDecode(decodedBody));
       } else {
         throw Exception('Failed to create diary');
       }
@@ -114,7 +116,7 @@ class DiaryService {
               'Authorization': 'Bearer $_accessToken',
               'Content-Type': 'application/json; charset=utf-8',
             },
-            body: utf8.encode(jsonEncode(diary.toJson())),
+            body: jsonEncode(diary.toJson()),
           )
           .timeout(
             _timeoutDuration,
@@ -126,7 +128,8 @@ class DiaryService {
           );
 
       if (response.statusCode == 200) {
-        return Diary.fromJson(json.decode(response.body));
+        final decodedBody = utf8.decode(response.bodyBytes);
+        return Diary.fromJson(json.decode(decodedBody));
       } else {
         throw Exception('Failed to update diary');
       }
