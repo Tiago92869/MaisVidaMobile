@@ -115,7 +115,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF1B263B), // Use the specified background color
+              color: const Color.fromARGB(255, 31, 68, 143), // Use the specified background color
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(

@@ -278,18 +278,6 @@ class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
         ),
       );
 
-      final updateProgress = UpdateUserJourneyResourceProgress(
-        order: widget.resourceProgress.order,
-        feeling: _selectedFeeling?.toUpperCase(),
-        completed: true,
-        unlocked: true,
-      );
-
-      await _journeyService.editUserJourneyProgress(
-        widget.resourceProgress.id,
-        updateProgress,
-      );
-
       // Show reward image if available
       if (widget.resourceProgress.rewardId != null) {
         await _showRewardImage(widget.resourceProgress.rewardId!);
