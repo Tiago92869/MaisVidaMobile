@@ -17,13 +17,13 @@ class _CustomTabBarState extends State<CustomTabBar> {
 
   int _selectedTab = 0;
 
-  // Updated icon mapping to match your actual artboard names
-  final Map<String, IconData> _iconMap = {
-    'HOME': Icons.home,
-    'RULES': Icons.book,
-    'SEARCH': Icons.search,
-    'SCORE': Icons.emoji_events,
-    'USER': Icons.person,
+  // Updated icon mapping to use emojis like the side menu
+  final Map<String, String> _emojiMap = {
+    'HOME': '🏠',
+    'RULES': '📝',
+    'SEARCH': '📚',
+    'SCORE': '🎯',
+    'USER': '👤',
   };
 
   void onTabPress(int index) {
@@ -95,12 +95,16 @@ class _CustomTabBarState extends State<CustomTabBar> {
                         SizedBox(
                           height: 36,
                           width: 36,
-                          child: Icon(
-                            _iconMap[icon.artboard] ?? Icons.circle,
-                            color: _selectedTab == index
-                                ? RiveAppTheme.accentColor
-                                : Colors.white.withOpacity(0.7),
-                            size: 30,
+                          child: Center(
+                            child: Text(
+                              _emojiMap[icon.artboard] ?? '📋',
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: _selectedTab == index
+                                    ? Colors.white
+                                    : Colors.white.withOpacity(0.7),
+                              ),
+                            ),
                           ),
                         ),
                       ],

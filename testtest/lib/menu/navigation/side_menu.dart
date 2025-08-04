@@ -4,6 +4,7 @@ import 'package:mentara/menu/models/menu_item.dart';
 import 'package:mentara/menu/theme.dart';
 import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
 
 import 'package:mentara/services/user/user_service.dart';
 
@@ -146,23 +147,30 @@ class _SideMenuState extends State<SideMenu> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  MenuButtonSection(
-                    title: "Navegar",
-                    selectedMenu: _selectedMenu,
-                    menuIcons: _browseMenuIcons,
-                    menuEmojiMap: _menuEmojiMap,
-                    onMenuPress: onMenuPress,
-                  ),
-                ],
+            child: ScrollShadow(
+              color: Colors.white.withOpacity(0.3),
+              size: 20.0,
+              fadeInCurve: Curves.easeIn,
+              fadeOutCurve: Curves.easeOut,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    MenuButtonSection(
+                      title: "Navegar",
+                      selectedMenu: _selectedMenu,
+                      menuIcons: _browseMenuIcons,
+                      menuEmojiMap: _menuEmojiMap,
+                      onMenuPress: onMenuPress,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           const Divider(
             color: Colors.white54,
             thickness: 1,
+            height: 1, // Add this to remove extra spacing
           ),
           ListTile(
             contentPadding: const EdgeInsets.only(left: 28),
@@ -225,7 +233,7 @@ class MenuButtonSection extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.all(8),
+          margin: const EdgeInsets.fromLTRB(8, 0, 8, 0), // Remove bottom margin
           child: Column(
             children: [
               for (var menu in menuIcons) ...[

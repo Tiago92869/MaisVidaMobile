@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
 import 'package:mentara/goals/goal_details_page.dart';
 import 'package:mentara/services/goal/goal_service.dart';
 import 'package:mentara/services/goal/goal_model.dart';
@@ -167,116 +168,63 @@ class _GoalsPageState extends State<GoalsPage> {
   }
 
   Future<void> _showInfoDialog() async {
-    final ScrollController scrollController = ScrollController();
-    bool atBottom = false;
-
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            scrollController.addListener(() {
-              if (!scrollController.hasClients) return;
-              final maxScroll = scrollController.position.maxScrollExtent;
-              final currentScroll = scrollController.offset;
-              final isAtBottom = (currentScroll >= maxScroll - 2);
-              if (isAtBottom != atBottom) {
-                setState(() {
-                  atBottom = isAtBottom;
-                });
-              }
-            });
-            return AlertDialog(
-              backgroundColor: const Color(0xFF0D1B2A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0D1B2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            "Informação",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SizedBox(
+            height: 340,
+            width: 400,
+            child: ScrollShadow(
+              color: Colors.white.withOpacity(0.3),
+              size: 15.0,
+              fadeInCurve: Curves.easeIn,
+              fadeOutCurve: Curves.easeOut,
+              child: SingleChildScrollView(
+                child: const Text(
+                  "Este é o ecrã das Metas, onde pode organizar os seus objetivos.\n\n"
+                  "No topo do ecrã, pode:\n"
+                  "  - Escolher ver metas completadas ou por completar.\n"
+                  "  - Filtrar as metas pelo tema (Pessoal, Trabalho, Estudos).\n\n"
+                  "Tem um mapa semanal com os dias de segunda a domingo, onde pode:\n"
+                  "  - Ver as metas da semana.\n"
+                  "  - Filtrar para ver as metas de um dia específico.\n\n"
+                  "Para adicionar uma nova meta, pode:\n"
+                  "  - Dar um título.\n"
+                  "  - Escolher um tema (Pessoal, Trabalho ou Estudos).\n"
+                  "  - Optar por receber notificações.\n"
+                  "  - Escrever uma descrição detalhada da meta.",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 15,
+                  ),
+                ),
               ),
-              title: const Text(
-                "Informação",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                "OK",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              content: SizedBox(
-                height: 340,
-                width: 400,
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      controller: scrollController,
-                      child: const Text(
-                      "Este é o ecrã das Metas, onde pode organizar os seus objetivos.\n\n"
-                      "No topo do ecrã, pode:\n"
-                      "  - Escolher ver metas completadas ou por completar.\n"
-                      "  - Filtrar as metas pelo tema (Pessoal, Trabalho, Estudos).\n\n"
-                      "Tem um mapa semanal com os dias de segunda a domingo, onde pode:\n"
-                      "  - Ver as metas da semana.\n"
-                      "  - Filtrar para ver as metas de um dia específico.\n\n"
-                      "Para adicionar uma nova meta, pode:\n"
-                      "  - Dar um título.\n"
-                      "  - Escolher um tema (Pessoal, Trabalho ou Estudos).\n"
-                      "  - Optar por receber notificações.\n"
-                      "  - Escrever uma descrição detalhada da meta.",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    if (!atBottom) ...[
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        height: 30,
-                        child: IgnorePointer(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Color(0xFF0D1B2A),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 6,
-                        child: IgnorePointer(
-                          child: Center(
-                            child: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white54,
-                              size: 28,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    "OK",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
+            ),
+          ],
         );
       },
     );
@@ -984,6 +932,4 @@ String getSubjectDisplayName(GoalSubject subject) {
     );
   }
 }
-
-
 
