@@ -27,12 +27,10 @@ class _CustomTabBarState extends State<CustomTabBar> {
   };
 
   void onTabPress(int index) {
-    if (_selectedTab != index) {
-      setState(() {
-        _selectedTab = index;
-      });
-      widget.onTabChange(index);
-    }
+    setState(() {
+      _selectedTab = index;
+    });
+    widget.onTabChange(index);
   }
 
   @override
