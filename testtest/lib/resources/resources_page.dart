@@ -496,9 +496,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
         return "🗂️";
       case ResourceType.TIVA:
         return "🧠";
-      default:
-        return "❓";
-    }
+      }
   }
 
   // Get display name for resource type (without emoji)
@@ -526,9 +524,7 @@ class _ResourcesPageState extends State<ResourcesPage> {
         return "Outro";
       case ResourceType.TIVA:
         return "Tiva";
-      default:
-        return "Desconhecido";
-    }
+      }
   }
 
   Widget _buildFilterPanel() {

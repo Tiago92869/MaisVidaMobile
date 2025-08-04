@@ -12,11 +12,9 @@ class MedicineService {
   final _storage = const FlutterSecureStorage();
 
   String? _accessToken;
-  String? _userId;
 
   Future<void> _loadStoredCredentials() async {
     _accessToken = await _storage.read(key: 'accessToken');
-    _userId = await _storage.read(key: 'userId');
   }
 
   Future<MedicinePage> fetchMedicines(

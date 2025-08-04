@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class Favorite {
   final String id;

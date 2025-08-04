@@ -20,14 +20,9 @@ class _LoginPageState extends State<LoginPage> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _isPasswordVisible = false;
 
   Future<void> _login() async {
-    setState(() {
-      _isLoading = true; // Show the loading overlay
-    });
-
     try {
       // Call the login method from UserService
       final token = await _userService.login(
@@ -75,13 +70,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       }
-    } finally {
-      // Check if the widget is still mounted before calling setState
-      if (mounted) {
-        setState(() {
-          _isLoading = false; // Hide the loading overlay
-        });
-      }
     }
   }
 
@@ -89,263 +77,249 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  height: 400,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/background1.png'),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned(
-                        left: 0,
-                        top: 50,
-                        width: 160,
-                        height: 200,
-                        child: Opacity(
-                          opacity: 0.4,
-                          child: FadeInUp(
-                            duration: const Duration(seconds: 1),
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/images/starfish1.png',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 270,
-                        top: 100,
-                        width: 200,
-                        height: 200,
-                        child: Opacity(
-                          opacity: 0.4,
-                          child: FadeInUp(
-                            duration: const Duration(milliseconds: 1200),
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/images/starfish2.png',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        child: FadeInUp(
-                          duration: const Duration(milliseconds: 1600),
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 50),
-                            child: const Center(
-                              child: Text(
-                                "Mentara",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 10,
-                    bottom: 10,
-                    left: 30,
-                    right: 30,
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      FadeInUp(
-                        duration: const Duration(milliseconds: 1800),
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: const Color(0xFF557BE9)),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x7D9AEE),
-                                blurRadius: 20.0,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: <Widget>[
-                              Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Color(0xFF557BE9),
-                                    ),
-                                  ),
-                                ),
-                                child: TextField(
-                                  controller: _emailController,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "E-mail",
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: TextField(
-                                  controller: _passwordController,
-                                  obscureText: !_isPasswordVisible,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Palavra-passe",
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey[700],
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                                        color: Colors.grey[700],
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isPasswordVisible = !_isPasswordVisible;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      FadeInUp(
-                        duration: const Duration(milliseconds: 1900),
-                        child: GestureDetector(
-                          onTap: _login, // Call the _login method
-                          child: Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
-                              ),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Login",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      FadeInUp(
-                        duration: const Duration(milliseconds: 1950),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CreateAccountPage(),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color.fromRGBO(85, 123, 233, 1),
-                                  Color.fromRGBO(125, 154, 238, 1),
-                                ],
-                              ),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Criar conta",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 70),
-                      FadeInUp(
-                        duration: const Duration(milliseconds: 2000),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ResetPasswordPage(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Esqueceu-se da sua palavra-passe?",
-                            style: TextStyle(
-                              color: Color(0xFF557BE9),
-                              fontSize: 16,
-                              decoration:
-                                  TextDecoration
-                                      .underline, // Underline to show it's clickable
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Loading Overlay
-          if (_isLoading)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 400,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background1.png'),
+                  fit: BoxFit.fill,
                 ),
               ),
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    left: 0,
+                    top: 50,
+                    width: 160,
+                    height: 200,
+                    child: Opacity(
+                      opacity: 0.4,
+                      child: FadeInUp(
+                        duration: const Duration(seconds: 1),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(
+                                'assets/images/starfish1.png',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 270,
+                    top: 100,
+                    width: 200,
+                    height: 200,
+                    child: Opacity(
+                      opacity: 0.4,
+                      child: FadeInUp(
+                        duration: const Duration(milliseconds: 1200),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(
+                                'assets/images/starfish2.png',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    child: FadeInUp(
+                      duration: const Duration(milliseconds: 1600),
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 50),
+                        child: const Center(
+                          child: Text(
+                            "Mentara",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 10,
+                bottom: 10,
+                left: 30,
+                right: 30,
+              ),
+              child: Column(
+                children: <Widget>[
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1800),
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFF557BE9)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x007d9aee),
+                            blurRadius: 20.0,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Color(0xFF557BE9),
+                                ),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "E-mail",
+                                hintStyle: TextStyle(
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              controller: _passwordController,
+                              obscureText: !_isPasswordVisible,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Palavra-passe",
+                                hintStyle: TextStyle(
+                                  color: Colors.grey[700],
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                    color: Colors.grey[700],
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1900),
+                    child: GestureDetector(
+                      onTap: _login, // Call the _login method
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF557BE9), Color(0xFF7D9AEE)],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Entrar",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1950),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateAccountPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color.fromRGBO(85, 123, 233, 1),
+                              Color.fromRGBO(125, 154, 238, 1),
+                            ],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Criar conta",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 70),
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 2000),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ResetPasswordPage(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Esqueceu-se da sua palavra-passe?",
+                        style: TextStyle(
+                          color: Color(0xFF557BE9),
+                          fontSize: 16,
+                          decoration:
+                              TextDecoration
+                                  .underline, // Underline to show it's clickable
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

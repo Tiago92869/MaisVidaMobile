@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
 import 'package:mentara/menu/theme.dart';
 import 'package:mentara/profile/change_password.dart';
-import 'package:mentara/services/user/user_repository.dart';
 import 'package:mentara/services/user/user_service.dart';
 import 'package:mentara/services/user/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -33,10 +32,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   String lastSavedAboutMe = "";
   String lastSavedEmergencyContact = "";
 
-  // UserRepository instance
-  final UserRepository userRepository = UserRepository(
-    userService: UserService(),
-  );
+  // UserService instance
+  final UserService userService = UserService();
 
   // Secure storage instance
   final FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -53,7 +50,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Future<void> fetchUserData() async {
     try {
       // Fetch user data using getSimpleUser
-      User user = await userRepository.getSimpleUser();
+      User user = await userService.getSimpleUser();
       setState(() {
         firstNameController.text = user.firstName;
         familyNameController.text = user.secondName;
@@ -90,7 +87,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> fetchUserProfileImage() async {
     try {
-      final profileImage = await userRepository.userService.getProfileImage();
+      final profileImage = await userService.getProfileImage();
       final base64Image = profileImage.data.split(',').last;
       setState(() {
         profileImageBase64 = base64Image;
@@ -105,7 +102,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> showImageSelectionPopup() async {
     try {
-      final images = await userRepository.userService.getAllImagePreviewsBase64();
+      final images = await userService.getAllImagePreviewsBase64();
 
       showDialog(
         context: context,
@@ -179,7 +176,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   );
 
                                   // Save the updated user data
-                                  await userRepository.updateUser(currentUser!);
+                                  await userService.updateUser(currentUser!);
                                 }
 
                                 Navigator.of(context).pop();
@@ -289,7 +286,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       );
 
       // Update user in the repository
-      await userRepository.updateUser(updatedUser);
+      await userService.updateUser(updatedUser);
 
       // Update secure storage with the new first name, family name, and emergency contact
       await _storage.write(key: 'firstName', value: updatedUser.firstName);

@@ -1,6 +1,5 @@
 // reset_password_page.dart
 import 'package:flutter/material.dart';
-import 'package:mentara/services/user/user_repository.dart';
 import 'package:mentara/services/user/user_service.dart';
 import 'login_page.dart'; // Import the Login Page
 
@@ -79,10 +78,8 @@ class ResetPasswordPage extends StatelessWidget {
                     );
 
                     // Call sendEmail method
-                    UserRepository userRepository = UserRepository(
-                      userService: UserService(),
-                    );
-                    userRepository
+                    UserService userService = UserService();
+                    userService
                         .sendEmail(_emailController.text)
                         .then((_) {
                           Navigator.pop(context); // Dismiss loading animation

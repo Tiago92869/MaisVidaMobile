@@ -876,9 +876,7 @@ class _HomeTabViewState extends State<HomeTabView> {
       case ResourceType.TIVA:
         emoji = "🧠";
         break;
-      default:
-        emoji = "❓";
-    }
+      }
 
     String translateResourceType(ResourceType type) {
       switch (type) {
@@ -904,9 +902,7 @@ class _HomeTabViewState extends State<HomeTabView> {
           return "Outro";
         case ResourceType.TIVA:
           return "TIVA";
-        default:
-          return type.toString().split('.').last;
-      }
+        }
     }
 
     return Center(

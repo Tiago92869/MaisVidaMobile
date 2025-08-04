@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mentara/services/journey/journey_model.dart';
-import 'dart:math';
 import 'package:mentara/journey/journey_feeling.dart';
 import 'package:mentara/services/image/image_service.dart';
 import 'dart:convert';

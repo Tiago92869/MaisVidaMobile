@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mentara/menu/components/menu_row.dart';
 import 'package:mentara/menu/models/menu_item.dart';
 import 'package:mentara/menu/theme.dart';
-import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
 
@@ -85,6 +84,48 @@ class _SideMenuState extends State<SideMenu> {
     });
     widget.onMenuPress(menu.title);
     }
+
+  Future<bool> _showLogoutConfirmationDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0D1B2A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                "Sair",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: const Text(
+                "Tem a certeza que deseja sair da aplicação?",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    "Não",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    "Sim",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,9 +228,12 @@ class _SideMenuState extends State<SideMenu> {
               ),
             ),
             onTap: () async {
-              final userService = UserService();
-              await userService.logout();
-              Navigator.pushReplacementNamed(context, '/login');
+              final shouldLogout = await _showLogoutConfirmationDialog();
+              if (shouldLogout) {
+                final userService = UserService();
+                await userService.logout();
+                Navigator.pushReplacementNamed(context, '/login');
+              }
             },
           ),
         ],

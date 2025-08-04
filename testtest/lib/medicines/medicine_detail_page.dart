@@ -1,7 +1,7 @@
 import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
 import 'package:mentara/services/medicine/medicine_model.dart'; // Import the models
-import 'package:mentara/services/medicine/medicine_repository.dart'; // Import the repository
+import 'package:mentara/services/medicine/medicine_service.dart'; // Import the service
 
 class MedicineDetailPage extends StatefulWidget {
   final Medicine? medicine; // Use the Medicine model
@@ -15,8 +15,8 @@ class MedicineDetailPage extends StatefulWidget {
 }
 
 class _MedicineDetailPageState extends State<MedicineDetailPage> {
-  final MedicineRepository _medicineRepository =
-      MedicineRepository(); // Repository instance
+  final MedicineService _medicineService =
+      MedicineService(); // Service instance
   bool editMode = false; // Tracks if the user is editing
   bool isSaving = false; // Tracks if the save operation is in progress
   late TextEditingController nameController;
@@ -116,7 +116,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           endedAt: endDate!,
           hasNotifications: hasNotifications,
         );
-        await _medicineRepository.createMedicine(newMedicine);
+        await _medicineService.createMedicine(newMedicine);
         Navigator.pop(context, true); // Return true to indicate success
       } else {
         // Updating an existing medicine
@@ -132,7 +132,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
           updatedAt: DateTime.now(),
           plans: widget.medicine!.plans, // Include plans
         );
-        await _medicineRepository.updateMedicine(
+        await _medicineService.modifyMedicine(
           updatedMedicine.id,
           updatedMedicine,
         );
@@ -155,7 +155,7 @@ class _MedicineDetailPageState extends State<MedicineDetailPage> {
     });
 
     try {
-      await _medicineRepository.deleteMedicine(widget.medicine!.id);
+      await _medicineService.deleteMedicine(widget.medicine!.id);
 
       // Navigate back and pass a flag to indicate deletion
       Navigator.pop(context, true); // Return true to indicate success

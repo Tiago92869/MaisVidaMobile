@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 
 class MedicinePage {
   final int totalPages;

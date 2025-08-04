@@ -98,9 +98,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         return "🗂️";
       case ResourceType.TIVA:
         return "🧠";
-      default:
-        return "❓";
-    }
+      }
   }
 
   String _translateResourceType(ResourceType type) {
@@ -127,9 +125,7 @@ class _ActivityDetailsPageState extends State<ActivityDetailsPage> {
         return "Outro";
       case ResourceType.TIVA:
         return "TIVA";
-      default:
-        return type.toString().split('.').last;
-    }
+      }
   }
 
   Future<void> _initializeImages() async {

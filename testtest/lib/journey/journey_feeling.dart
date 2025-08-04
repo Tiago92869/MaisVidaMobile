@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:mentara/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
 import 'package:mentara/resources/resource_detail_page.dart';
 import 'package:mentara/services/resource/resource_service.dart';
-import 'package:mentara/services/journey/journey_service.dart';
 import 'package:mentara/services/image/image_service.dart'; // Import for ImageService
 import 'dart:convert'; // Import for base64Decode
 
@@ -18,7 +17,6 @@ class JourneyFeelingPage extends StatefulWidget {
 
 class _JourneyFeelingPageState extends State<JourneyFeelingPage> {
   final ResourceService _resourceService = ResourceService();
-  final JourneyService _journeyService = JourneyService();
   final ImageService _imageService = ImageService();
 
   String? _selectedFeeling; // Track the selected feeling

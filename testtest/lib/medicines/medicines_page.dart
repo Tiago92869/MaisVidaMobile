@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/services/medicine/medicine_repository.dart';
 import 'package:mentara/services/medicine/medicine_model.dart';
+import 'package:mentara/services/medicine/medicine_service.dart';
 
 import 'medicine_detail_page.dart';
 
@@ -24,7 +24,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
   int _totalPages = 1; // Track the total number of pages (default to 1)
   bool _isFetchingMore = false; // Prevent multiple fetches at the same time
 
-  final MedicineRepository _medicineRepository = MedicineRepository();
+  final MedicineService _medicineService = MedicineService();
 
   final List<Medicine> _medicines = []; // Use the Medicine model directly
 
@@ -65,7 +65,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
     });
 
     try {
-      final medicinePage = await _medicineRepository.getMedicines(
+      final medicinePage = await _medicineService.fetchMedicines(
         _showArchived,
         _selectedDay ?? _currentWeekStart,
         _selectedDay ?? _currentWeekStart.add(const Duration(days: 6)),
@@ -103,7 +103,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
     try {
       final formattedDay = _formatDate(day);
 
-      final medicinePage = await _medicineRepository.getMedicines(
+      final medicinePage = await _medicineService.fetchMedicines(
         _showArchived,
         DateTime.parse(formattedDay), // Pass formatted day as start date
         DateTime.parse(formattedDay), // Pass formatted day as end date
@@ -142,7 +142,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
         _selectedDay ?? _currentWeekStart.add(const Duration(days: 6)),
       );
 
-      final medicinePage = await _medicineRepository.getMedicines(
+      final medicinePage = await _medicineService.fetchMedicines(
         _showArchived,
         DateTime.parse(startDate),
         DateTime.parse(endDate),

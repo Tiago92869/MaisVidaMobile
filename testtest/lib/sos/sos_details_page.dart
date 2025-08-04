@@ -59,12 +59,12 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
 
       setState(() {
         if (loadNextPage) {
-          _sosResources.addAll(resources.content ?? []);
+          _sosResources.addAll(resources.content);
         } else {
-          _sosResources = resources.content ?? [];
+          _sosResources = resources.content;
         }
-        _isLastPage = resources.last ?? true;
-        _currentPage = (resources.number ?? 0) + 1;
+        _isLastPage = resources.last;
+        _currentPage = (resources.number) + 1;
       });
     } catch (e) {
       setState(() {
@@ -78,137 +78,114 @@ class _SosDetailsPageState extends State<SosDetailsPage> {
   }
 
   Future<void> _makePhoneCall(String? number) async {
-  // ...removed print...
-  // ...removed print...
-
-  if (number == null || number.isEmpty) {
-    // ...removed print...
-    _showNoContactDialog();
-    return;
-  }
-
-  final Uri phoneUri = Uri(scheme: 'tel', path: number);
-  // ...removed print...
-
-  if (Platform.isAndroid) {
-    // ...removed print...
-
-    final status = await Permission.phone.status;
-    // ...removed print...
-
-    if (status.isDenied || status.isRestricted) {
-      // ...removed print...
-      final result = await Permission.phone.request();
-      // ...removed print...
-
-      if (!result.isGranted) {
-        // ...removed print...
-        _showPermissionError();
-        return;
-      } else {
-        // ...removed print...
-      }
-    } else {
-      // ...removed print...
+    if (number == null || number.isEmpty) {
+      _showNoContactDialog();
+      return;
     }
-  } else {
-    // ...removed print...
+
+    final Uri phoneUri = Uri(scheme: 'tel', path: number);
+
+    if (Platform.isAndroid) {
+      final status = await Permission.phone.status;
+
+      if (status.isDenied || status.isRestricted) {
+        final result = await Permission.phone.request();
+
+        if (!result.isGranted) {
+          _showPermissionError();
+          return;
+        }
+      }
+    }
+
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      _showLaunchError();
+    }
   }
-
-  // ...removed print...
-
-  if (await canLaunchUrl(phoneUri)) {
-    // ...removed print...
-    await launchUrl(phoneUri);
-  } else {
-    // ...removed print...
-    _showLaunchError();
-  }
-}
-
 
   void _showNoContactDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Erro",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF0D1B2A), Color(0xFF1B263B)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Contacto de emergência não definido.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.white70),
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Erro",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Text(
-                    "OK",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                const SizedBox(height: 20),
+                const Text(
+                  "Contacto de emergência não definido.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Text(
+                      "OK",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
-void _showPermissionError() {
-  // ...removed print...
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("É necessária permissão para chamada telefónica."),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
+  void _showPermissionError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("É necessária permissão para chamada telefónica."),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
-void _showLaunchError() {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("Não é possível redirecionar para as chamadas"),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
+  void _showLaunchError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Não é possível redirecionar para as chamadas"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
   void _navigateToResourceDetail(BuildContext context, Resource resource) {
     Navigator.push(
@@ -414,7 +391,7 @@ void _showLaunchError() {
                                         const SizedBox(width: 15),
                                         Expanded(
                                           child: Text(
-                                            resource.title ?? "Sem título",
+                                            resource.title,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(

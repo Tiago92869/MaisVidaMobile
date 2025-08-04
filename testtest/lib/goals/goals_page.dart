@@ -232,7 +232,7 @@ class _GoalsPageState extends State<GoalsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final weekDays = _getWeekDays(_currentWeekStart);
+    _getWeekDays(_currentWeekStart);
 
     return Scaffold(
       body: Stack(

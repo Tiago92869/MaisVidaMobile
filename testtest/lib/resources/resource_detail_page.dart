@@ -7,8 +7,8 @@ import 'package:mentara/services/favorite/favorite_service.dart';
 import 'package:mentara/services/favorite/favorite_model.dart';
 import 'package:mentara/resources/resource_feedback_page.dart';
 import 'package:mentara/services/image/image_service.dart';
-import 'package:mentara/services/video/video_repository.dart';
-import 'package:mentara/services/audio/audio_repository.dart';
+import 'package:mentara/services/video/video_service.dart';
+import 'package:mentara/services/audio/audio_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class ResourceDetailPage extends StatefulWidget {
@@ -30,8 +30,8 @@ class ResourceDetailPage extends StatefulWidget {
 class _ResourceDetailPageState extends State<ResourceDetailPage> {
   final FavoriteService _favoriteService = FavoriteService();
   final ImageService _imageService = ImageService();
-  final VideoRepository _videoRepository = VideoRepository();
-  final AudioRepository _audioRepository = AudioRepository();
+  final VideoService _videoService = VideoService();
+  final AudioService _audioService = AudioService();
   final Map<String, AudioPlayer> _audioPlayers = {}; // Map to store audio players for each content
   final Map<String, bool> _audioLoadingStates = {}; // Map to track loading states for each content
   final Map<String, String?> _audioUrls = {}; // Map to store audio URLs for each content
@@ -80,7 +80,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
       return;
     }
     try {
-      final file = await _videoRepository.downloadVideoFile(videoContent.contentId!);
+      final file = await _videoService.downloadVideoFile(videoContent.contentId!);
 
       if (file != null && await file.exists()) {
         _videoController = VideoPlayerController.file(file)
@@ -180,9 +180,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
         return "Outro";
       case ResourceType.TIVA:
         return "TIVA";
-      default:
-        return type.toString().split('.').last;
-    }
+      }
   }
 
   @override
@@ -394,9 +392,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                       return "🗂️";
                     case ResourceType.TIVA:
                       return "🧠";
-                    default:
-                      return "❓";
-                  }
+                    }
                 }(),
                 style: const TextStyle(
                   fontSize: 18,
@@ -1045,7 +1041,7 @@ class _ResourceDetailPageState extends State<ResourceDetailPage> {
                         _audioLoadingStates[content.id] = true;
                       });
                       try {
-                        final audioFile = await _audioRepository.downloadAudioFile(content.contentId!);
+                        final audioFile = await _audioService.downloadAudioFile(content.contentId!);
                         if (audioFile != null) {
                           _audioUrls[content.id] = audioFile.path;
                           await audioPlayer.setSourceDeviceFile(audioFile.path);
