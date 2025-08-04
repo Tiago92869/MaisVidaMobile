@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                                   obscureText: !_isPasswordVisible,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: "Palavra-chave",
+                                    hintText: "Palavra-passe",
                                     hintStyle: TextStyle(
                                       color: Colors.grey[700],
                                     ),
@@ -262,6 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 18
                                 ),
                               ),
                             ),
@@ -297,6 +298,7 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 18,
                                 ),
                               ),
                             ),
@@ -316,9 +318,10 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           },
                           child: const Text(
-                            "Esqueceu-se da sua senha?",
+                            "Esqueceu-se da sua palavra-passe?",
                             style: TextStyle(
                               color: Color(0xFF557BE9),
+                              fontSize: 16,
                               decoration:
                                   TextDecoration
                                       .underline, // Underline to show it's clickable
