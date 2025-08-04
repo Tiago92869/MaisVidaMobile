@@ -21,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _login() async {
     setState(() {
@@ -217,12 +218,23 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: TextField(
                                   controller: _passwordController,
-                                  obscureText: true,
+                                  obscureText: !_isPasswordVisible,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Palavra-chave",
                                     hintStyle: TextStyle(
                                       color: Colors.grey[700],
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                        color: Colors.grey[700],
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isPasswordVisible = !_isPasswordVisible;
+                                        });
+                                      },
                                     ),
                                   ),
                                 ),

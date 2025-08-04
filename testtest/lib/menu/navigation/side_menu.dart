@@ -5,7 +5,7 @@ import 'package:mentara/menu/theme.dart';
 import 'dart:developer';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:mentara/services/user/user_service.dart'; // Import the log function
+import 'package:mentara/services/user/user_service.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({Key? key, required this.onMenuPress}) : super(key: key);
@@ -26,10 +26,23 @@ class _SideMenuState extends State<SideMenu> {
   String _userName = "Não encontrado";
   String _userEmail = "Não encontrado";
 
+  // Emoji mapping for menu items
+  final Map<String, String> _menuEmojiMap = {
+    'Menu': '🏠',
+    'Diário': '📝',
+    'Metas': '🎯',
+    'Medicamentos': '💊',
+    'Recursos': '📚',
+    'Atividades': '🏃‍♀️',
+    'Jornadas': '🗺️',
+    'Notificações': '🔔',
+    'SOS': '🚨',
+  };
+
   @override
   void initState() {
     super.initState();
-    _fetchUserData(); // Fetch user data when the menu is initialized
+    _fetchUserData();
   }
 
   Future<void> _fetchUserData() async {
@@ -74,7 +87,6 @@ class _SideMenuState extends State<SideMenu> {
 
   @override
   Widget build(BuildContext context) {
-    // Debug: Print all menu titles to check if Notificações and SOS are present
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top,
@@ -141,9 +153,9 @@ class _SideMenuState extends State<SideMenu> {
                     title: "Navegar",
                     selectedMenu: _selectedMenu,
                     menuIcons: _browseMenuIcons,
+                    menuEmojiMap: _menuEmojiMap,
                     onMenuPress: onMenuPress,
                   ),
-                  // Não há mais secções, tudo está em Navegar
                 ],
               ),
             ),
@@ -151,19 +163,17 @@ class _SideMenuState extends State<SideMenu> {
           const Divider(
             color: Colors.white54,
             thickness: 1,
-          ), // Divider before Logout
+          ),
           ListTile(
-            contentPadding: const EdgeInsets.only(
-              left: 28,
-            ), // Add padding to the left
+            contentPadding: const EdgeInsets.only(left: 28),
             leading: const Icon(
               Icons.logout,
               color: Colors.red,
-            ), // Set icon color to red
+            ),
             title: const Text(
               "Sair",
               style: TextStyle(
-                color: Colors.red, // Set text color to red
+                color: Colors.red,
                 fontSize: 16,
                 fontFamily: "Inter",
                 fontWeight: FontWeight.w600,
@@ -171,11 +181,8 @@ class _SideMenuState extends State<SideMenu> {
             ),
             onTap: () async {
               final userService = UserService();
-              await userService.logout(); // Call the logout method
-              Navigator.pushReplacementNamed(
-                context,
-                '/login',
-              ); // Redirect to login screen
+              await userService.logout();
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
@@ -189,6 +196,7 @@ class MenuButtonSection extends StatelessWidget {
     super.key,
     required this.title,
     required this.menuIcons,
+    required this.menuEmojiMap,
     this.selectedMenu = "Home",
     this.onMenuPress,
   });
@@ -196,26 +204,16 @@ class MenuButtonSection extends StatelessWidget {
   final String title;
   final String selectedMenu;
   final List<MenuItemModel> menuIcons;
+  final Map<String, String> menuEmojiMap;
   final Function(MenuItemModel menu)? onMenuPress;
 
   @override
   Widget build(BuildContext context) {
-    log(
-      'Building MenuButtonSection: $title',
-    ); // Log when a MenuButtonSection is built
-    if (onMenuPress == null) {
-      log('Warning: onMenuPress is null in MenuButtonSection: $title');
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 10,
-            bottom: 8,
-          ),
+          padding: const EdgeInsets.only(left: 24, right: 24, top: 10, bottom: 8),
           child: Text(
             title,
             style: TextStyle(
@@ -241,10 +239,10 @@ class MenuButtonSection extends StatelessWidget {
                 MenuRow(
                   menu: menu,
                   selectedMenu: selectedMenu,
+                  emoji: menuEmojiMap[menu.title] ?? '📋',
                   onMenuPress: () {
                     if (onMenuPress != null) {
                       onMenuPress!(menu);
-                    } else {
                     }
                   },
                 ),
@@ -256,4 +254,3 @@ class MenuButtonSection extends StatelessWidget {
     );
   }
 }
-

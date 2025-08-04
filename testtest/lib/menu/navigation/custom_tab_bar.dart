@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:mentara/menu/models/tab_item.dart';
 import 'package:mentara/menu/theme.dart';
-import 'package:mentara/menu/assets.dart' as app_assets;
 
 class CustomTabBar extends StatefulWidget {
   const CustomTabBar({Key? key, required this.onTabChange}) : super(key: key);
@@ -19,15 +17,14 @@ class _CustomTabBarState extends State<CustomTabBar> {
 
   int _selectedTab = 0;
 
-  void _onRiveIconInit(Artboard artboard, index) {
-    final controller = StateMachineController.fromArtboard(
-      artboard,
-      _icons[index].stateMachine,
-    );
-    artboard.addController(controller!);
-    
-    //_icons[index].status = controller.findInput<bool>("active") as SMIBool;
-  }
+  // Updated icon mapping to match your actual artboard names
+  final Map<String, IconData> _iconMap = {
+    'HOME': Icons.home,
+    'RULES': Icons.book,
+    'SEARCH': Icons.search,
+    'SCORE': Icons.emoji_events,
+    'USER': Icons.person,
+  };
 
   void onTabPress(int index) {
     if (_selectedTab != index) {
@@ -35,11 +32,6 @@ class _CustomTabBarState extends State<CustomTabBar> {
         _selectedTab = index;
       });
       widget.onTabChange(index);
-
-      _icons[index].status!.change(true);
-      Future.delayed(const Duration(seconds: 1), () {
-        _icons[index].status!.change(false);
-      });
     }
   }
 
@@ -60,7 +52,6 @@ class _CustomTabBarState extends State<CustomTabBar> {
           ),
         ),
         child: Container(
-          // Clip to avoid the tab touch outside the border radius area
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: RiveAppTheme.background2.withOpacity(0.8),
@@ -104,13 +95,12 @@ class _CustomTabBarState extends State<CustomTabBar> {
                         SizedBox(
                           height: 36,
                           width: 36,
-                          child: RiveAnimation.asset(
-                            app_assets.iconsRiv2,
-                            stateMachines: [icon.stateMachine],
-                            artboard: icon.artboard,
-                            onInit: (artboard) {
-                              _onRiveIconInit(artboard, index);
-                            },
+                          child: Icon(
+                            _iconMap[icon.artboard] ?? Icons.circle,
+                            color: _selectedTab == index
+                                ? RiveAppTheme.accentColor
+                                : Colors.white.withOpacity(0.7),
+                            size: 30,
                           ),
                         ),
                       ],
