@@ -325,36 +325,42 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               controller: scrollController,
                               physics: const AlwaysScrollableScrollPhysics(),
                               padding: const EdgeInsets.symmetric(horizontal: 20),
-                              itemCount: _resources.length,
+                              itemCount: _resources.length + 1,
                               itemBuilder: (context, index) {
-                                final resource = _resources[index];
-                                final backgroundColor =
-                                    _resourceColors[index % _resourceColors.length];
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      // Navigate to ResourceDetailPage and wait for the result
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ResourceDetailPage(resource: resource),
-                                        ),
-                                      );
+                                if (index < _resources.length) {
+                                  final resource = _resources[index];
+                                  final backgroundColor =
+                                      _resourceColors[index % _resourceColors.length];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        // Navigate to ResourceDetailPage and wait for the result
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ResourceDetailPage(resource: resource),
+                                          ),
+                                        );
 
-                                      // Refresh the resources list when returning
-                                      if (_isStarGlowing) {
-                                        // If the star icon is glowing, fetch favorite resources
-                                        await _fetchFavoriteResources();
-                                      } else {
-                                        // Otherwise, refresh the default resources list
-                                        _onSearch(_searchText);
-                                      }
-                                    },
-                                    child: _buildHCard(resource, backgroundColor),
-                                  ),
-                                );
+                                        // Refresh the resources list when returning
+                                        if (_isStarGlowing) {
+                                          // If the star icon is glowing, fetch favorite resources
+                                          await _fetchFavoriteResources();
+                                        } else {
+                                          // Otherwise, refresh the default resources list
+                                          _onSearch(_searchText);
+                                        }
+                                      },
+                                      child: _buildHCard(resource, backgroundColor),
+                                    ),
+                                  );
+                                } else {
+                                  return SizedBox(
+                                    height: 60,
+                                  );
+                                }
                               },
                             ),
                     ),
@@ -479,33 +485,63 @@ class _ResourcesPageState extends State<ResourcesPage> {
     );
   }
 
-  // Substitua o método _iconForResourceType pelo getResourceDisplayName para mostrar emoji+nome
-  String getResourceDisplayName(ResourceType type) {
+  // Get emoji for resource type
+  String _getResourceEmoji(ResourceType type) {
     switch (type) {
       case ResourceType.ARTICLE:
-        return "📖 Artigo";
+        return "📖";
       case ResourceType.VIDEO:
-        return "🎬 Vídeo";
+        return "🎬";
       case ResourceType.PODCAST:
-        return "🎧 Podcast";
+        return "🎧";
       case ResourceType.PHRASE:
-        return "💬 Frase";
+        return "💬";
       case ResourceType.CARE:
-        return "💚 Cuidado";
+        return "💚";
       case ResourceType.EXERCISE:
-        return "🏋️ Exercício";
+        return "🏋️";
       case ResourceType.RECIPE:
-        return "🍲 Receita";
+        return "🍲";
       case ResourceType.MUSIC:
-        return "🎵 Música";
+        return "🎵";
       case ResourceType.SOS:
-        return "🚨 Ajuda";
+        return "🚨";
       case ResourceType.OTHER:
-        return "🗂️ Outro";
+        return "🗂️";
       case ResourceType.TIVA:
-        return "🧠 Tiva";
+        return "🧠";
       default:
-        return "❓ Desconhecido";
+        return "❓";
+    }
+  }
+
+  // Get display name for resource type (without emoji)
+  String _getResourceDisplayName(ResourceType type) {
+    switch (type) {
+      case ResourceType.ARTICLE:
+        return "Artigo";
+      case ResourceType.VIDEO:
+        return "Vídeo";
+      case ResourceType.PODCAST:
+        return "Podcast";
+      case ResourceType.PHRASE:
+        return "Frase";
+      case ResourceType.CARE:
+        return "Cuidado";
+      case ResourceType.EXERCISE:
+        return "Exercício";
+      case ResourceType.RECIPE:
+        return "Receita";
+      case ResourceType.MUSIC:
+        return "Música";
+      case ResourceType.SOS:
+        return "Ajuda";
+      case ResourceType.OTHER:
+        return "Outro";
+      case ResourceType.TIVA:
+        return "Tiva";
+      default:
+        return "Desconhecido";
     }
   }
 
@@ -572,6 +608,9 @@ class _ResourcesPageState extends State<ResourcesPage> {
                           bool isSelected = _selectedResourceTypes.contains(
                             resourceType,
                           );
+                          String emoji = _getResourceEmoji(resourceType);
+                          String resourceDisplay = _getResourceDisplayName(resourceType);
+                          
                           return GestureDetector(
                             onTap: () => _toggleResourceType(resourceType),
                             child: AnimatedContainer(
@@ -604,16 +643,25 @@ class _ResourcesPageState extends State<ResourcesPage> {
                               ),
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               child: Center(
-                                child: Text(
-                                  getResourceDisplayName(resourceType),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : const Color(0xFF0D1B2A),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      emoji,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      resourceDisplay,
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : const Color(0xFF0D1B2A),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -667,46 +715,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
         ? '${resource.description.substring(0, maxDescriptionLength)}...'
         : resource.description;
 
-    // Emoji para cada tipo de recurso (incluindo TIVA)
-    String emoji;
-    switch (resource.type) {
-      case ResourceType.ARTICLE:
-        emoji = "📖";
-        break;
-      case ResourceType.VIDEO:
-        emoji = "🎬";
-        break;
-      case ResourceType.PODCAST:
-        emoji = "🎧";
-        break;
-      case ResourceType.PHRASE:
-        emoji = "💬";
-        break;
-      case ResourceType.CARE:
-        emoji = "💚";
-        break;
-      case ResourceType.EXERCISE:
-        emoji = "🏋️";
-        break;
-      case ResourceType.RECIPE:
-        emoji = "🍲";
-        break;
-      case ResourceType.MUSIC:
-        emoji = "🎵";
-        break;
-      case ResourceType.SOS:
-        emoji = "🚨";
-        break;
-      case ResourceType.OTHER:
-        emoji = "🗂️";
-        break;
-      case ResourceType.TIVA:
-        emoji = "🧠";
-        break;
-      default:
-        emoji = "❓";
-    }
-
     return Center(
       child: Container(
         width: 520, // aumenta a largura do card
@@ -755,14 +763,14 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          emoji,
+                          _getResourceEmoji(resource.type),
                           style: const TextStyle(
                             fontSize: 18,
                           ),
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          _translateResourceType(resource.type),
+                          _getResourceDisplayName(resource.type),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
