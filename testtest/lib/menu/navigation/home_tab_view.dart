@@ -512,7 +512,7 @@ class _HomeTabViewState extends State<HomeTabView> {
                   4, // Tab index for "Resources"
                 ),
                 _buildSection(
-                  "Medicamentos",
+                  "Medicação",
                   _medications,
                   _isLoadingMedications,
                   (medicine) {

@@ -1,4 +1,3 @@
-//asd
 class Config {
   static const String goalUrl = 'http://34.155.254.244:2221/api/starfish/goal';
   static const String diaryUrl =

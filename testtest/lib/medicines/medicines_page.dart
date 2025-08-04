@@ -329,7 +329,7 @@ class _MedicinesPageState extends State<MedicinesPage> {
         onRefresh: _fetchMedicines, // Pull-to-refresh functionality
         child: ListView.builder(
           controller: _scrollController, // Attach the ScrollController
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 80),
           itemCount: _medicines.length + (_isFetchingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == _medicines.length) {
@@ -547,39 +547,35 @@ class _MedicinesPageState extends State<MedicinesPage> {
             onTap: _closeFilterPanel,
             child: IgnorePointer(
               ignoring: _isFilterPanelVisible,
-              child: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: _showArchived ? 20 : 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Center(
-                        child: Text(
-                          _showArchived ? "Arquivados" : "Medicação",
-                          style: TextStyle(
-                            fontSize:
-                                _showArchived
-                                    ? 28
-                                    : 28, // Reduce font size for Archived Medicines
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Poppins",
-                            color: Colors.white,
-                          ),
-                        ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 60),
+                  // Title
+                  Center(
+                    child: Text(
+                      _showArchived ? "Arquivados" : "Medicação",
+                      style: TextStyle(
+                        fontSize:
+                            _showArchived
+                                ? 28
+                                : 28, // Reduce font size for Archived Medicines
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Poppins",
+                        color: Colors.white,
                       ),
-                      const SizedBox(height: 20),
-                      // Calendar
-                      _buildCalendar(weekDays),
-                      const SizedBox(height: 20),
-                      // Medicines List
-                      _buildMedicinesList(),
-                    ],
+                    ),
                   ),
-                ),
+                  SizedBox(height: 25),
+                  // Calendar
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: _buildCalendar(weekDays),
+                  ),
+                  SizedBox(height: 20),
+                  // Medicines List
+                  _buildMedicinesList(),
+                ],
               ),
             ),
           ),

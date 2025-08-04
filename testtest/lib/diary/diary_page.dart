@@ -257,14 +257,15 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ),
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 60),
+              // Header with title and icons - matching goals_page structure
+              Stack(
                 children: [
-                  const Center(
-                    child: Text(
+                  Center(
+                    child: const Text(
                       "Diário",
                       style: TextStyle(
                         fontSize: 28,
@@ -274,185 +275,260 @@ class _DiaryPageState extends State<DiaryPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: _goToPreviousDay,
-                      ),
-                      GestureDetector(
-                        onTap: _selectDate,
-                        child: Text(
-                          "${_selectedDate.toLocal().month}/${_selectedDate.toLocal().day}/${_selectedDate.toLocal().year}",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                  // Info icon on the left side
+                  Positioned(
+                    top: 0,
+                    left: 70,
+                    child: GestureDetector(
+                      onTap: _showInfoDialog,
+                      child: Container(
+                        width: 37,
+                        height: 37,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF0D1B2A),
+                            size: 24,
                           ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_forward,
+                    ),
+                  ),
+                  // Filter icon on the right
+                  if (!_isFilterPanelVisible)
+                    Positioned(
+                      top: 0,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: _toggleFilterPanel,
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 37,
+                                height: 37,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.filter_alt,
+                                  color: Color(0xFF0D1B2A),
+                                  size: 24,
+                                ),
+                              ),
+                              if (_selectedEmotions.isNotEmpty)
+                                Positioned(
+                                  top: 3,
+                                  right: 4,
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFF0D1B2A),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: _goToPreviousDay,
+                    ),
+                    GestureDetector(
+                      onTap: _selectDate,
+                      child: Text(
+                        "${_selectedDate.toLocal().month}/${_selectedDate.toLocal().day}/${_selectedDate.toLocal().year}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
-                        onPressed: _goToNextDay,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (ScrollNotification scrollInfo) {
-                        if (!_isLoading &&
-                            _hasMoreData &&
-                            scrollInfo.metrics.pixels ==
-                                scrollInfo.metrics.maxScrollExtent) {
-                          _fetchDiariesForSelectedDate(isScrolling: true);
-                        }
-                        return false;
-                      },
-                      child: RefreshIndicator(
-                        onRefresh: () => _fetchDiariesForSelectedDate(isScrolling: false),
-                        child: _hasError
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                      ),
+                      onPressed: _goToNextDay,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    if (!_isLoading &&
+                        _hasMoreData &&
+                        scrollInfo.metrics.pixels ==
+                            scrollInfo.metrics.maxScrollExtent) {
+                      _fetchDiariesForSelectedDate(isScrolling: true);
+                    }
+                    return false;
+                  },
+                  child: RefreshIndicator(
+                    onRefresh: () => _fetchDiariesForSelectedDate(isScrolling: false),
+                    child: _hasError
+                        ? const Center(
+                            child: Text(
+                              "Falha ao carregar os diários. Tente novamente.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          )
+                        : _diaryEntries.isEmpty
                             ? const Center(
                                 child: Text(
-                                  "Falha ao carregar os diários. Tente novamente.",
+                                  "Não há diários para este dia.",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.white70,
                                   ),
                                 ),
                               )
-                            : _diaryEntries.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      "Não há diários para este dia.",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.only(bottom: 60),
-                                    itemCount: _diaryEntries.length,
-                                    itemBuilder: (context, index) {
-                                      final entry = _diaryEntries[index];
-                                      return GestureDetector(
-                                        onTap: () async {
-                                          final result = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => DiaryDetailPage(
-                                                diary: entry,
-                                                createDiary: false,
-                                              ),
-                                            ),
-                                          );
-                                          if (result == true) {
-                                            _fetchDiariesForSelectedDate(isScrolling: false);
-                                          }
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(vertical: 8),
-                                          padding: const EdgeInsets.all(20),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
-                                            borderRadius: BorderRadius.circular(20),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
-                                                blurRadius: 5,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                entry.title,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                entry.description,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.white70,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 6,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white.withOpacity(0.2),
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      _getEmotionEmoji(entry.emotion),
-                                                      style: const TextStyle(fontSize: 18),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      () {
-                                                        switch (entry.emotion) {
-                                                          case DiaryType.Love:
-                                                            return "Amor";
-                                                          case DiaryType.Fantastic:
-                                                            return "Fantástico";
-                                                          case DiaryType.Happy:
-                                                            return "Feliz";
-                                                          case DiaryType.Neutral:
-                                                            return "Neutro";
-                                                          case DiaryType.Disappointed:
-                                                            return "Desapontado";
-                                                          case DiaryType.Sad:
-                                                            return "Triste";
-                                                          case DiaryType.Angry:
-                                                            return "Zangado";
-                                                          case DiaryType.Sick:
-                                                            return "Doente";
-                                                        }
-                                                      }(),
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
+                            : ListView.builder(
+                                padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 80),
+                                itemCount: _diaryEntries.length,
+                                itemBuilder: (context, index) {
+                                  final entry = _diaryEntries[index];
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DiaryDetailPage(
+                                            diary: entry,
+                                            createDiary: false,
                                           ),
                                         ),
                                       );
+                                      if (result == true) {
+                                        _fetchDiariesForSelectedDate(isScrolling: false);
+                                      }
                                     },
-                                  ),
-                      ),
-                    ),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 8),
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.8),
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color.fromARGB(255, 33, 70, 119).withOpacity(0.3),
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            entry.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            entry.description,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  _getEmotionEmoji(entry.emotion),
+                                                  style: const TextStyle(fontSize: 18),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  () {
+                                                    switch (entry.emotion) {
+                                                      case DiaryType.Love:
+                                                        return "Amor";
+                                                      case DiaryType.Fantastic:
+                                                        return "Fantástico";
+                                                      case DiaryType.Happy:
+                                                        return "Feliz";
+                                                      case DiaryType.Neutral:
+                                                        return "Neutro";
+                                                      case DiaryType.Disappointed:
+                                                        return "Desapontado";
+                                                      case DiaryType.Sad:
+                                                        return "Triste";
+                                                      case DiaryType.Angry:
+                                                        return "Zangado";
+                                                      case DiaryType.Sick:
+                                                        return "Doente";
+                                                    }
+                                                  }(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
           if (_isFilterPanelVisible)
             Positioned.fill(
@@ -618,108 +694,38 @@ class _DiaryPageState extends State<DiaryPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 60),
                   ],
                 ),
               ),
             ),
           if (!_isFilterPanelVisible)
             Positioned(
-              top: 58,
-              right: 20,
-              child: GestureDetector(
-                onTap: _toggleFilterPanel,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 5,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.filter_alt,
-                          color: Color(0xFF0D1B2A),
-                          size: 28,
+              bottom: 100,
+              right: _isFilterPanelVisible ? -80 : 20,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: _isFilterPanelVisible ? 0.0 : 1.0,
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DiaryDetailPage(
+                          diary: null,
+                          createDiary: true,
                         ),
                       ),
-                      if (_selectedEmotions.isNotEmpty)
-                        Positioned(
-                          top: 3,
-                          right: 4,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFF0D1B2A),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                    );
+                    if (result == true) {
+                      _fetchDiariesForSelectedDate(isScrolling: false);
+                    }
+                  },
+                  backgroundColor: Colors.white,
+                  child: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
                 ),
               ),
             ),
-          Positioned(
-            bottom: 100,
-            right: _isFilterPanelVisible ? -80 : 20,
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: _isFilterPanelVisible ? 0.0 : 1.0,
-              child: FloatingActionButton(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DiaryDetailPage(
-                        diary: null,
-                        createDiary: true,
-                      ),
-                    ),
-                  );
-                  if (result == true) {
-                    _fetchDiariesForSelectedDate(isScrolling: false);
-                  }
-                },
-                backgroundColor: Colors.white,
-                child: const Icon(Icons.add, color: Color(0xFF0D1B2A)),
-              ),
-            ),
-          ),
-          // Info icon on the left side (same position as in menu)
-          Positioned(
-            top: 58,
-            left: 70,
-            child: GestureDetector(
-              onTap: _showInfoDialog,
-              child: Container(
-                width: 37,
-                height: 37,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.info_outline,
-                    color: Color(0xFF0D1B2A),
-                    size: 24,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );

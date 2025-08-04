@@ -28,7 +28,7 @@ class MenuItemModel {
       ),
     ),
     MenuItemModel(
-      title: "Medicamentos",
+      title: "Medicação",
       riveIcon: TabItem(stateMachine: "CHAT_Interactivity", artboard: "CHAT"),
     ),
     MenuItemModel(

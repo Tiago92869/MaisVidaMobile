@@ -252,20 +252,113 @@ class _ResourcesPageState extends State<ResourcesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 60),
-                  const Center(
-                    child: Text(
-                      "Recursos",
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                  SizedBox(height: 60),
+                  // Header with title and icons - matching goals_page structure
+                  Stack(
+                    children: [
+                      Center(
+                        child: const Text(
+                          "Recursos",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Poppins",
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
+                      // Info icon on the left side
+                      Positioned(
+                        top: 0,
+                        left: 70,
+                        child: GestureDetector(
+                          onTap: _showInfoDialog,
+                          child: Container(
+                            width: 37,
+                            height: 37,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.info_outline,
+                                color: Color(0xFF0D1B2A),
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Star icon on the right
+                      Positioned(
+                        top: 0,
+                        right: 60,
+                        child: GestureDetector(
+                          onTap: () async {
+                            setState(() {
+                              _isStarGlowing = !_isStarGlowing;
+                            });
+
+                            if (_isStarGlowing) {
+                              await _fetchFavoriteResources();
+                            } else {
+                              setState(() {
+                                _resources.clear();
+                                _currentPage = 0;
+                                _isLastPage = false;
+                              });
+                              _fetchResources();
+                            }
+                          },
+                          child: Container(
+                            width: 37,
+                            height: 37,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.star,
+                              color: _isStarGlowing ? const Color.fromARGB(255, 255, 217, 0) : const Color(0xFF0D1B2A),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Filter icon
+                      Positioned(
+                        top: 0,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: _toggleFilterPanel,
+                          child: Container(
+                            width: 37,
+                            height: 37,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.filter_alt,
+                              color: Color(0xFF0D1B2A),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 40),
+                  SizedBox(height: 30),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: TextField(
                       onChanged: _onSearch,
                       decoration: InputDecoration(
@@ -299,8 +392,8 @@ class _ResourcesPageState extends State<ResourcesPage> {
                       style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Flexible(
+                  SizedBox(height: 20),
+                  Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {
                         setState(() {
@@ -324,43 +417,37 @@ class _ResourcesPageState extends State<ResourcesPage> {
                           : ListView.builder(
                               controller: scrollController,
                               physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              itemCount: _resources.length + 1,
+                              padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 80),
+                              itemCount: _resources.length,
                               itemBuilder: (context, index) {
-                                if (index < _resources.length) {
-                                  final resource = _resources[index];
-                                  final backgroundColor =
-                                      _resourceColors[index % _resourceColors.length];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        // Navigate to ResourceDetailPage and wait for the result
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ResourceDetailPage(resource: resource),
-                                          ),
-                                        );
+                                final resource = _resources[index];
+                                final backgroundColor =
+                                    _resourceColors[index % _resourceColors.length];
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      // Navigate to ResourceDetailPage and wait for the result
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ResourceDetailPage(resource: resource),
+                                        ),
+                                      );
 
-                                        // Refresh the resources list when returning
-                                        if (_isStarGlowing) {
-                                          // If the star icon is glowing, fetch favorite resources
-                                          await _fetchFavoriteResources();
-                                        } else {
-                                          // Otherwise, refresh the default resources list
-                                          _onSearch(_searchText);
-                                        }
-                                      },
-                                      child: _buildHCard(resource, backgroundColor),
-                                    ),
-                                  );
-                                } else {
-                                  return SizedBox(
-                                    height: 60,
-                                  );
-                                }
+                                      // Refresh the resources list when returning
+                                      if (_isStarGlowing) {
+                                        // If the star icon is glowing, fetch favorite resources
+                                        await _fetchFavoriteResources();
+                                      } else {
+                                        // Otherwise, refresh the default resources list
+                                        _onSearch(_searchText);
+                                      }
+                                    },
+                                    child: _buildHCard(resource, backgroundColor),
+                                  ),
+                                );
                               },
                             ),
                     ),
@@ -369,8 +456,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
               ),
             ),
           ),
-          // Filter Icon
-          _buildFilterIcon(),
           // Blur effect under the filter panel
           if (_isFilterPanelVisible)
             GestureDetector(
@@ -381,105 +466,6 @@ class _ResourcesPageState extends State<ResourcesPage> {
           _buildFilterPanel(),
           // Loading indicator in the center of the screen
           if (_isLoading) const Center(child: CircularProgressIndicator()),
-          // Info icon on the left side (same position as in menu)
-          Positioned(
-            top: 58,
-            left: 70,
-            child: GestureDetector(
-              onTap: _showInfoDialog,
-              child: Container(
-                width: 37,
-                height: 37,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.info_outline,
-                    color: Color(0xFF0D1B2A),
-                    size: 24,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterIcon() {
-    return Positioned(
-      top: 58,
-      right: 20,
-      child: Row(
-        children: [
-          // Star Icon
-          GestureDetector(
-            onTap: () async {
-              setState(() {
-                _isStarGlowing = !_isStarGlowing; // Toggle the star's glowing state
-              });
-
-              if (_isStarGlowing) {
-                // Fetch favorite resources when the star is glowing
-                await _fetchFavoriteResources();
-              } else {
-                // Reset the resources list using the existing fetch logic
-                setState(() {
-                  _resources.clear();
-                  _currentPage = 0;
-                  _isLastPage = false;
-                });
-                _fetchResources();
-              }
-            },
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                child: Icon(
-                  Icons.star,
-                  color: _isStarGlowing ? const Color.fromARGB(255, 255, 217, 0) : Colors.grey,
-                  size: 28,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          // Filter Icon
-          GestureDetector(
-            onTap: _toggleFilterPanel,
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.filter_alt,
-                  color: Color(0xFF0D1B2A), // Igual ao goals_page
-                  size: 28,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -671,41 +657,11 @@ class _ResourcesPageState extends State<ResourcesPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 60),
           ],
         ),
       ),
     );
-  }
-
-  // Função para traduzir tipos de recurso para português
-  String _translateResourceType(ResourceType type) {
-    switch (type) {
-      case ResourceType.ARTICLE:
-        return "Artigo";
-      case ResourceType.VIDEO:
-        return "Vídeo";
-      case ResourceType.PODCAST:
-        return "Podcast";
-      case ResourceType.PHRASE:
-        return "Frase";
-      case ResourceType.CARE:
-        return "Cuidado";
-      case ResourceType.EXERCISE:
-        return "Exercício";
-      case ResourceType.RECIPE:
-        return "Receita";
-      case ResourceType.MUSIC:
-        return "Música";
-      case ResourceType.SOS:
-        return "SOS";
-      case ResourceType.OTHER:
-        return "Outro";
-      case ResourceType.TIVA:
-        return "TIVA";
-      default:
-        return type.toString().split('.').last;
-    }
   }
 
   Widget _buildHCard(Resource resource, Color backgroundColor) {
@@ -715,77 +671,75 @@ class _ResourcesPageState extends State<ResourcesPage> {
         ? '${resource.description.substring(0, maxDescriptionLength)}...'
         : resource.description;
 
-    return Center(
-      child: Container(
-        width: 520, // aumenta a largura do card
-        constraints: const BoxConstraints(minHeight: 140), // altura mínima, cresce conforme necessário
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-        decoration: BoxDecoration(
-          color: backgroundColor.withOpacity(0.65), // reduz opacidade do fundo
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 5,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    resource.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+    return Container(
+      width: double.infinity, // Full width to reach the end of the page
+      constraints: const BoxConstraints(minHeight: 140), // altura mínima, cresce conforme necessário
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15), // Reduced horizontal padding
+      decoration: BoxDecoration(
+        color: backgroundColor.withOpacity(0.65), // reduz opacidade do fundo
+        borderRadius: BorderRadius.circular(25), // Slightly reduced border radius
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  resource.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    truncatedDescription,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  truncatedDescription,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _getResourceEmoji(resource.type),
-                          style: const TextStyle(
-                            fontSize: 18,
-                          ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getResourceEmoji(resource.type),
+                        style: const TextStyle(
+                          fontSize: 18,
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          _getResourceDisplayName(resource.type),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _getResourceDisplayName(resource.type),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(width: 24),
-          ],
-        ),
+          ),
+          const SizedBox(width: 15), // Reduced spacing
+        ],
       ),
     );
   }

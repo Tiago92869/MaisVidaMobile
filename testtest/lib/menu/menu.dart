@@ -353,7 +353,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   "Mais abaixo, pode consultar várias secções:\n"
                   "  - Atividades: As tarefas que pode fazer ao longo do dia.\n"
                   "  - Recursos: Ferramentas e informações úteis da aplicação.\n"
-                  "  - Medicamentos: Os medicamentos que deve tomar e respetivos horários.\n"
+                  "  - Medicação: Os medicamentos que deve tomar e respetivos horários.\n"
                   "  - Metas: Os seus objectivos e o progresso em cada um.\n"
                   "  - Diário: Um registo simples do que fez em cada dia.\n",
                   style: TextStyle(

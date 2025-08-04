@@ -32,7 +32,7 @@ class _SideMenuState extends State<SideMenu> {
     'Menu': '🏠',
     'Diário': '📝',
     'Metas': '🎯',
-    'Medicamentos': '💊',
+    'Medicação': '💊',
     'Recursos': '📑',
     'Atividades': '📖',
     'Jornadas': '🗺️',

@@ -298,13 +298,34 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 28,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                if (widget.createDiary || editMode) {
+                                  saveDiary();
+                                } else {
+                                  toggleEditMode();
+                                }
+                              },
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  widget.createDiary || editMode ? Icons.check : Icons.edit,
+                                  color: const Color(0xFF0D1B2A),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
                         TextField(
@@ -488,26 +509,6 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 58,
-            right: 30,
-            child: GestureDetector(
-              onTap: () {
-                if (widget.createDiary || editMode) {
-                  saveDiary();
-                } else {
-                  toggleEditMode();
-                }
-              },
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(
-                  widget.createDiary || editMode ? Icons.check : Icons.edit,
-                  color: const Color(0xFF0D1B2A),
                 ),
               ),
             ),

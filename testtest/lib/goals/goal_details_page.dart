@@ -262,15 +262,97 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 28,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                if (editMode) {
+                                  if (widget.createResource &&
+                                      (titleController.text.isEmpty ||
+                                          descriptionController.text.isEmpty ||
+                                          selectedDate == null ||
+                                          selectedSubject == null)) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          backgroundColor: const Color(0xFF0D1B2A),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          title: const Text(
+                                            "Campos ausentes",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          content: const Text(
+                                            "Por favor preencha todos os campos antes de guardar.",
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text(
+                                                "OK",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+                                  if (_isLoading) return;
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  try {
+                                    await _saveGoal();
+                                    if (widget.onSave != null) {
+                                      widget.onSave!();
+                                    }
+                                    Navigator.pop(context, true);
+                                  } finally {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  }
+                                } else {
+                                  setState(() {
+                                    editMode = true;
+                                  });
+                                }
+                              },
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: Icon(
+                                  editMode ? Icons.check : Icons.edit,
+                                  color: const Color(0xFF0D1B2A),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20),
                         TextField(
@@ -412,87 +494,6 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 58,
-            right: 30,
-            child: GestureDetector(
-              onTap: () async {
-                if (editMode) {
-                  if (widget.createResource &&
-                      (titleController.text.isEmpty ||
-                          descriptionController.text.isEmpty ||
-                          selectedDate == null ||
-                          selectedSubject == null)) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: const Color(0xFF0D1B2A),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          title: const Text(
-                            "Campos ausentes",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          content: const Text(
-                            "Por favor preencha todos os campos antes de guardar.",
-                            style: TextStyle(
-                              color: Colors.white70,
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                "OK",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                    return;
-                  }
-                  if (_isLoading) return;
-                  setState(() {
-                    _isLoading = true;
-                  });
-                  try {
-                    await _saveGoal();
-                    if (widget.onSave != null) {
-                      widget.onSave!();
-                    }
-                    Navigator.pop(context, true);
-                  } finally {
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  }
-                } else {
-                  setState(() {
-                    editMode = true;
-                  });
-                }
-              },
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(
-                  editMode ? Icons.check : Icons.edit,
-                  color: const Color(0xFF0D1B2A),
                 ),
               ),
             ),

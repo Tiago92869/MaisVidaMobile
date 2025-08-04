@@ -242,143 +242,137 @@ class _GoalsPageState extends State<GoalsPage> {
             onTap: _closeFilterPanel,
             child: IgnorePointer(
               ignoring: _isFilterPanelVisible,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 60),
+                  // Info icon at the left (same position as in menu)
+                  Stack(
                     children: [
-                      // Info icon at the left (same position as in menu)
-                      Stack(
-                        children: [
-                          Center(
-                            child: _buildTitle(),
+                      Center(
+                        child: _buildTitle(),
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 70,
+                        child: GestureDetector(
+                          onTap: _showInfoDialog,
+                          child: Container(
+                            width: 37,
+                            height: 37,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.info_outline,
+                                color: Color(0xFF0D1B2A),
+                                size: 24,
+                              ),
+                            ),
                           ),
-                          Positioned(
-                            top: 0,
-                            left: 60,
-                            child: GestureDetector(
-                              onTap: _showInfoDialog,
-                              child: Container(
-                                width: 37,
-                                height: 37,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
+                        ),
+                      ),
+                      // Toggle completed/por completar
+                      Positioned(
+                        top: 0,
+                        right: 60,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isCompleted = !_isCompleted;
+                            });
+                            if (_selectedDay != null) {
+                              _fetchGoalsForDay(_selectedDay!);
+                            } else {
+                              _fetchGoalsForWeek();
+                            }
+                          },
+                          child: Container(
+                            width: 37,
+                            height: 37,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _isCompleted ? Colors.green : Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 5),
                                 ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.info_outline,
+                              ],
+                            ),
+                            child: Icon(
+                              _isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+                              color: _isCompleted ? Colors.white : const Color(0xFF0D1B2A),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Filter
+                      Positioned(
+                        top: 0,
+                        right: 10,
+                        child: GestureDetector(
+                          onTap: _toggleFilterPanel,
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: 37,
+                                  height: 37,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.filter_alt,
                                     color: Color(0xFF0D1B2A),
                                     size: 24,
                                   ),
                                 ),
-                              ),
+                                if (_selectedSubjects.isNotEmpty)
+                                  Positioned(
+                                    top: 3,
+                                    right: 4,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xFF0D1B2A),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      _buildCalendar(weekDays),
-                      const SizedBox(height: 10),
-                      _buildGoalsList(),
                     ],
                   ),
-                ),
+                  SizedBox(height: 25),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: _buildCalendar(_getWeekDays(_currentWeekStart)),
+                  ),
+                  SizedBox(height: 20),
+                  _buildGoalsList(),
+                ],
               ),
             ),
           ),
           if (_isFilterPanelVisible) _buildBlurEffect(),
-          // Filtro e toggle de completadas
-          Positioned(
-            top: 58,
-            right: 20,
-            child: Row(
-              children: [
-                // Toggle completed/por completar
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isCompleted = !_isCompleted;
-                    });
-                    if (_selectedDay != null) {
-                      _fetchGoalsForDay(_selectedDay!);
-                    } else {
-                      _fetchGoalsForWeek();
-                    }
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    margin: const EdgeInsets.only(right: 10),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _isCompleted ? Colors.green : Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 5,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      _isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
-                      color: _isCompleted ? Colors.white : const Color(0xFF0D1B2A),
-                      size: 28,
-                    ),
-                  ),
-                ),
-                // Filtro
-                GestureDetector(
-                  onTap: _toggleFilterPanel,
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Stack(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 5,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.filter_alt,
-                            color: Color(0xFF0D1B2A),
-                            size: 28,
-                          ),
-                        ),
-                        if (_selectedSubjects.isNotEmpty)
-                          Positioned(
-                            top: 3,
-                            right: 4,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFF0D1B2A),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           // Move FAB before filter panel so the panel covers it
           Positioned(
             bottom: 10,
@@ -547,7 +541,7 @@ class _GoalsPageState extends State<GoalsPage> {
         },
         child: ListView.builder(
           controller: _scrollController, // Attach the ScrollController
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 180),
           itemCount: _goals.length + (_isFetchingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == _goals.length) {
@@ -932,4 +926,5 @@ String getSubjectDisplayName(GoalSubject subject) {
     );
   }
 }
+
 
