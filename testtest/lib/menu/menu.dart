@@ -245,14 +245,22 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       context: context,
       builder: (context) {
         return Dialog(
+          backgroundColor: RiveAppTheme.background2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 31, 68, 143), // Use the specified background color
+              color: const Color(0xFF9CC5FF).withOpacity(0.8),
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF9CC5FF).withOpacity(0.3),
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -267,23 +275,29 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 20),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Display two images side by side
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
+                  child: ScrollShadow(
+                    color: Colors.white.withOpacity(0.3),
+                    size: 15.0,
+                    fadeInCurve: Curves.easeIn,
+                    fadeOutCurve: Curves.easeOut,
+                    child: SingleChildScrollView(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Display two images side by side
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: images.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final base64Image = images[index].data.split(',').last;
+                          return Image.memory(
+                            base64Decode(base64Image),
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
-                      itemCount: images.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final base64Image = images[index].data.split(',').last;
-                        return Image.memory(
-                          base64Decode(base64Image),
-                          fit: BoxFit.cover,
-                        );
-                      },
                     ),
                   ),
                 ),
