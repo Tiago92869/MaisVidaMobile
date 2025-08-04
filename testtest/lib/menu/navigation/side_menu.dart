@@ -35,7 +35,7 @@ class _SideMenuState extends State<SideMenu> {
     'Medicação': '💊',
     'Recursos': '📑',
     'Atividades': '📖',
-    'Jornadas': '🗺️',
+    'Jornadas': '✨',
     'Notificações': '🔔',
     'SOS': '🚨',
   };
@@ -156,7 +156,6 @@ class _SideMenuState extends State<SideMenu> {
                 child: Column(
                   children: [
                     MenuButtonSection(
-                      title: "Navegar",
                       selectedMenu: _selectedMenu,
                       menuIcons: _browseMenuIcons,
                       menuEmojiMap: _menuEmojiMap,
@@ -202,14 +201,12 @@ class _SideMenuState extends State<SideMenu> {
 class MenuButtonSection extends StatelessWidget {
   const MenuButtonSection({
     super.key,
-    required this.title,
     required this.menuIcons,
     required this.menuEmojiMap,
     this.selectedMenu = "Home",
     this.onMenuPress,
   });
 
-  final String title;
   final String selectedMenu;
   final List<MenuItemModel> menuIcons;
   final Map<String, String> menuEmojiMap;
@@ -220,20 +217,8 @@ class MenuButtonSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 24, right: 24, top: 10, bottom: 8),
-          child: Text(
-            title,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
-              fontSize: 15,
-              fontFamily: "Inter",
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
         Container(
-          margin: const EdgeInsets.fromLTRB(8, 0, 8, 0), // Remove bottom margin
+          margin: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: Column(
             children: [
               for (var menu in menuIcons) ...[
@@ -248,6 +233,7 @@ class MenuButtonSection extends StatelessWidget {
                   menu: menu,
                   selectedMenu: selectedMenu,
                   emoji: menuEmojiMap[menu.title] ?? '📋',
+                  isHighlighted: menu.title == 'Jornadas',
                   onMenuPress: () {
                     if (onMenuPress != null) {
                       onMenuPress!(menu);
