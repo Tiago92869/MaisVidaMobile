@@ -292,153 +292,155 @@ void _showLaunchError() {
               ),
             ),
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Detalhes SOS",
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 60),
+              const SizedBox(height: 20),
+              const Text(
+                "Detalhes SOS",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _makePhoneCall("+351808242424"),
+                      child: _buildEmergencyBox(
+                        "Emergência médica",
+                        Colors.redAccent,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        final emergencyContact =
+                            await _fetchEmergencyContact();
+                        _makePhoneCall(emergencyContact);
+                      },
+                      child: _buildEmergencyBox(
+                        "Contacto de emergência",
+                        Colors.orangeAccent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 25),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Recursos de emergência",
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      GestureDetector(
-                        onTap: () => _makePhoneCall("+351808242424"),
-                        child: _buildEmergencyBox(
-                          "Emergência médica",
-                          Colors.redAccent,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          final emergencyContact =
-                              await _fetchEmergencyContact();
-                          _makePhoneCall(emergencyContact);
-                        },
-                        child: _buildEmergencyBox(
-                          "Contacto de emergência",
-                          Colors.orangeAccent,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Recursos de emergência",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        _currentPage = 0;
-                        _isLastPage = false;
-                        await _fetchSosResources();
-                      },
-                      child:
-                          _isLoading && _sosResources.isEmpty
-                              ? const Center(child: CircularProgressIndicator())
-                              : _errorMessage != null
-                              ? Center(
-                                child: Text(
-                                  _errorMessage!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              )
-                              : ListView.builder(
-                                controller: _scrollController,
-                                padding: const EdgeInsets.only(bottom: 30),
-                                itemCount:
-                                    _sosResources.length + (_isLoading ? 1 : 0),
-                                itemBuilder: (context, index) {
-                                  if (index < _sosResources.length) {
-                                    final resource = _sosResources[index];
-                                    return GestureDetector(
-                                      onTap:
-                                          () => _navigateToResourceDetail(
-                                            context,
-                                            resource,
-                                          ),
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                        padding: const EdgeInsets.all(15),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF2C3E50),
-                                          borderRadius: BorderRadius.circular(
-                                            15,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.3,
-                                              ),
-                                              blurRadius: 10,
-                                              offset: const Offset(0, 5),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            const Text(
-                                              '🚨',
-                                              style: TextStyle(
-                                                fontSize: 32,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 15),
-                                            Expanded(
-                                              child: Text(
-                                                resource.title ?? "Sem título",
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return const Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(20),
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    _currentPage = 0;
+                    _isLastPage = false;
+                    await _fetchSosResources();
+                  },
+                  child:
+                      _isLoading && _sosResources.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : _errorMessage != null
+                          ? Center(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                          : ListView.builder(
+                            controller: _scrollController,
+                            padding: EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 80),
+                            itemCount:
+                                _sosResources.length + (_isLoading ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index < _sosResources.length) {
+                                final resource = _sosResources[index];
+                                return GestureDetector(
+                                  onTap:
+                                      () => _navigateToResourceDetail(
+                                        context,
+                                        resource,
+                                      ),
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    padding: const EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF2C3E50),
+                                      borderRadius: BorderRadius.circular(
+                                        15,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(
+                                            0.3,
+                                          ),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          '🚨',
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 15),
+                                        Expanded(
+                                          child: Text(
+                                            resource.title ?? "Sem título",
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(20),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                ),
+              ),
+            ],
           ),
           // Info icon moved to the right side
           Positioned(
