@@ -1001,7 +1001,7 @@ String _getSubjectDisplayName(GoalSubject subject) {
     case GoalSubject.Work:
       return "💼 Trabalho";
     case GoalSubject.Studies:
-      return "📚 Estudos";
+      return "📑 Estudos";
     case GoalSubject.Family:
       return "👪 Família";
   }
