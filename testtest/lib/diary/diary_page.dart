@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/services/diary/diary_service.dart';
-import 'package:mentara/services/diary/diary_model.dart';
+import 'package:maisvida/services/diary/diary_service.dart';
+import 'package:maisvida/services/diary/diary_model.dart';
 import 'diary_detail_page.dart';
 
 class DiaryPage extends StatefulWidget {

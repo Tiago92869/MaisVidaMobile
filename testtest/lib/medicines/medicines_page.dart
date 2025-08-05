@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/services/medicine/medicine_model.dart';
-import 'package:mentara/services/medicine/medicine_service.dart';
+import 'package:maisvida/services/medicine/medicine_model.dart';
+import 'package:maisvida/services/medicine/medicine_service.dart';
 
 import 'medicine_detail_page.dart';
 

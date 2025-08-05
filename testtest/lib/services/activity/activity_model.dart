@@ -1,5 +1,5 @@
-import 'package:mentara/services/favorite/favorite_model.dart';
-import 'package:mentara/services/resource/resource_model.dart';
+import 'package:maisvida/services/favorite/favorite_model.dart';
+import 'package:maisvida/services/resource/resource_model.dart';
 
 class ActivityPage {
   final int totalElements;

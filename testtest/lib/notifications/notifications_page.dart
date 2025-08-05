@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/services/notification/notification_service.dart';
-import 'package:mentara/services/notification/notification_model.dart';
+import 'package:maisvida/services/notification/notification_service.dart';
+import 'package:maisvida/services/notification/notification_model.dart';
 import 'notification_details_page.dart';
 import 'dart:async';
 

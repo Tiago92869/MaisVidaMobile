@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mentara/services/image/image_model.dart';
-import 'package:mentara/config/config.dart';
+import 'package:maisvida/services/image/image_model.dart';
+import 'package:maisvida/config/config.dart';
 
 const Duration _timeoutDuration = Duration(seconds: 10);
 

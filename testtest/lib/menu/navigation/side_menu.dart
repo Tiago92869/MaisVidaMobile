@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/menu/components/menu_row.dart';
-import 'package:mentara/menu/models/menu_item.dart';
-import 'package:mentara/menu/theme.dart';
+import 'package:maisvida/menu/components/menu_row.dart';
+import 'package:maisvida/menu/models/menu_item.dart';
+import 'package:maisvida/menu/theme.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
 
-import 'package:mentara/services/user/user_service.dart';
+import 'package:maisvida/services/user/user_service.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({Key? key, required this.onMenuPress}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/services/journey/journey_model.dart';
-import 'package:mentara/journey/journey_feeling.dart';
-import 'package:mentara/services/image/image_service.dart';
+import 'package:maisvida/services/journey/journey_model.dart';
+import 'package:maisvida/journey/journey_feeling.dart';
+import 'package:maisvida/services/image/image_service.dart';
 import 'dart:convert';
 import 'dart:ui'; // For BackdropFilter
 

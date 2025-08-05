@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/resources/resource_detail_page.dart';
-import 'package:mentara/services/resource/resource_service.dart';
-import 'package:mentara/services/resource/resource_model.dart';
+import 'package:maisvida/resources/resource_detail_page.dart';
+import 'package:maisvida/services/resource/resource_service.dart';
+import 'package:maisvida/services/resource/resource_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io' show Platform;

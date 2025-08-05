@@ -1,6 +1,6 @@
 // reset_password_page.dart
 import 'package:flutter/material.dart';
-import 'package:mentara/services/user/user_service.dart';
+import 'package:maisvida/services/user/user_service.dart';
 import 'login_page.dart'; // Import the Login Page
 
 class ResetPasswordPage extends StatelessWidget {
@@ -165,6 +165,7 @@ class ResetPasswordPage extends StatelessWidget {
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/services/notification/notification_model.dart';
+import 'package:maisvida/services/notification/notification_model.dart';
 import 'dart:math'; // Import for randomization
 
 class NotificationDetailsPage extends StatefulWidget {

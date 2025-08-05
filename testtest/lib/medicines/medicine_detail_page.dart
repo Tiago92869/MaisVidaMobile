@@ -1,7 +1,7 @@
 import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
-import 'package:mentara/services/medicine/medicine_model.dart'; // Import the models
-import 'package:mentara/services/medicine/medicine_service.dart'; // Import the service
+import 'package:maisvida/services/medicine/medicine_model.dart'; // Import the models
+import 'package:maisvida/services/medicine/medicine_service.dart'; // Import the service
 
 class MedicineDetailPage extends StatefulWidget {
   final Medicine? medicine; // Use the Medicine model

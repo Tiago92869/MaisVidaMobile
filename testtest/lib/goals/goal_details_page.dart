@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/services/goal/goal_service.dart';
-import 'package:mentara/services/goal/goal_model.dart';
+import 'package:maisvida/services/goal/goal_service.dart';
+import 'package:maisvida/services/goal/goal_model.dart';
 
 class GoalDetailPage extends StatefulWidget {
   final GoalInfoCard? goal;

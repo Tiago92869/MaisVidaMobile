@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/services/feedback/feedback_model.dart' as feedback_model;
-import 'package:mentara/services/feedback/feedback_service.dart';
+import 'package:maisvida/services/feedback/feedback_model.dart' as feedback_model;
+import 'package:maisvida/services/feedback/feedback_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mentara/services/journey/journey_model.dart';
-import 'package:mentara/services/journey/journey_service.dart';
+import 'package:maisvida/services/journey/journey_model.dart';
+import 'package:maisvida/services/journey/journey_service.dart';
 
 class ResourceFeedbackPage extends StatefulWidget {
   final String resourceId;

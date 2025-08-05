@@ -1,7 +1,7 @@
 // create_account_page.dart
 import 'package:flutter/material.dart';
-import 'package:mentara/services/user/user_service.dart';
-import 'package:mentara/services/user/user_model.dart';
+import 'package:maisvida/services/user/user_service.dart';
+import 'package:maisvida/services/user/user_model.dart';
 
 class CreateAccountPage extends StatefulWidget {
   @override
@@ -308,6 +308,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
         ),

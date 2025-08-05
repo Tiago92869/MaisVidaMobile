@@ -1,10 +1,10 @@
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/services/favorite/favorite_service.dart';
-import 'package:mentara/services/resource/resource_service.dart';
-import 'package:mentara/services/resource/resource_model.dart';
-import 'package:mentara/resources/resource_detail_page.dart';
+import 'package:maisvida/services/favorite/favorite_service.dart';
+import 'package:maisvida/services/resource/resource_service.dart';
+import 'package:maisvida/services/resource/resource_model.dart';
+import 'package:maisvida/resources/resource_detail_page.dart';
 
 class ResourcesPage extends StatefulWidget {
   const ResourcesPage({Key? key}) : super(key: key);

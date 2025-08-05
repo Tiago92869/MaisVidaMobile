@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:mentara/services/user/user_service.dart';
-import 'package:mentara/services/user/user_model.dart';
-import 'package:mentara/login/login_page.dart';
+import 'package:maisvida/services/user/user_service.dart';
+import 'package:maisvida/services/user/user_model.dart';
+import 'package:maisvida/login/login_page.dart';
 
 
 class ChangePasswordPage extends StatefulWidget {

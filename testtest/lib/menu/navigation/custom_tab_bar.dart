@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mentara/menu/models/tab_item.dart';
-import 'package:mentara/menu/theme.dart';
+import 'package:maisvida/menu/models/tab_item.dart';
+import 'package:maisvida/menu/theme.dart';
 
 class CustomTabBar extends StatefulWidget {
   const CustomTabBar({Key? key, required this.onTabChange}) : super(key: key);

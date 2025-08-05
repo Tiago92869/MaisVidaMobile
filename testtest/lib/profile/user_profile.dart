@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/menu/theme.dart';
-import 'package:mentara/profile/change_password.dart';
-import 'package:mentara/services/user/user_service.dart';
-import 'package:mentara/services/user/user_model.dart';
+import 'package:maisvida/menu/theme.dart';
+import 'package:maisvida/profile/change_password.dart';
+import 'package:maisvida/services/user/user_service.dart';
+import 'package:maisvida/services/user/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 

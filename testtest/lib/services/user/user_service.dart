@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mentara/services/user/user_model.dart';
-import 'package:mentara/config/config.dart';
+import 'package:maisvida/services/user/user_model.dart';
+import 'package:maisvida/config/config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart'; // Import the jwt_decoder package
 

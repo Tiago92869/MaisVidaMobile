@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 // Import for Random
-import 'package:mentara/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
-import 'package:mentara/resources/resource_detail_page.dart';
-import 'package:mentara/services/resource/resource_service.dart';
-import 'package:mentara/services/image/image_service.dart'; // Import for ImageService
+import 'package:maisvida/services/journey/journey_model.dart'; // Import for UserJourneyResourceProgress
+import 'package:maisvida/resources/resource_detail_page.dart';
+import 'package:maisvida/services/resource/resource_service.dart';
+import 'package:maisvida/services/image/image_service.dart'; // Import for ImageService
 import 'dart:convert'; // Import for base64Decode
 
 class JourneyFeelingPage extends StatefulWidget {

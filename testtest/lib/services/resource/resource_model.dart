@@ -1,4 +1,4 @@
-import 'package:mentara/services/favorite/favorite_model.dart';
+import 'package:maisvida/services/favorite/favorite_model.dart';
 
 enum ResourceType {
   ARTICLE,

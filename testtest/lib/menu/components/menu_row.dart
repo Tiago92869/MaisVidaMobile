@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/menu/models/menu_item.dart';
+import 'package:maisvida/menu/models/menu_item.dart';
 
 class MenuRow extends StatelessWidget {
   const MenuRow({

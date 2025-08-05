@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'package:mentara/config/config.dart';
-import 'package:mentara/services/activity/activity_model.dart';
-import 'package:mentara/services/favorite/favorite_model.dart';
+import 'package:maisvida/config/config.dart';
+import 'package:maisvida/services/activity/activity_model.dart';
+import 'package:maisvida/services/favorite/favorite_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mentara/services/resource/resource_model.dart';
+import 'package:maisvida/services/resource/resource_model.dart';
 
 const Duration _timeoutDuration = Duration(seconds: 10);
 

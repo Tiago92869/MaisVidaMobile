@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/goals/goal_details_page.dart';
-import 'package:mentara/services/goal/goal_service.dart';
-import 'package:mentara/services/goal/goal_model.dart';
+import 'package:maisvida/goals/goal_details_page.dart';
+import 'package:maisvida/services/goal/goal_service.dart';
+import 'package:maisvida/services/goal/goal_model.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({Key? key}) : super(key: key);

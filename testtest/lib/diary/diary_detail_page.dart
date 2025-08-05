@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/services/diary/diary_model.dart';
-import 'package:mentara/services/diary/diary_service.dart';
+import 'package:maisvida/services/diary/diary_model.dart';
+import 'package:maisvida/services/diary/diary_service.dart';
 
 class DiaryDetailPage extends StatefulWidget {
   final Diary? diary;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/services/journey/journey_service.dart';
-import 'package:mentara/services/journey/journey_model.dart';
+import 'package:maisvida/services/journey/journey_service.dart';
+import 'package:maisvida/services/journey/journey_model.dart';
 import 'journey_detail_page.dart';
 
 class JourneyPage extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mentara/menu/menu.dart';
+import 'package:maisvida/menu/menu.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);

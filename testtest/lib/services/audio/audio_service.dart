@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'audio_model.dart';
-import 'package:mentara/config/config.dart' as configg;
+import 'package:maisvida/config/config.dart' as configg;
 
 const Duration _timeoutDuration = Duration(seconds: 10);
 

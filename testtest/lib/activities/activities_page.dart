@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/services/activity/activity_service.dart';
-import 'package:mentara/services/activity/activity_model.dart';
-import 'package:mentara/services/favorite/favorite_service.dart';
+import 'package:maisvida/services/activity/activity_service.dart';
+import 'package:maisvida/services/activity/activity_model.dart';
+import 'package:maisvida/services/favorite/favorite_service.dart';
 import 'activity_details_page.dart';
 
 class ActivitiesPage extends StatefulWidget {

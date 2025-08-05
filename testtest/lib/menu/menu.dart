@@ -5,24 +5,24 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart' as rive hide LinearGradient;
 import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
-import 'package:mentara/activities/activities_page.dart';
-import 'package:mentara/diary/diary_page.dart';
-import 'package:mentara/goals/goals_page.dart';
-import 'package:mentara/medicines/medicines_page.dart';
-import 'package:mentara/menu/models/menu_item.dart';
+import 'package:maisvida/activities/activities_page.dart';
+import 'package:maisvida/diary/diary_page.dart';
+import 'package:maisvida/goals/goals_page.dart';
+import 'package:maisvida/medicines/medicines_page.dart';
+import 'package:maisvida/menu/models/menu_item.dart';
 import 'dart:math' as math;
-import 'package:mentara/menu/navigation/custom_tab_bar.dart';
-import 'package:mentara/menu/navigation/home_tab_view.dart';
-import 'package:mentara/menu/navigation/side_menu.dart';
-import 'package:mentara/notifications/notifications_page.dart';
-import 'package:mentara/resources/resources_page.dart';
-import 'package:mentara/sos/sos_details_page.dart';
-import 'package:mentara/menu/theme.dart';
-import 'package:mentara/menu/assets.dart' as app_assets;
-import 'package:mentara/profile/user_profile.dart'; // Import the user_profile.dart
-import 'package:mentara/journey/journey_page.dart';
-import 'package:mentara/services/user/user_service.dart'; // Import UserService
-import 'package:mentara/services/user/user_model.dart'; // Import UserModel
+import 'package:maisvida/menu/navigation/custom_tab_bar.dart';
+import 'package:maisvida/menu/navigation/home_tab_view.dart';
+import 'package:maisvida/menu/navigation/side_menu.dart';
+import 'package:maisvida/notifications/notifications_page.dart';
+import 'package:maisvida/resources/resources_page.dart';
+import 'package:maisvida/sos/sos_details_page.dart';
+import 'package:maisvida/menu/theme.dart';
+import 'package:maisvida/menu/assets.dart' as app_assets;
+import 'package:maisvida/profile/user_profile.dart'; // Import the user_profile.dart
+import 'package:maisvida/journey/journey_page.dart';
+import 'package:maisvida/services/user/user_service.dart'; // Import UserService
+import 'package:maisvida/services/user/user_model.dart'; // Import UserModel
 
 // Common Tab Scene for the tabs other than 1st one, showing only tab name in center
 Widget commonTabScene(String tabName) {
