@@ -61,14 +61,14 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Palavra-passe atualizada com sucesso! Faça login novamente."),
+          content: Text("Palavra-passe alterada com sucesso! Faça login novamente."),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Falha ao atualizar a palavra-passe: $e"),
+          content: Text("Falha ao alterar a palavra-passe: $e"),
           backgroundColor: Colors.red,
         ),
       );
@@ -143,7 +143,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   const SizedBox(height: 20),
                   const Center(
                     child: Text(
-                      "Atualizar palavra-passe",
+                      "Alterar palavra-passe",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -178,7 +178,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         ),
                       ),
                       child: const Text(
-                        "Atualizar palavra-passe",
+                        "Alterar palavra-passe",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

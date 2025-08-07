@@ -21,7 +21,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
   final Map<String, String> _emojiMap = {
     'HOME': '🏠',
     'RULES': '📝',
-    'SEARCH': '📚',
+    'SEARCH': '📑',
     'SCORE': '🎯',
     'USER': '👤',
   };
